@@ -36,36 +36,80 @@ static void HelpMarker ( const char *desc ) {
 
 void engine::MenuLayout( bool* p_open ) {
 	ImGui::SetNextWindowSize(ImVec2(500, 440), ImGuiCond_FirstUseEver);
-	if (ImGui::Begin("Menu layout", p_open, ImGuiWindowFlags_MenuBar)) {
-		// IMGUI_DEMO_MARKER("Examples/Simple layout");
+
+
+
+	auto windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar;
+	if ( ImGui::Begin( "Menu layout", p_open, windowFlags ) ) {
+
+		// I'd like to have a reason to have a menu
 		if (ImGui::BeginMenuBar()) {
 			if (ImGui::BeginMenu("File")) {
 				if (ImGui::MenuItem("Close")) *p_open = false;
 					ImGui::EndMenu();
-				}
-				ImGui::EndMenuBar();
 			}
+			ImGui::EndMenuBar();
+		}
 
-			// Left Side
-			static int selected = 0;
-			{
-				ImGui::BeginChild("left pane", ImVec2(150, 0), true);
-				for (int i = 0; i < 100; i++) {
-					// FIXME: Good candidate to use ImGuiSelectableFlags_SelectOnNav
-					char label[128];
-					sprintf(label, "MyObject %d", i);
-					if (ImGui::Selectable(label, selected == i))
-						selected = i;
+		// Left Side
+		static int currentlySelected = 0;
+		{
+			ImGui::BeginChild( "TreeView", ImVec2( 185, 0 ), true );
+
+			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_None;
+			int current = 0;
+
+			char label[ 128 ];
+			if (ImGui::CollapsingHeader( "Shapes", flags )) {
+				for ( int i = 0; i < 10; i++ ) {
+					sprintf(label, "  MyObject %d", current);
+					if (ImGui::Selectable(label, currentlySelected == current))
+						currentlySelected = current;
+					current++;
 				}
-				ImGui::EndChild();
 			}
+			current = 10;
+
+			if (ImGui::CollapsingHeader( "Utilities", flags )) {
+				for ( int i = 0; i < 10; i++ ) {
+					sprintf(label, "  MyObject %d", current);
+					if (ImGui::Selectable(label, currentlySelected == current))
+						currentlySelected = current;
+					current++;
+				}
+			}
+			current = 20;
+
+			if (ImGui::CollapsingHeader( "Lighting", flags )) {
+				for ( int i = 0; i < 10; i++ ) {
+					sprintf(label, "  MyObject %d", current);
+					if (ImGui::Selectable(label, currentlySelected == current))
+						currentlySelected = current;
+					current++;
+				}
+			}
+			current = 30;
+
+			// want to handle this differently, maybe - or break up the settings into multiple sections and then I wouldn't have to - render settings, then something else? not sure
+			if (ImGui::CollapsingHeader( "Settings", flags )) {
+				for ( int i = 0; i < 10; i++ ) {
+					sprintf(label, "  MyObject %d", current);
+					if (ImGui::Selectable(label, currentlySelected == current))
+						currentlySelected = current;
+					current++;
+				}
+			}
+			current = 40;
+
+			ImGui::EndChild();
+		}
 		ImGui::SameLine();
 
 	// Right Side
 		{
 			ImGui::BeginGroup();
-			ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
-			ImGui::Text("MyObject: %d", selected);
+			ImGui::BeginChild("Contents", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+			ImGui::Text("MyObject: %d", currentlySelected);
 			ImGui::Separator();
 			if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None)) {
 				if (ImGui::BeginTabItem("Description")) {
@@ -83,8 +127,8 @@ void engine::MenuLayout( bool* p_open ) {
 			ImGui::SameLine();
 			if (ImGui::Button("Save")) {}
 			ImGui::EndGroup();
-			}
 		}
+	}
 	ImGui::End();
 }
 
@@ -124,6 +168,8 @@ void engine::DrawTextEditor () {
 	ImGui::End();
 }
 
+
+// this will eventually move to the settings section of the main menu
 void engine::TonemapControlsWindow () {
 	ImGui::Begin( "Tonemapping Controls", NULL, 0 );
 
@@ -146,9 +192,9 @@ void engine::TonemapControlsWindow () {
 		"jodieReinhard",
 		"jodieReinhard2"
 	};
-	ImGui::Combo("Tonemapping Mode", &tonemap.tonemapMode, tonemapModesList, IM_ARRAYSIZE( tonemapModesList ) );
+	ImGui::Combo( "Tonemapping Mode", &tonemap.tonemapMode, tonemapModesList, IM_ARRAYSIZE( tonemapModesList ) );
 	ImGui::SliderFloat( "Gamma", &tonemap.gamma, 0.0f, 3.0f );
-	ImGui::SliderFloat( "Color Temperature", &tonemap.colorTemp, 1000.0f, 40000.0f );
+	ImGui::SliderFloat( "Color Temperature", &tonemap.colorTemp, 1000.0f, 40000.0f, "%.2f", ImGuiSliderFlags_Logarithmic );
 
 	ImGui::End();
 }
