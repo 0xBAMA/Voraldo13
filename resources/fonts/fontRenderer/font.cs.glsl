@@ -8,7 +8,8 @@ ivec2 getCurrentGlyphBase( int index ) {
 	// 16x16 array of glyphs, each of which is 8x16 pixels
 	ivec2 location;
 	location.x = 8 * ( index % 16 );
-	location.y = 239 - 16 * ( index / 16 );
+	// location.y = 239 - 16 * ( index / 16 );
+	location.y = 240 - 16 * ( index / 16 );
 	return location;
 }
 
@@ -19,7 +20,7 @@ void main () {
 	// which glyph ID/character color to pull dataTexture
 	ivec2 bin = ivec2( invokeLoc.x / 8, invokeLoc.y / 16 );
 	// where to reference the fontAtlas' glyph ( uv ), for the given character ID
-	ivec2 loc = ivec2( invokeLoc.x % 8, invokeLoc.y % 16);
+	ivec2 loc = ivec2( invokeLoc.x % 8, invokeLoc.y % 16 );
 
 	// figure out which glyph is being used by reading the data texture ( +its color )
 	uvec4 dataTexRead = imageLoad( dataTexture, bin );
