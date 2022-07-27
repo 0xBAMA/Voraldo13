@@ -142,6 +142,11 @@ void engine::ComputeShaderCompile () {
 
 	// tonemapping shader
 	tonemapShader = CShader( "resources/engineCode/shaders/tonemap.cs.glsl" ).Program;
+
+	// orientTrident shaders
+	GLuint orientTridentGen = CShader( "resources/engineCode/shaders/tridentGenerate.cs.glsl" ).Program;
+	GLuint orientTridentCopy = CShader( "resources/engineCode/shaders/tridentCopy.cs.glsl" ).Program;
+	trident.PassInShaders( orientTridentGen, orientTridentCopy );
 }
 
 

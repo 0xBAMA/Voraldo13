@@ -61,6 +61,9 @@ constexpr int MSAACount = 1;
 // image load/save/resize/access/manipulation wrapper
 #include "../ImageHandling/image.h"
 
+// orientation widget implementation, "orientTrident"
+#include "trident.h"
+
 // tracy profiler annotation
 #include "../tracy/public/tracy/Tracy.hpp"
 
