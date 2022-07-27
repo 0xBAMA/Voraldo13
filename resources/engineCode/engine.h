@@ -21,9 +21,6 @@ private:
 	// text renderer framework
 	layerManager textRenderer;
 
-	// keyboard input management
-	// inputHandler keyboard;
-
 	// OpenGL data
 	GLuint blueNoiseTexture;
 	GLuint accumulatorTexture;
@@ -32,6 +29,9 @@ private:
 	GLuint displayVAO;
 	GLuint dummyDrawShader;
 	GLuint tonemapShader;
+
+	// tracks and visualizes current block orientation
+	orientTrident trident;
 
 	// tonemapping parameters + adjustment
 	colorGradeParameters tonemap;
