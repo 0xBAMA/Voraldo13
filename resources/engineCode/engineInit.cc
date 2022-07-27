@@ -131,6 +131,15 @@ void engine::DisplaySetup () {
 	glActiveTexture( GL_TEXTURE4 );
 	glBindTexture( GL_TEXTURE_2D, blueNoiseTexture );
 	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, blueNoiseImage.width, blueNoiseImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &blueNoiseImage.data.data()[ 0 ] );
+
+	// create the image for the trident
+	GLuint tridentImage;
+	Image initialT( trident.blockDimensions.x * 8, trident.blockDimensions.y * 16, true );
+	glGenTextures( 1, &tridentImage );
+	glActiveTexture( GL_TEXTURE5 );
+	glBindTexture( GL_TEXTURE_2D, tridentImage );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, initialT.width, initialT.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &initialT.data.data()[ 0 ] );
+	trident.PassInImage( tridentImage );
 }
 
 void engine::ComputeShaderCompile () {

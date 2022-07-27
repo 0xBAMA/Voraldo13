@@ -42,6 +42,10 @@ void engine::ComputePasses () {
 	// other postprocessing
 		// ...
 
+	// draw the orientation trident/gizmo
+	trident.Update( displayTexture );
+	glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
+
 	// text rendering timestamp, as final step - required texture binds are handled internally
 	textRenderer.Update( ImGui::GetIO().DeltaTime );
 	textRenderer.Draw( displayTexture ); // displayTexture is the writeTarget
@@ -99,6 +103,7 @@ void engine::ImguiPass () {
 void engine::HandleEvents () {
 	ZoneScoped;
 
+	// these will operate on the trident, now
 	const uint8_t *state = SDL_GetKeyboardState( NULL );
 	if ( state[ SDL_SCANCODE_RIGHT ] )	cout << "Right Key Pressed" << endl << flush;
 	if ( state[ SDL_SCANCODE_LEFT ] )		cout << "Left Key Pressed" << endl << flush;

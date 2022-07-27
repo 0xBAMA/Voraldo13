@@ -15,9 +15,6 @@ public:
 		basisX = glm::vec3( 1.0f, 0.0f, 0.0f );
 		basisY = glm::vec3( 0.0f, 1.0f, 0.0f );
 		basisZ = glm::vec3( 0.0f, 0.0f, 1.0f );
-
-		// create the image
-
 	}
 
 	void PassInShaders ( GLuint generate, GLuint copy ) {
@@ -25,17 +22,36 @@ public:
 		copyShader = copy;
 	}
 
+	void PassInImage ( GLuint textureHandle ) {
+		tridentImage = textureHandle;
+	}
+
 	// rotate functions X,Y,Z with an amount to rotate by ( pos/neg )
 		// each of these will set needsRedraw to true, since the state changes
 
 	void Update ( GLuint writeTarget ) {
 
-		// check needsRedraw, invoke generateShader if true
+		// bind reqiured textures
+		glBindImageTexture( 0, tridentImage, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
+		glBindImageTexture( 1, writeTarget, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
+
+		if ( needsRedraw ) { // do the raymarch
 			// while relatively cheap, this is still the most expensive part of this
 			//   operation, so the idea is to write the result to a texture and copy
 			//   that until the state changes and that is no longer good data
+			glUseProgram( generateShader );
+			glUniform3fv( glGetUniformLocation( generateShader, "basisX" ), 1, glm::value_ptr( basisX ) );
+			glUniform3fv( glGetUniformLocation( generateShader, "basisY" ), 1, glm::value_ptr( basisY ) );
+			glUniform3fv( glGetUniformLocation( generateShader, "basisZ" ), 1, glm::value_ptr( basisZ ) );
 
+			glDispatchCompute( blockDimensions.x, blockDimensions.y, 1 );
+			// needsRedraw = false;
+		}
+
+		glUseProgram( copyShader );
+		// need to pass uniforms for base location
 		// copy to the writeTarget with copyShader
+		glDispatchCompute( blockDimensions.x, blockDimensions.y, 1 );
 
 	}
 
