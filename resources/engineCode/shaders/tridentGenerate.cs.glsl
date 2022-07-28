@@ -6,7 +6,7 @@ uniform vec3 basisX;
 uniform vec3 basisY;
 uniform vec3 basisZ;
 
-#define MAXSTEPS 25
+#define MAXSTEPS 30
 #define MAXDIST 2.5
 #define EPSILON 0.01
 
@@ -55,7 +55,31 @@ float deRoundedCone ( vec3 p, vec3 a, vec3 b ) {
 
 vec4 deMat ( vec3 p ) {
 	// return value has .rgb color and .a is distance
-	vec4 result = vec4( 0.0 );
+	vec4 result = vec4( 1000.0 );
+
+	float x = deRoundedCone( p, vec3( 0.0 ), basisX / 2.0 );
+	vec3 xc = vec3( 1.0, 0.0, 0.0 );
+	float y = deRoundedCone( p, vec3( 0.0 ), basisY / 2.0 );
+	vec3 yc = vec3( 0.0, 1.0, 0.0 );
+	float z = deRoundedCone( p, vec3( 0.0 ), basisZ / 2.0 );
+	vec3 zc = vec3( 0.0, 0.0, 1.0 );
+	float c = distance( vec3( 0.0 ), p ) - 0.18;
+	vec3 cc = vec3( 0.16 );
+
+	result.a = SdSmoothMin( 1000.0, x, vec3( 0.0 ), xc, result.rgb );
+	result.a = SdSmoothMin( result.a, y, result.rgb, yc, result.rgb );
+	result.a = SdSmoothMin( result.a, z, result.rgb, zc, result.rgb );
+	result.a = SdSmoothMin( result.a, c, result.rgb, cc, result.rgb );
+
+	// result.a = min( result.a, x );
+	// if ( result.a == x ) result.xyz = xc;
+	// result.a = min( result.a, y );
+	// if ( result.a == y ) result.xyz = yc;
+	// result.a = min( result.a, z );
+	// if ( result.a == z ) result.xyz = zc;
+	// result.a = min( result.a, c );
+	// if ( result.a == c ) result.xyz = cc;
+
 	return result;
 }
 
@@ -63,8 +87,8 @@ float de ( vec3 p ) {
 	float x = deRoundedCone( p, vec3( 0.0 ), basisX / 2.0 );
 	float y = deRoundedCone( p, vec3( 0.0 ), basisY / 2.0 );
 	float z = deRoundedCone( p, vec3( 0.0 ), basisZ / 2.0 );
-	return SdSmoothMin( SdSmoothMin( x, y ), z );
-	// return distance( vec3( 0.0 ), p ) - 0.2;
+	float c = distance( vec3( 0.0 ), p ) - 0.18;
+	return SdSmoothMin( SdSmoothMin( SdSmoothMin( x, y ), z ), c );
 }
 
 
@@ -77,7 +101,7 @@ void main () {
 	position = ( 2.0 * position ) - vec2( 1.0 );
 	position.x *= ( float( imageSize( tridentStorage ).x ) / float( imageSize( tridentStorage ).y ) );
 
-	vec3 rayOrigin = vec3( position, -1.0 );
+	vec3 rayOrigin = vec3( position * 0.55, -1.0 );
 	vec3 rayDirection = vec3( 0.0, 0.0, 1.0 );
 
 	float t = 0.1;
@@ -90,6 +114,8 @@ void main () {
 		t += dist;
 	}
 
-	colorResult = uvec4( uvec3( t * 128 ), 255 );
+	vec4 wCol = deMat( rayOrigin + t * rayDirection );
+
+	colorResult = uvec4( uvec3( wCol.rgb * 255 ), wCol.a < ( EPSILON * 5.0 ) ? 255 : 0 );
 	imageStore( tridentStorage, loc, colorResult );
 }

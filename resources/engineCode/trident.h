@@ -29,6 +29,27 @@ public:
 	// rotate functions X,Y,Z with an amount to rotate by ( pos/neg )
 		// each of these will set needsRedraw to true, since the state changes
 
+	void RotateX ( float amnt ) {
+		basisX = glm::rotate( basisX, amnt, glm::vec3( 1.0f, 0.0f, 0.0f ) );
+		basisY = glm::rotate( basisY, amnt, glm::vec3( 1.0f, 0.0f, 0.0f ) );
+		basisZ = glm::rotate( basisZ, amnt, glm::vec3( 1.0f, 0.0f, 0.0f ) );
+		needsRedraw = true;
+	}
+
+	void RotateY ( float amnt ) {
+		basisX = glm::rotate( basisX, amnt, glm::vec3( 0.0f, 1.0f, 0.0f ) );
+		basisY = glm::rotate( basisY, amnt, glm::vec3( 0.0f, 1.0f, 0.0f ) );
+		basisZ = glm::rotate( basisZ, amnt, glm::vec3( 0.0f, 1.0f, 0.0f ) );
+		needsRedraw = true;
+	}
+
+	void RotateZ ( float amnt ) {
+		basisX = glm::rotate( basisX, amnt, glm::vec3( 0.0f, 0.0f, 1.0f ) );
+		basisY = glm::rotate( basisY, amnt, glm::vec3( 0.0f, 0.0f, 1.0f ) );
+		basisZ = glm::rotate( basisZ, amnt, glm::vec3( 0.0f, 0.0f, 1.0f ) );
+		needsRedraw = true;
+	}
+
 	void Update ( GLuint writeTarget ) {
 
 		// bind reqiured textures
@@ -45,19 +66,19 @@ public:
 			glUniform3fv( glGetUniformLocation( generateShader, "basisZ" ), 1, glm::value_ptr( basisZ ) );
 
 			glDispatchCompute( blockDimensions.x, blockDimensions.y, 1 );
-			// needsRedraw = false;
+			needsRedraw = false;
 		}
 
 		glUseProgram( copyShader );
-		// need to pass uniforms for base location
-		// copy to the writeTarget with copyShader
+		glUniform2iv( glGetUniformLocation( copyShader, "basePt" ), 1, glm::value_ptr( basePt ) );
 		glDispatchCompute( blockDimensions.x, blockDimensions.y, 1 );
-
 	}
 
 	glm::vec3 basisX;
 	glm::vec3 basisY;
 	glm::vec3 basisZ;
+
+	glm::ivec2 basePt;
 
 	// size in terms of font glyphs - sizes the dispatches
 	glm::ivec2 blockDimensions{ 20, 7 };

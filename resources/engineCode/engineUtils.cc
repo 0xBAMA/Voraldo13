@@ -103,12 +103,25 @@ void engine::ImguiPass () {
 void engine::HandleEvents () {
 	ZoneScoped;
 
-	// these will operate on the trident, now
 	const uint8_t *state = SDL_GetKeyboardState( NULL );
-	if ( state[ SDL_SCANCODE_RIGHT ] )	cout << "Right Key Pressed" << endl << flush;
-	if ( state[ SDL_SCANCODE_LEFT ] )		cout << "Left Key Pressed" << endl << flush;
-	if ( state[ SDL_SCANCODE_UP ] )			cout << "Up Key Pressed" << endl << flush;
-	if ( state[ SDL_SCANCODE_DOWN ] )		cout << "Down Key Pressed" << endl << flush;
+
+	float bigStep = 0.120;
+	float lilStep = 0.008;
+
+	// these will operate on the trident, now
+	if ( state[ SDL_SCANCODE_LEFT ] )
+		trident.RotateY( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep );
+
+	if ( state[ SDL_SCANCODE_RIGHT ] )
+		trident.RotateY( -( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep ) );
+
+	if ( state[ SDL_SCANCODE_UP ] )
+		trident.RotateX( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep );
+
+	if ( state[ SDL_SCANCODE_DOWN ] )
+		trident.RotateX( -( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep ) );
+
+
 
 //==============================================================================
 // Need to keep this for pQuit handling ( force quit )

@@ -145,6 +145,8 @@ void engine::DisplaySetup () {
 void engine::ComputeShaderCompile () {
 	// initialize the text renderer
 	textRenderer.Init( WIDTH, HEIGHT, CShader( "resources/fonts/fontRenderer/font.cs.glsl" ).Program );
+	// get the base point to draw the gizmo/widget/trident from the text renderer
+	trident.basePt = textRenderer.basePt;
 
 	// something to put data in the accumulator texture
 	dummyDrawShader = CShader( "resources/engineCode/shaders/dummyDraw.cs.glsl" ).Program;
