@@ -83,6 +83,26 @@ float de ( vec3 p ) {
 	return SdSmoothMin( SdSmoothMin( SdSmoothMin( x, y ), z ), c );
 }
 
+vec3 normal ( vec3 p ) { // to get the normal vector for a point in space, this function evaluates the gradient of the distance function
+#define METHOD 2
+#if METHOD == 0
+	// tetrahedron version, unknown source - 4 evaluations
+	vec2 e = vec2( 1, -1 ) * EPSILON;
+	return normalize( e.xyy * de( p + e.xyy ) + e.yyx * de( p + e.yyx ) + e.yxy * de( p + e.yxy ) + e.xxx * de( p + e.xxx ) );
+#elif METHOD == 1
+	// by iq = more efficient, 4 evaluations
+	vec2 e = vec2( EPSILON, 0.0 ); // computes the gradient of the estimator function
+	return normalize( vec3( de( p ) ) - vec3( de( p - e.xyy ), de( p - e.yxy ), de( p - e.yyx ) ) );
+#elif METHOD == 2
+// by iq - less efficient, 6 evaluations
+	vec3 eps = vec3( EPSILON, 0.0, 0.0 );
+	return normalize( vec3(
+		de( p + eps.xyy ) - de( p - eps.xyy ),
+		de( p + eps.yxy ) - de( p - eps.yxy ),
+		de( p + eps.yyx ) - de( p - eps.yyx ) ) );
+#endif
+}
+
 void main () {
 	ivec2 loc = ivec2( gl_GlobalInvocationID.xy );
 	vec2 position = vec2( loc ) / vec2( imageSize( tridentStorage ).xy );
@@ -105,8 +125,38 @@ void main () {
 		t += dist;
 	}
 
-	vec4 wCol = deMat( rayOrigin + t * rayDirection );
+	vec3 hitPoint = rayOrigin + t * rayDirection;
+	vec3 surfaceNormal = normal( hitPoint );
+	vec4 wCol = deMat( hitPoint ); // albedo + distance
 
-	colorResult = uvec4( uvec3( wCol.rgb * 255 ), wCol.a < ( EPSILON * 5.0 ) ? 255 : 0 );
+	// go go gadget phong
+	vec3 light1Position = vec3( -1.4, -0.8, -0.15 );
+	vec3 light2Position = vec3( 1.8, -0.3,  0.25 );
+	vec3 eyePosition = vec3( 0.0, 0.0, -1.0 );
+	vec3 l1 = normalize( hitPoint - light1Position );
+	vec3 l2 = normalize( hitPoint - light2Position );
+	vec3 v = normalize( hitPoint - eyePosition );
+	vec3 n = normalize( surfaceNormal );
+	vec3 r1 = normalize( reflect( l1, n ) );
+	vec3 r2 = normalize( reflect( l2, n ) );
+	vec3 pixcol = wCol.xyz;
+	float ambient = -0.2;
+	pixcol += ambient * vec3( 0.1, 0.1, 0.2 );
+	float diffuse1 = ( 1.0 / ( pow( 0.25 * distance( hitPoint, light1Position ), 2.0 ) ) ) * 0.18 * max( dot( n,  l1 ), 0.0 );
+	float diffuse2 = ( 1.0 / ( pow( 0.25 * distance( hitPoint, light2Position ), 2.0 ) ) ) * 0.18 * max( dot( n,  l2 ), 0.0 );
+	pixcol += diffuse1 * vec3( 0.09, 0.09, 0.04 );
+	pixcol += diffuse2 * vec3( 0.09, 0.09, 0.04 );
+	float specular1 = ( 1.0 / ( pow( 0.25 * distance( hitPoint, light1Position ), 2.0 ) ) ) * 0.4 * pow( max( dot( r1, v), 0.0 ), 60.0 );
+	float specular2 = ( 1.0 / ( pow( 0.25 * distance( hitPoint, light2Position ), 2.0 ) ) ) * 0.4 * pow( max( dot( r2, v), 0.0 ), 80.0 );
+
+	if ( dot( n, l1 ) > 0.0 )
+		pixcol += specular1 * vec3( 0.4, 0.2, 0.0 );
+
+	if ( dot( n, l2 ) > 0.0 )
+		pixcol += specular2 * vec3( 0.4, 0.2, 0.0 );
+
+
+	// colorResult = uvec4( uvec3( wCol.rgb * 255 ), wCol.a < ( EPSILON * 5.0 ) ? 255 : 0 );
+	colorResult = uvec4( uvec3( pixcol * 255 ), wCol.a < ( EPSILON * 5.0 ) ? 255 : 0 );
 	imageStore( tridentStorage, loc, colorResult );
 }
