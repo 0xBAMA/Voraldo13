@@ -89,14 +89,19 @@ void engine::BlitToScreen () {
 
 void engine::ImguiPass () {
 	ZoneScoped;
-
 	ImguiFrameStart();					// start the imgui frame
+
+	// if ( true ) ImGui::ShowDemoWindow();	// show the demo window
+
+	// this gets moved into the menu container soon
 	TonemapControlsWindow();
-	if ( true )
-		ImGui::ShowDemoWindow();	// show the demo window
-	QuitConf( &quitConfirm );		// show quit confirm window, if triggered
+
+	// menu container
 	static bool showMenu = true;
 	MenuLayout( &showMenu );
+
+	// this has to be the final thing, because apparently order matters with modals
+	QuitConf( &quitConfirm );		// show quit confirm window, if triggered
 	ImguiFrameEnd();						// finish up the imgui stuff and put it in the framebuffer
 }
 

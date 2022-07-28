@@ -4,7 +4,7 @@ void engine::QuitConf ( bool *open ) {
 	if ( *open ) {
 		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 		ImGui::SetNextWindowPos( center, 0, ImVec2( 0.5f, 0.5f ) );
-		ImGui::SetNextWindowSize( ImVec2( 230, 55 ) );
+		ImGui::SetNextWindowSize( ImVec2( 225, 45 ) );
 		ImGui::OpenPopup( "Quit Confirm" );
 		if ( ImGui::BeginPopupModal( "Quit Confirm", NULL, ImGuiWindowFlags_NoDecoration ) ) {
 			ImGui::Text( "Are you sure you want to quit?" );
