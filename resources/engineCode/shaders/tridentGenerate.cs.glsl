@@ -18,7 +18,7 @@ float SdSmoothMin( float a, float b ) {
 }
 
 // version with materials
-float SdSmoothMin(float a, float b, vec3 mtl1, vec3 mtl0, inout vec3 mtl) {
+float SdSmoothMin( float a, float b, vec3 mtl1, vec3 mtl0, inout vec3 mtl ) {
 	float k = 0.12;
 	float h = clamp( 0.5 + 0.5 * ( b - a ) / k, 0.0, 1.0 );
 	float s = mix( b, a, h ) - k * h * ( 1.0 - h );
@@ -49,9 +49,9 @@ float deRoundedCone ( vec3 p, vec3 a, vec3 b ) {
 
 	float k = sign( rr ) * rr * rr * x2;
 	if( sign( z ) * a2 * z2 > k )
-		return  sqrt( x2 + z2 ) * il2 - r2;
+		return sqrt( x2 + z2 ) * il2 - r2;
 	if( sign( y ) * a2 * y2 < k )
-		return  sqrt( x2 + y2 ) * il2 - r1;
+		return sqrt( x2 + y2 ) * il2 - r1;
 	return ( sqrt( x2 * a2 * il2 ) + y * rr ) * il2 - r1;
 }
 

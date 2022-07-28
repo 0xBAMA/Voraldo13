@@ -121,6 +121,12 @@ void engine::HandleEvents () {
 	if ( state[ SDL_SCANCODE_DOWN ] )
 		trident.RotateX( -( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep ) );
 
+	if ( state[ SDL_SCANCODE_PAGEUP ] )
+		trident.RotateZ( -( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep ) );
+
+	if ( state[ SDL_SCANCODE_PAGEDOWN ] )
+		trident.RotateZ( ( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep ) );
+
 
 
 //==============================================================================
