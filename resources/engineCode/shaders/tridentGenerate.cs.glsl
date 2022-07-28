@@ -11,10 +11,10 @@ uniform vec3 basisZ;
 #define EPSILON 0.01
 
 // version without materials
-float SdSmoothMin(float a, float b) {
+float SdSmoothMin( float a, float b ) {
 	float k = 0.12;
-	float h = clamp(0.5 + 0.5 * (b-a) / k, 0.0, 1.0);
-	return mix(b, a, h) - k * h * (1.0 - h);
+	float h = clamp( 0.5 + 0.5 * ( b - a ) / k, 0.0, 1.0 );
+	return mix( b, a, h ) - k * h * ( 1.0 - h );
 }
 
 // version with materials
@@ -34,29 +34,31 @@ float deRoundedCone ( vec3 p, vec3 a, vec3 b ) {
 	float r2 = 0.02; // radius at a
 
 	vec3  ba = b - a;
-	float l2 = dot(ba,ba);
+	float l2 = dot( ba, ba );
 	float rr = r1 - r2;
-	float a2 = l2 - rr*rr;
-	float il2 = 1.0/l2;
+	float a2 = l2 - rr * rr;
+	float il2 = 1.0 / l2;
 
 	vec3 pa = p - a;
-	float y = dot(pa,ba);
+	float y = dot( pa, ba );
 	float z = y - l2;
-	vec3 d2 =  pa*l2 - ba*y;
-	float x2 = dot(d2, d2);
-	float y2 = y*y*l2;
-	float z2 = z*z*l2;
+	vec3 d2 =  pa * l2 - ba * y;
+	float x2 = dot( d2, d2 );
+	float y2 = y * y * l2;
+	float z2 = z * z * l2;
 
-	float k = sign(rr)*rr*rr*x2;
-	if( sign(z)*a2*z2 > k ) return  sqrt(x2 + z2)        *il2 - r2;
-	if( sign(y)*a2*y2 < k ) return  sqrt(x2 + y2)        *il2 - r1;
-													return (sqrt(x2*a2*il2)+y*rr)*il2 - r1;
+	float k = sign( rr ) * rr * rr * x2;
+	if( sign( z ) * a2 * z2 > k )
+		return  sqrt( x2 + z2 ) * il2 - r2;
+	if( sign( y ) * a2 * y2 < k )
+		return  sqrt( x2 + y2 ) * il2 - r1;
+	return ( sqrt( x2 * a2 * il2 ) + y * rr ) * il2 - r1;
 }
 
+// with materials
 vec4 deMat ( vec3 p ) {
 	// return value has .rgb color and .a is distance
 	vec4 result = vec4( 1000.0 );
-
 	float x = deRoundedCone( p, vec3( 0.0 ), basisX / 2.0 );
 	vec3 xc = vec3( 1.0, 0.0, 0.0 );
 	float y = deRoundedCone( p, vec3( 0.0 ), basisY / 2.0 );
@@ -65,24 +67,14 @@ vec4 deMat ( vec3 p ) {
 	vec3 zc = vec3( 0.0, 0.0, 1.0 );
 	float c = distance( vec3( 0.0 ), p ) - 0.18;
 	vec3 cc = vec3( 0.16 );
-
 	result.a = SdSmoothMin( 1000.0, x, vec3( 0.0 ), xc, result.rgb );
 	result.a = SdSmoothMin( result.a, y, result.rgb, yc, result.rgb );
 	result.a = SdSmoothMin( result.a, z, result.rgb, zc, result.rgb );
 	result.a = SdSmoothMin( result.a, c, result.rgb, cc, result.rgb );
-
-	// result.a = min( result.a, x );
-	// if ( result.a == x ) result.xyz = xc;
-	// result.a = min( result.a, y );
-	// if ( result.a == y ) result.xyz = yc;
-	// result.a = min( result.a, z );
-	// if ( result.a == z ) result.xyz = zc;
-	// result.a = min( result.a, c );
-	// if ( result.a == c ) result.xyz = cc;
-
 	return result;
 }
 
+// without materials
 float de ( vec3 p ) {
 	float x = deRoundedCone( p, vec3( 0.0 ), basisX / 2.0 );
 	float y = deRoundedCone( p, vec3( 0.0 ), basisY / 2.0 );
@@ -90,7 +82,6 @@ float de ( vec3 p ) {
 	float c = distance( vec3( 0.0 ), p ) - 0.18;
 	return SdSmoothMin( SdSmoothMin( SdSmoothMin( x, y ), z ), c );
 }
-
 
 void main () {
 	ivec2 loc = ivec2( gl_GlobalInvocationID.xy );
