@@ -6,20 +6,22 @@ uniform vec3 basisX;
 uniform vec3 basisY;
 uniform vec3 basisZ;
 
-#define MAXSTEPS 30
+#define MAXSTEPS 35
 #define MAXDIST 2.5
-#define EPSILON 0.01
+#define EPSILON 0.001
 
 // version without materials
 float SdSmoothMin( float a, float b ) {
-	float k = 0.12;
+	// float k = 0.12;
+	float k = 0.1;
 	float h = clamp( 0.5 + 0.5 * ( b - a ) / k, 0.0, 1.0 );
 	return mix( b, a, h ) - k * h * ( 1.0 - h );
 }
 
 // version with materials
 float SdSmoothMin( float a, float b, vec3 mtl1, vec3 mtl0, inout vec3 mtl ) {
-	float k = 0.12;
+	// float k = 0.12;
+	float k = 0.1;
 	float h = clamp( 0.5 + 0.5 * ( b - a ) / k, 0.0, 1.0 );
 	float s = mix( b, a, h ) - k * h * ( 1.0 - h );
 	float sA = s - a;
@@ -55,6 +57,26 @@ float deRoundedCone ( vec3 p, vec3 a, vec3 b ) {
 	return ( sqrt( x2 * a2 * il2 ) + y * rr ) * il2 - r1;
 }
 
+float deF ( vec3 p ){
+	// float scalar = 6.0;
+		float scalar = 4.0;
+		mat3 transform = inverse( mat3( basisX, basisY, basisZ ) );
+		p = transform * p;
+
+		p *= scalar;
+    float a=1.;
+    for(int i=0;i<5;i++){ // adjust iteration count here
+      p=abs(p)-1./3.;
+      if(p.y>p.x)p.xy=p.yx;
+      if(p.z>p.y)p.yz=p.zy;
+      p.z=abs(p.z);
+      p*=3.;
+      p-=1.;
+      a*=3.;
+    }
+    return (length(max(abs(p)-1.,0.))/a) / scalar;
+ }
+
 // with materials
 vec4 deMat ( vec3 p ) {
 	// return value has .rgb color and .a is distance
@@ -65,8 +87,11 @@ vec4 deMat ( vec3 p ) {
 	vec3 yc = vec3( 0.0, 1.0, 0.0 );
 	float z = deRoundedCone( p, vec3( 0.0 ), basisZ / 2.0 );
 	vec3 zc = vec3( 0.0, 0.0, 1.0 );
-	float c = distance( vec3( 0.0 ), p ) - 0.18;
-	vec3 cc = vec3( 0.16 );
+	// float c = min( distance( vec3( 0.0 ), p ) - 0.18, deF( p ) );
+	float c = deF( p );
+	// vec3 cc = vec3( 0.16 );
+	// vec3 cc = vec3( 0.32 );
+	vec3 cc = vec3( 0.64 );
 	result.a = SdSmoothMin( 1000.0, x, vec3( 0.0 ), xc, result.rgb );
 	result.a = SdSmoothMin( result.a, y, result.rgb, yc, result.rgb );
 	result.a = SdSmoothMin( result.a, z, result.rgb, zc, result.rgb );
@@ -79,7 +104,8 @@ float de ( vec3 p ) {
 	float x = deRoundedCone( p, vec3( 0.0 ), basisX / 2.0 );
 	float y = deRoundedCone( p, vec3( 0.0 ), basisY / 2.0 );
 	float z = deRoundedCone( p, vec3( 0.0 ), basisZ / 2.0 );
-	float c = distance( vec3( 0.0 ), p ) - 0.18;
+	// float c = min( distance( vec3( 0.0 ), p ) - 0.18, deF( p ) );
+	float c = deF( p );
 	return SdSmoothMin( SdSmoothMin( SdSmoothMin( x, y ), z ), c );
 }
 
@@ -101,6 +127,18 @@ vec3 normal ( vec3 p ) { // to get the normal vector for a point in space, this 
 		de( p + eps.yxy ) - de( p - eps.yxy ),
 		de( p + eps.yyx ) - de( p - eps.yyx ) ) );
 #endif
+}
+
+float calcAO ( in vec3 pos, in vec3 nor ) {
+	float occ = 0.0;
+	float sca = 1.0;
+	for( int i = 0; i < 5; i++ ) {
+		float h = 0.001 + 0.15 * float( i ) / 4.0;
+		float d = de( pos + h * nor );
+		occ += ( h - d ) * sca;
+		sca *= 0.95;
+	}
+	return clamp( 1.0 - 1.5 * occ, 0.0, 1.0 );
 }
 
 void main () {
@@ -140,7 +178,7 @@ void main () {
 	vec3 r1 = normalize( reflect( l1, n ) );
 	vec3 r2 = normalize( reflect( l2, n ) );
 	vec3 pixcol = wCol.xyz;
-	float ambient = -0.2;
+	float ambient = -0.0;
 	pixcol += ambient * vec3( 0.1, 0.1, 0.2 );
 	float diffuse1 = ( 1.0 / ( pow( 0.25 * distance( hitPoint, light1Position ), 2.0 ) ) ) * 0.18 * max( dot( n,  l1 ), 0.0 );
 	float diffuse2 = ( 1.0 / ( pow( 0.25 * distance( hitPoint, light2Position ), 2.0 ) ) ) * 0.18 * max( dot( n,  l2 ), 0.0 );
@@ -148,13 +186,10 @@ void main () {
 	pixcol += diffuse2 * vec3( 0.09, 0.09, 0.04 );
 	float specular1 = ( 1.0 / ( pow( 0.25 * distance( hitPoint, light1Position ), 2.0 ) ) ) * 0.4 * pow( max( dot( r1, v), 0.0 ), 60.0 );
 	float specular2 = ( 1.0 / ( pow( 0.25 * distance( hitPoint, light2Position ), 2.0 ) ) ) * 0.4 * pow( max( dot( r2, v), 0.0 ), 80.0 );
+	if ( dot( n, l1 ) > 0.0 ) pixcol += specular1 * vec3( 0.4, 0.2, 0.0 );
+	if ( dot( n, l2 ) > 0.0 ) pixcol += specular2 * vec3( 0.4, 0.2, 0.0 );
 
-	if ( dot( n, l1 ) > 0.0 )
-		pixcol += specular1 * vec3( 0.4, 0.2, 0.0 );
-
-	if ( dot( n, l2 ) > 0.0 )
-		pixcol += specular2 * vec3( 0.4, 0.2, 0.0 );
-
+	pixcol *= calcAO( hitPoint, surfaceNormal );
 
 	// colorResult = uvec4( uvec3( wCol.rgb * 255 ), wCol.a < ( EPSILON * 5.0 ) ? 255 : 0 );
 	colorResult = uvec4( uvec3( pixcol * 255 ), wCol.a < ( EPSILON * 5.0 ) ? 255 : 0 );

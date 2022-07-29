@@ -64,7 +64,6 @@ public:
 			glUniform3fv( glGetUniformLocation( generateShader, "basisX" ), 1, glm::value_ptr( basisX ) );
 			glUniform3fv( glGetUniformLocation( generateShader, "basisY" ), 1, glm::value_ptr( basisY ) );
 			glUniform3fv( glGetUniformLocation( generateShader, "basisZ" ), 1, glm::value_ptr( basisZ ) );
-
 			glDispatchCompute( blockDimensions.x, blockDimensions.y, 1 );
 			needsRedraw = false;
 		}
