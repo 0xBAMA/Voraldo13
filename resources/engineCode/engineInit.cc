@@ -33,12 +33,16 @@ void engine::CreateWindowAndContext () {
 
 	// different window configurations
 	int windowInitMode = 0;
+
+	// putting this on different monitors
+	int baseX = ( STARTONWINDOW - 1 ) * dm.w;
+
 	switch ( windowInitMode ) {
 		case 0: // little window, using WIDTH/HEIGHT defines in includes.h
 			flags = SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE;
 			totalScreenWidth = WIDTH;
 			totalScreenHeight = HEIGHT;
-			window = SDL_CreateWindow( "NQADE", 0, 0, WIDTH, HEIGHT, flags );
+			window = SDL_CreateWindow( "NQADE", baseX, 0, WIDTH, HEIGHT, flags );
 			break;
 
 		case 1: // fullscreen borderless
@@ -46,14 +50,14 @@ void engine::CreateWindowAndContext () {
 			totalScreenWidth = dm.w;
 			totalScreenHeight = dm.h;
 			flags = SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS;
-			window = SDL_CreateWindow( "NQADE", 0, 0, dm.w, dm.h, flags );
+			window = SDL_CreateWindow( "NQADE", baseX, 0, dm.w, dm.h, flags );
 			break;
 
 		case 2: // borderless floating
 			totalScreenWidth = dm.w - 100;
 			totalScreenHeight = dm.h - 100;
 			flags = SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS;
-			window = SDL_CreateWindow( "NQADE", 50, 50, totalScreenWidth, totalScreenHeight, flags );
+			window = SDL_CreateWindow( "NQADE", 50 + baseX, 50, totalScreenWidth, totalScreenHeight, flags );
 			break;
 
 			// other modes?
@@ -87,6 +91,53 @@ void engine::CreateWindowAndContext () {
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	cout << T_GREEN << "done." << RESET << endl;
 
+}
+
+void engine::MenuPopulate () {
+	// eventually this will come from a json structure containing records of each menu entry
+	cout << T_BLUE << "    Populating Menu" << RESET << " .................................. ";
+
+	menu.entries.push_back( menuEntry( "  zeroth shape", category_t::shapes ) );
+	menu.entries.push_back( menuEntry( "  first shape", category_t::shapes ) );
+	menu.entries.push_back( menuEntry( "  second shape", category_t::shapes ) );
+	menu.entries.push_back( menuEntry( "  third shape", category_t::shapes ) );
+	menu.entries.push_back( menuEntry( "  fourth shape", category_t::shapes ) );
+	menu.entries.push_back( menuEntry( "  fifth shape", category_t::shapes ) );
+	menu.entries.push_back( menuEntry( "  sixth shape", category_t::shapes ) );
+	menu.entries.push_back( menuEntry( "  seventh shape", category_t::shapes ) );
+	menu.entries.push_back( menuEntry( "  eighth shape", category_t::shapes ) );
+
+	menu.entries.push_back( menuEntry( "  first utility", category_t::utilities ) );
+	menu.entries.push_back( menuEntry( "  second utility", category_t::utilities ) );
+	menu.entries.push_back( menuEntry( "  third utility", category_t::utilities ) );
+	menu.entries.push_back( menuEntry( "  fourth utility", category_t::utilities ) );
+	menu.entries.push_back( menuEntry( "  fifth utility", category_t::utilities ) );
+	menu.entries.push_back( menuEntry( "  sixth utility", category_t::utilities ) );
+	menu.entries.push_back( menuEntry( "  seventh utility", category_t::utilities ) );
+	menu.entries.push_back( menuEntry( "  eighth utility", category_t::utilities ) );
+	menu.entries.push_back( menuEntry( "  ninth utility", category_t::utilities ) );
+
+	menu.entries.push_back( menuEntry( "  first lighting", category_t::lighting ) );
+	menu.entries.push_back( menuEntry( "  second lighting", category_t::lighting ) );
+	menu.entries.push_back( menuEntry( "  third lighting", category_t::lighting ) );
+	menu.entries.push_back( menuEntry( "  fourth lighting", category_t::lighting ) );
+	menu.entries.push_back( menuEntry( "  fifth lighting", category_t::lighting ) );
+	menu.entries.push_back( menuEntry( "  sixth lighting", category_t::lighting ) );
+	menu.entries.push_back( menuEntry( "  seventh lighting", category_t::lighting ) );
+
+	menu.entries.push_back( menuEntry( "  first setting", category_t::settings ) );
+	menu.entries.push_back( menuEntry( "  second setting", category_t::settings ) );
+	menu.entries.push_back( menuEntry( "  third setting", category_t::settings ) );
+	menu.entries.push_back( menuEntry( "  fourth setting", category_t::settings ) );
+	menu.entries.push_back( menuEntry( "  fifth setting", category_t::settings ) );
+	menu.entries.push_back( menuEntry( "  sixth setting", category_t::settings ) );
+	menu.entries.push_back( menuEntry( "  seventh setting", category_t::settings ) );
+	menu.entries.push_back( menuEntry( "  eighth setting", category_t::settings ) );
+
+	// if out of order, need to sort - order must be
+		// all shapes, followed by all utilities, then all lighting, then all settings
+
+	cout << T_GREEN << "done." << RESET << endl;
 }
 
 void engine::DisplaySetup () {
@@ -248,5 +299,5 @@ void engine::ImguiSetup () {
 	style.FramePadding.y = 2;
 	style.ScrollbarSize = 10;
 
-	cout << T_GREEN << "done." << RESET << endl << endl;
+	cout << T_GREEN << "done." << RESET << endl;
 }

@@ -9,6 +9,7 @@ void engine::Init () {
 	DisplaySetup();
 	ComputeShaderCompile();
 	ImguiSetup();
+	MenuPopulate();
 }
 
 // terminate ImGUI

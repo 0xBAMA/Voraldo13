@@ -6,7 +6,8 @@ uniform vec3 basisX;
 uniform vec3 basisY;
 uniform vec3 basisZ;
 
-const int mode = 0; // 0 is menger, 1 is sphere - hook this up to a uniform eventually and put it in the settings
+// what to draw at the center
+uniform int mode;
 
 #define MAXSTEPS 35
 #define MAXDIST 2.5

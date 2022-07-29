@@ -33,6 +33,9 @@ private:
 	// tracks and visualizes current block orientation
 	orientTrident trident;
 
+	// contains the menu entries ( labels + interface layout blocks )
+	menuContainer menu;
+
 	// tonemapping parameters + adjustment
 	colorGradeParameters tonemap;
 	void TonemapControlsWindow ();
@@ -45,6 +48,7 @@ private:
 	void DisplaySetup ();
 	void ComputeShaderCompile ();
 	void ImguiSetup ();
+	void MenuPopulate ();
 
 	// main loop functions
 	void BlitToScreen ();

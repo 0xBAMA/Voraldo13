@@ -64,6 +64,9 @@ constexpr int MSAACount = 1;
 // orientation widget implementation, "orientTrident"
 #include "trident.h"
 
+// menu layout stuff
+#include "menuEntry.h"
+
 // tracy profiler annotation
 #include "../tracy/public/tracy/Tracy.hpp"
 
@@ -106,6 +109,8 @@ using json = nlohmann::json;
 
 #define WIDTH 1920
 #define HEIGHT 1080
+
+#define STARTONWINDOW 3
 
 struct colorGradeParameters {
 	int tonemapMode = 6;

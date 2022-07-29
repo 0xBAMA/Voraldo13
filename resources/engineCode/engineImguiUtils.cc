@@ -36,77 +36,111 @@ static void HelpMarker ( const char *desc ) {
 
 // this needs a formatting pass
 void engine::MenuLayout( bool* p_open ) {
-	ImGui::SetNextWindowSize(ImVec2(500, 440), ImGuiCond_FirstUseEver);
 
-
-
+	// ImGui::SetNextWindowSize( ImVec2( 500, 440 ), ImGuiCond_FirstUseEver );
 	auto windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar;
 	if ( ImGui::Begin( "Menu layout", p_open, windowFlags ) ) {
 
 		// I'd like to have a reason to have a menu
-		if (ImGui::BeginMenuBar()) {
-			if (ImGui::BeginMenu("File")) {
-				if (ImGui::MenuItem("Close")) *p_open = false;
-					ImGui::EndMenu();
+		if ( ImGui::BeginMenuBar() ) {
+			if ( ImGui::BeginMenu( "File" ) ) {
+				if ( ImGui::MenuItem( "Close" ) ) *p_open = false;
+				ImGui::EndMenu();
 			}
 			ImGui::EndMenuBar();
 		}
 
-		// Left Side
-		static int currentlySelected = 0;
+// =============================================================================
+// Left Side
+// =============================================================================
+		static int currentlySelected = -1;
 		{
 			ImGui::BeginChild( "TreeView", ImVec2( 185, 0 ), true );
 
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_None;
 			int current = 0;
 
-			char label[ 128 ];
-			if (ImGui::CollapsingHeader( "Shapes", flags )) {
-				for ( int i = 0; i < 10; i++ ) {
-					sprintf(label, "  MyObject %d", current);
-					if (ImGui::Selectable(label, currentlySelected == current))
+			if ( ImGui::CollapsingHeader( "Shapes", flags ) ) {
+				while ( menu.entries[ current ].category == category_t::shapes ) {
+					if ( ImGui::Selectable( menu.entries[ current ].label.c_str(), currentlySelected == current ) ) {
 						currentlySelected = current;
+					}
+					current++;
+				}
+			} else {
+				// iterate through to the first utility entry if the header is collapsed
+				while ( menu.entries[ current ].category == category_t::shapes ) {
 					current++;
 				}
 			}
-			current = 10;
 
-			if (ImGui::CollapsingHeader( "Utilities", flags )) {
-				for ( int i = 0; i < 10; i++ ) {
-					sprintf(label, "  MyObject %d", current);
-					if (ImGui::Selectable(label, currentlySelected == current))
+			if ( ImGui::CollapsingHeader( "Utilities", flags ) ) {
+				while ( menu.entries[ current ].category == category_t::utilities ) {
+					if ( ImGui::Selectable( menu.entries[ current ].label.c_str(), currentlySelected == current ) ) {
 						currentlySelected = current;
+					}
+					current++;
+				}
+			} else {
+				while ( menu.entries[ current ].category == category_t::utilities ) {
 					current++;
 				}
 			}
-			current = 20;
 
-			if (ImGui::CollapsingHeader( "Lighting", flags )) {
-				for ( int i = 0; i < 10; i++ ) {
-					sprintf(label, "  MyObject %d", current);
-					if (ImGui::Selectable(label, currentlySelected == current))
+			if ( ImGui::CollapsingHeader( "Lighting", flags ) ) {
+				while ( menu.entries[ current ].category == category_t::lighting ) {
+					if ( ImGui::Selectable( menu.entries[ current ].label.c_str(), currentlySelected == current ) ) {
 						currentlySelected = current;
+					}
+					current++;
+				}
+			} else {
+				while ( menu.entries[ current ].category == category_t::lighting ) {
 					current++;
 				}
 			}
-			current = 30;
 
 			// want to handle this differently, maybe - or break up the settings into multiple sections and then I wouldn't have to - render settings, then something else? not sure
-			if (ImGui::CollapsingHeader( "Settings", flags )) {
-				for ( int i = 0; i < 10; i++ ) {
-					sprintf(label, "  MyObject %d", current);
-					if (ImGui::Selectable(label, currentlySelected == current))
-						currentlySelected = current;
-					current++;
-				}
-			}
-			current = 40;
+			char label[ 128 ];
+			if ( ImGui::CollapsingHeader( "Settings", flags ) ) {
 
+				sprintf( label, "  Color Settings" );
+				if ( ImGui::Selectable( label, currentlySelected == current ) ) {
+					currentlySelected = current;
+				}
+				current++;
+
+				sprintf( label, "  Render Settings" );
+				if ( ImGui::Selectable( label, currentlySelected == current ) ) {
+					currentlySelected = current;
+				}
+				current++;
+
+				sprintf( label, "  Application Settings" );
+				if ( ImGui::Selectable( label, currentlySelected == current ) ) {
+					currentlySelected = current;
+				}
+				current++;
+
+				sprintf( label, "  Logging" );
+				if ( ImGui::Selectable( label, currentlySelected == current ) ) {
+					currentlySelected = current;
+				}
+				current++;
+
+			}
 			ImGui::EndChild();
 		}
 		ImGui::SameLine();
 
-	// Right Side
+/* =============================================================================
+	Right Side
+		At this stage, the currently selected option is currentlySelected - this can
+	be used to index into the menu.entries[] array, to get any menu layout
+	information that will be relevant for this particular menu entry.
+
+		Special reserve value -1 used for a welcome splash screen, shown on startup.
+============================================================================= */
 		{
 			ImGui::BeginGroup();
 			ImGui::BeginChild("Contents", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us

@@ -64,6 +64,7 @@ public:
 			glUniform3fv( glGetUniformLocation( generateShader, "basisX" ), 1, glm::value_ptr( basisX ) );
 			glUniform3fv( glGetUniformLocation( generateShader, "basisY" ), 1, glm::value_ptr( basisY ) );
 			glUniform3fv( glGetUniformLocation( generateShader, "basisZ" ), 1, glm::value_ptr( basisZ ) );
+			glUniform1i( glGetUniformLocation( generateShader, "mode" ), modeSelect );
 			glDispatchCompute( blockDimensions.x, blockDimensions.y, 1 );
 			needsRedraw = false;
 		}
@@ -76,6 +77,9 @@ public:
 	glm::vec3 basisX;
 	glm::vec3 basisY;
 	glm::vec3 basisZ;
+
+	// want something to set this from the application settings
+	int modeSelect = 1;
 
 	glm::ivec2 basePt;
 
