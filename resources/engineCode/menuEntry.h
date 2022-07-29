@@ -10,6 +10,9 @@ struct menuEntry {
 	menuEntry ( std::string l, category_t c ) : label( l ), category( c ) {}
 	std::string label;
 	category_t category;
+
+	// vector of layout formatting blocks to be executed in order for the menu entry
+
 };
 
 struct menuContainer {
