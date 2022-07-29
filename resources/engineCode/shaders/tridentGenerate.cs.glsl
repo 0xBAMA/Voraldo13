@@ -6,6 +6,8 @@ uniform vec3 basisX;
 uniform vec3 basisY;
 uniform vec3 basisZ;
 
+const int mode = 0; // 0 is menger, 1 is sphere - hook this up to a uniform eventually and put it in the settings
+
 #define MAXSTEPS 35
 #define MAXDIST 2.5
 #define EPSILON 0.001
@@ -77,6 +79,17 @@ float deF ( vec3 p ){
     return (length(max(abs(p)-1.,0.))/a) / scalar;
  }
 
+// core distance
+float cDist ( vec3 p ) {
+	switch ( mode ) {
+		case 0:	// menger core
+			return deF( p );
+		case 1: // sphere core
+			return distance( vec3( 0.0 ), p ) - 0.18;
+		// etc...
+	}
+}
+
 // with materials
 vec4 deMat ( vec3 p ) {
 	// return value has .rgb color and .a is distance
@@ -87,8 +100,7 @@ vec4 deMat ( vec3 p ) {
 	vec3 yc = vec3( 0.0, 1.0, 0.0 );
 	float z = deRoundedCone( p, vec3( 0.0 ), basisZ / 2.0 );
 	vec3 zc = vec3( 0.0, 0.0, 1.0 );
-	// float c = min( distance( vec3( 0.0 ), p ) - 0.18, deF( p ) );
-	float c = deF( p );
+	float c = cDist( p );
 	// vec3 cc = vec3( 0.16 );
 	// vec3 cc = vec3( 0.32 );
 	vec3 cc = vec3( 0.64 );
@@ -104,8 +116,7 @@ float de ( vec3 p ) {
 	float x = deRoundedCone( p, vec3( 0.0 ), basisX / 2.0 );
 	float y = deRoundedCone( p, vec3( 0.0 ), basisY / 2.0 );
 	float z = deRoundedCone( p, vec3( 0.0 ), basisZ / 2.0 );
-	// float c = min( distance( vec3( 0.0 ), p ) - 0.18, deF( p ) );
-	float c = deF( p );
+	float c = cDist( p );
 	return SdSmoothMin( SdSmoothMin( SdSmoothMin( x, y ), z ), c );
 }
 
