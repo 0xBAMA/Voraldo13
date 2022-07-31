@@ -105,35 +105,14 @@ void engine::MenuLayout( bool* p_open ) {
 				}
 			}
 
-			// want to handle this differently, maybe - or break up the settings into multiple sections and then I wouldn't have to - render settings, then something else? not sure
-			char label[ 128 ];
 			if ( ImGui::CollapsingHeader( "Settings", flags ) ) {
 				ImGui::Indent( 16.0f );
-
-				sprintf( label, "  Color Settings" );
-				if ( ImGui::Selectable( label, currentlySelected == current ) ) {
-					currentlySelected = current;
+				while ( menu.entries[ current ].category == category_t::settings ) {
+					if ( ImGui::Selectable( menu.entries[ current ].label.c_str(), currentlySelected == current ) ) {
+						currentlySelected = current;
+					}
+					current++;
 				}
-				current++;
-
-				sprintf( label, "  Render Settings" );
-				if ( ImGui::Selectable( label, currentlySelected == current ) ) {
-					currentlySelected = current;
-				}
-				current++;
-
-				sprintf( label, "  Application Settings" );
-				if ( ImGui::Selectable( label, currentlySelected == current ) ) {
-					currentlySelected = current;
-				}
-				current++;
-
-				sprintf( label, "  Logging" );
-				if ( ImGui::Selectable( label, currentlySelected == current ) ) {
-					currentlySelected = current;
-				}
-				current++;
-
 				ImGui::Unindent( 16.0f );
 			}
 			ImGui::EndChild();
@@ -149,21 +128,29 @@ void engine::MenuLayout( bool* p_open ) {
 		Special reserve value -1 used for a welcome splash screen, shown on startup.
 ============================================================================= */
 		{
+			if ( !menu.entries[ currentlySelected ].requiresSpecialHandling ) {
+				// parse list of layout elements
+			} else {
+				// if blablah
+					// do the imgui layout
+			}
+
+
 			ImGui::BeginGroup();
 			ImGui::BeginChild("Contents", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
 			ImGui::Text("MyObject: %d", currentlySelected);
-			ImGui::Separator();
-			if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None)) {
-				if (ImGui::BeginTabItem("Description")) {
-					ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ");
-					ImGui::EndTabItem();
-				}
-				if (ImGui::BeginTabItem("Details")) {
-					ImGui::Text("ID: 0123456789");
-					ImGui::EndTabItem();
-				}
-				ImGui::EndTabBar();
-			}
+			// ImGui::Separator();
+			// if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None)) {
+			// 	if (ImGui::BeginTabItem("Description")) {
+			// 		ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ");
+			// 		ImGui::EndTabItem();
+			// 	}
+			// 	if (ImGui::BeginTabItem("Details")) {
+			// 		ImGui::Text("ID: 0123456789");
+			// 		ImGui::EndTabItem();
+			// 	}
+			// 	ImGui::EndTabBar();
+			// }
 			ImGui::EndChild();
 			if (ImGui::Button("Revert")) {}
 			ImGui::SameLine();
