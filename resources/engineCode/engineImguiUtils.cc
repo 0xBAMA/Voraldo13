@@ -61,8 +61,8 @@ void engine::MenuLayout( bool* p_open ) {
 			int current = 0;
 
 		// remove some redundancy
-		#define COLLAPSING_SECTION(label,x) \
-			if ( ImGui::CollapsingHeader( label, flags ) ) { \
+		#define COLLAPSING_SECTION(labelString,x) \
+			if ( ImGui::CollapsingHeader( labelString, flags ) ) { \
 				ImGui::Indent( 16.0f ); \
 				while ( menu.entries[ current ].category == x ) { \
 					if ( ImGui::Selectable( menu.entries[ current ].label.c_str(), currentlySelected == current ) ) { \
