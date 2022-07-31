@@ -60,64 +60,33 @@ void engine::MenuLayout( bool* p_open ) {
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_None;
 			int current = 0;
 
-			if ( ImGui::CollapsingHeader( "Shapes", flags ) ) {
-				ImGui::Indent( 16.0f );
-				while ( menu.entries[ current ].category == category_t::shapes ) {
-					if ( ImGui::Selectable( menu.entries[ current ].label.c_str(), currentlySelected == current ) ) {
-						currentlySelected = current;
-					}
-					current++;
-				}
-				ImGui::Unindent( 16.0f );
-			} else {
-				// iterate through to the first utility entry if the header is collapsed
-				while ( menu.entries[ current ].category == category_t::shapes ) {
-					current++;
-				}
+		// remove some redundancy
+		#define COLLAPSING_SECTION(label,x) \
+			if ( ImGui::CollapsingHeader( label, flags ) ) { \
+				ImGui::Indent( 16.0f ); \
+				while ( menu.entries[ current ].category == x ) { \
+					if ( ImGui::Selectable( menu.entries[ current ].label.c_str(), currentlySelected == current ) ) { \
+						currentlySelected = current; \
+					} \
+					current++; \
+				} \
+				ImGui::Unindent( 16.0f ); \
+			} else { /* if collapsed, bump current to compensate */ \
+				while ( menu.entries[ current ].category == x ) { \
+					current++; \
+				} \
 			}
 
-			if ( ImGui::CollapsingHeader( "Utilities", flags ) ) {
-				ImGui::Indent( 16.0f );
-				while ( menu.entries[ current ].category == category_t::utilities ) {
-					if ( ImGui::Selectable( menu.entries[ current ].label.c_str(), currentlySelected == current ) ) {
-						currentlySelected = current;
-					}
-					current++;
-				}
-			} else {
-				while ( menu.entries[ current ].category == category_t::utilities ) {
-					current++;
-				}
-			}
+			COLLAPSING_SECTION( "Shapes", category_t::shapes );
+			COLLAPSING_SECTION( "Utilities", category_t::utilities );
+			COLLAPSING_SECTION( "Lighting", category_t::lighting );
+			COLLAPSING_SECTION( "Settings", category_t::settings );
 
-			if ( ImGui::CollapsingHeader( "Lighting", flags ) ) {
-				ImGui::Indent( 16.0f );
-				while ( menu.entries[ current ].category == category_t::lighting ) {
-					if ( ImGui::Selectable( menu.entries[ current ].label.c_str(), currentlySelected == current ) ) {
-						currentlySelected = current;
-					}
-					current++;
-				}
-				ImGui::Unindent( 16.0f );
-			} else {
-				while ( menu.entries[ current ].category == category_t::lighting ) {
-					current++;
-				}
-			}
-
-			if ( ImGui::CollapsingHeader( "Settings", flags ) ) {
-				ImGui::Indent( 16.0f );
-				while ( menu.entries[ current ].category == category_t::settings ) {
-					if ( ImGui::Selectable( menu.entries[ current ].label.c_str(), currentlySelected == current ) ) {
-						currentlySelected = current;
-					}
-					current++;
-				}
-				ImGui::Unindent( 16.0f );
-			}
+			#undef COLLAPSING_SECTION // only needed in this scope
 			ImGui::EndChild();
 		}
 		ImGui::SameLine();
+
 
 /* =============================================================================
 	Right Side
