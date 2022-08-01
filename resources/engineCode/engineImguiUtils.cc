@@ -67,23 +67,21 @@ void engine::MenuLayout( bool* p_open ) {
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_None;
 			int current = 0;
 
-		// remove some redundancy
-		#define COLLAPSING_SECTION(labelString,x) \
-			if ( ImGui::CollapsingHeader( labelString, flags ) ) { \
-				/* ImGui::Indent( 16.0f ); */ \
-				while ( menu.entries[ current ].category == x ) { \
-					std::string label = std::string( "  " ) + menu.entries[ current ].label; \
-					if ( ImGui::Selectable( label.c_str(), currentlySelected == current ) ) { \
-						currentlySelected = current; \
+			// remove some redundancy
+			#define COLLAPSING_SECTION(labelString,x) \
+				if ( ImGui::CollapsingHeader( labelString, flags ) ) { \
+					while ( menu.entries[ current ].category == x ) { \
+						std::string label = std::string( "  " ) + menu.entries[ current ].label; \
+						if ( ImGui::Selectable( label.c_str(), currentlySelected == current ) ) { \
+							currentlySelected = current; \
+						} \
+						current++; \
 					} \
-					current++; \
-				} \
-				/* ImGui::Unindent( 16.0f ); */ \
-			} else { /* if collapsed, bump current to compensate */ \
-				while ( menu.entries[ current ].category == x ) { \
-					current++; \
-				} \
-			}
+				} else { /* if collapsed, bump current to compensate */ \
+					while ( menu.entries[ current ].category == x ) { \
+						current++; \
+					} \
+				}
 
 			COLLAPSING_SECTION( "Shapes", category_t::shapes );
 			COLLAPSING_SECTION( "Utilities", category_t::utilities );
@@ -118,7 +116,7 @@ void engine::MenuLayout( bool* p_open ) {
 
 				// do the specific layout for the named elements
 				if ( menu.entries[ currentlySelected ].label == "Tonemapping" ) {
-					OrangeText( std::string( " Tonemapping Settings" ).c_str() );
+					OrangeText( " Tonemapping Settings" );
 					ImGui::Separator();
 					ImGui::Indent( 16.0f );
 					const char* tonemapModesList[] = {
