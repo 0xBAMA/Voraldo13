@@ -34,6 +34,13 @@ static void HelpMarker ( const char *desc ) {
 	}
 }
 
+static void OrangeText ( const char *string ) {
+	ImGui::Separator();
+	ImGui::PushStyleColor( ImGuiCol_Text, ImVec4( 0.75, 0.35, 0.1, 1.0 ) );
+	ImGui::TextUnformatted( string );
+	ImGui::PopStyleColor();
+}
+
 // this needs a formatting pass
 void engine::MenuLayout( bool* p_open ) {
 
@@ -63,14 +70,15 @@ void engine::MenuLayout( bool* p_open ) {
 		// remove some redundancy
 		#define COLLAPSING_SECTION(labelString,x) \
 			if ( ImGui::CollapsingHeader( labelString, flags ) ) { \
-				ImGui::Indent( 16.0f ); \
+				/* ImGui::Indent( 16.0f ); */ \
 				while ( menu.entries[ current ].category == x ) { \
-					if ( ImGui::Selectable( menu.entries[ current ].label.c_str(), currentlySelected == current ) ) { \
+					std::string label = std::string( "  " ) + menu.entries[ current ].label; \
+					if ( ImGui::Selectable( label.c_str(), currentlySelected == current ) ) { \
 						currentlySelected = current; \
 					} \
 					current++; \
 				} \
-				ImGui::Unindent( 16.0f ); \
+				/* ImGui::Unindent( 16.0f ); */ \
 			} else { /* if collapsed, bump current to compensate */ \
 				while ( menu.entries[ current ].category == x ) { \
 					current++; \
@@ -110,7 +118,8 @@ void engine::MenuLayout( bool* p_open ) {
 
 				// do the specific layout for the named elements
 				if ( menu.entries[ currentlySelected ].label == "Tonemapping" ) {
-					
+					OrangeText( std::string( " Tonemapping Settings" ).c_str() );
+					ImGui::Separator();
 					ImGui::Indent( 16.0f );
 					const char* tonemapModesList[] = {
 						"None (Linear)",
