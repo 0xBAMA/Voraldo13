@@ -52,6 +52,9 @@ void engine::MenuLayout( bool* p_open ) {
 		if ( ImGui::BeginMenuBar() ) {
 			if ( ImGui::BeginMenu( "File" ) ) {
 				if ( ImGui::MenuItem( "Close" ) ) *p_open = false;
+
+				// probably add swapBlocks() here - this would be a nice, since it is globally accessible
+
 				ImGui::EndMenu();
 			}
 			ImGui::EndMenuBar();
@@ -112,12 +115,49 @@ void engine::MenuLayout( bool* p_open ) {
 			if ( !menu.entries[ currentlySelected ].requiresSpecialHandling ) {
 				// parse list of layout elements in the menu entry
 
+
+
+
 			} else {
+				// this section requires special handling / manual layout
+
+
 				// do the specific layout for the named elements
-				if ( menu.entries[ currentlySelected ].label == "Tonemapping" ) {
-					OrangeText( " Tonemapping Settings" );
+				if ( menu.entries[ currentlySelected ].label == "Application" ) {
+					const char* tridentModesList[] = {
+						"Fractal",
+						"Spherical"
+						// maybe look at doing some more versions of this? might be interesting
+					};
+					OrangeText( " Application Settings" );
 					ImGui::Separator();
 					ImGui::Indent( 16.0f );
+
+					ImGui::Combo( "Trident Mode", &trident.modeSelect, tridentModesList, IM_ARRAYSIZE( tridentModesList ) );
+
+					// etc
+					ImGui::Unindent( 16.0f );
+
+				} else if ( menu.entries[ currentlySelected ].label == "Rendering" ) {
+					OrangeText( " Rendering Settings" );
+					ImGui::Separator();
+					ImGui::Indent( 16.0f );
+					ImGui::SliderFloat( "Gamma", &tonemap.gamma, 0.0f, 3.0f );
+					ImGui::SliderFloat( "Alpha Correction Power", &render.alphaCorrectionPower, 0.0f, 4.0f );
+					ImGui::SliderFloat( "Jitter Amount", &render.jitterAmount, 0.0f, 2.0f );
+					ImGui::SliderFloat( "Perspective", &render.perspective, -4.0f, 4.0f );
+					ImGui::SliderInt( "Volume Steps", &render.volumeSteps, 0, 1400 );
+					// picker for render mode
+					ImGui::SliderInt( "History Frames", &render.numFramesHistory, 0, 14 );
+					ImGui::Unindent( 16.0f );
+				} else if ( menu.entries[ currentlySelected ].label == "Post Processing" ) {
+					OrangeText( "Post Process Settings" );
+					ImGui::Separator();
+					ImGui::Indent( 16.0f );
+
+					// color temp adjust is definitely postprocessing territory
+					ImGui::SliderFloat( "Color Temperature", &tonemap.colorTemp, 1000.0f, 40000.0f, "%.2f", ImGuiSliderFlags_Logarithmic );
+
 					const char* tonemapModesList[] = {
 						"None (Linear)",
 						"ACES (Narkowicz 2015)",
@@ -138,28 +178,17 @@ void engine::MenuLayout( bool* p_open ) {
 						"jodieReinhard2"
 					};
 					ImGui::Combo( "Tonemapping Mode", &tonemap.tonemapMode, tonemapModesList, IM_ARRAYSIZE( tonemapModesList ) );
-					ImGui::SliderFloat( "Gamma", &tonemap.gamma, 0.0f, 3.0f );
-					ImGui::SliderFloat( "Color Temperature", &tonemap.colorTemp, 1000.0f, 40000.0f, "%.2f", ImGuiSliderFlags_Logarithmic );
+					// probably move tonemapping controls here, and remove the separate tonemapping settings section
+
+					// add dither controls
+						// methodology picker - quantize, palette
+						// color space picker ( quantize or distance metric for palette )
+						// if mode is quantize, give control over bit depth + quantize method ( exponential / bitcrush )
+						// if mode is palette, give a picker for the palette
+
 					ImGui::Unindent( 16.0f );
-				} else if ( menu.entries[ currentlySelected ].label == "Application" ) {
-					const char* tridentModesList[] = {
-						"Fractal",
-						"Spherical"
-					};
-					OrangeText( " Application Settings" );
-					ImGui::Separator();
-					ImGui::Combo( "Trident Mode", &trident.modeSelect, tridentModesList, IM_ARRAYSIZE( tridentModesList ) );
-
-					// etc
-
-				} else if ( menu.entries[ currentlySelected ].label == "Rendering" ) {
-					OrangeText( " Rendering Settings" );
-					ImGui::Separator();
-					// alpha power
-					// blablah
-					// etc
-
 				}
+
 			}
 
 			ImGui::EndChild();

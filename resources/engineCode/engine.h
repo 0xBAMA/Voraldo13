@@ -40,6 +40,9 @@ private:
 	colorGradeParameters tonemap;
 	void SendTonemappingParameters ();
 
+	// render settings, will probably end up with more, tbd
+	renderSettings render;
+
 	// initialization
 	void Init ();
 	void StartMessage ();

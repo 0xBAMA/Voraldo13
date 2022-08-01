@@ -114,8 +114,17 @@ using json = nlohmann::json;
 
 struct colorGradeParameters {
 	int tonemapMode = 6;
-	float gamma = 1.1f;
+	float gamma = 1.337f;
 	float colorTemp = 6500.0f;
+};
+
+struct renderSettings {
+	float alphaCorrectionPower = 2.0f;
+	float jitterAmount = 1.0f;
+	float perspective = 0.2f;
+	int volumeSteps = 400;
+	int renderMode = 3;
+	int numFramesHistory = 8;
 };
 
 // Function to get color temperature from shadertoy user BeRo
