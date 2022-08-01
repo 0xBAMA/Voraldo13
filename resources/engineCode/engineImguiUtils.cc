@@ -97,29 +97,47 @@ void engine::MenuLayout( bool* p_open ) {
 		Special reserve value -1 used for a welcome splash screen, shown on startup.
 ============================================================================= */
 		{
-			if ( !menu.entries[ currentlySelected ].requiresSpecialHandling ) {
-				// parse list of layout elements
-			} else {
-				// if blablah
-					// do the imgui layout
-			}
 
 
 			ImGui::BeginGroup();
 			ImGui::BeginChild("Contents", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
 			ImGui::Text("MyObject: %d", currentlySelected);
-			// ImGui::Separator();
-			// if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None)) {
-			// 	if (ImGui::BeginTabItem("Description")) {
-			// 		ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ");
-			// 		ImGui::EndTabItem();
-			// 	}
-			// 	if (ImGui::BeginTabItem("Details")) {
-			// 		ImGui::Text("ID: 0123456789");
-			// 		ImGui::EndTabItem();
-			// 	}
-			// 	ImGui::EndTabBar();
-			// }
+
+			if ( !menu.entries[ currentlySelected ].requiresSpecialHandling ) {
+				// parse list of layout elements in the menu entry
+
+			} else {
+
+				// do the specific layout for the named elements
+				if ( menu.entries[ currentlySelected ].label == "Tonemapping" ) {
+					
+					ImGui::Indent( 16.0f );
+					const char* tonemapModesList[] = {
+						"None (Linear)",
+						"ACES (Narkowicz 2015)",
+						"Unreal Engine 3",
+						"Unreal Engine 4",
+						"Uncharted 2",
+						"Gran Turismo",
+						"Modified Gran Turismo",
+						"Rienhard",
+						"Modified Rienhard",
+						"jt",
+						"robobo1221s",
+						"robo",
+						"reinhardRobo",
+						"jodieRobo",
+						"jodieRobo2",
+						"jodieReinhard",
+						"jodieReinhard2"
+					};
+					ImGui::Combo( "Tonemapping Mode", &tonemap.tonemapMode, tonemapModesList, IM_ARRAYSIZE( tonemapModesList ) );
+					ImGui::SliderFloat( "Gamma", &tonemap.gamma, 0.0f, 3.0f );
+					ImGui::SliderFloat( "Color Temperature", &tonemap.colorTemp, 1000.0f, 40000.0f, "%.2f", ImGuiSliderFlags_Logarithmic );
+					ImGui::Unindent( 16.0f );
+				} // else if (  ) {}
+			}
+
 			ImGui::EndChild();
 			if (ImGui::Button("Revert")) {}
 			ImGui::SameLine();
@@ -163,37 +181,6 @@ void engine::DrawTextEditor () {
 
 	editor.Render( "Editor" );
 	HelpMarker( "dummy helpmarker to get rid of unused warning" );
-	ImGui::End();
-}
-
-
-// this will eventually move to the settings section of the main menu
-void engine::TonemapControlsWindow () {
-	ImGui::Begin( "Tonemapping Controls", NULL, 0 );
-
-	const char* tonemapModesList[] = {
-		"None (Linear)",
-		"ACES (Narkowicz 2015)",
-		"Unreal Engine 3",
-		"Unreal Engine 4",
-		"Uncharted 2",
-		"Gran Turismo",
-		"Modified Gran Turismo",
-		"Rienhard",
-		"Modified Rienhard",
-		"jt",
-		"robobo1221s",
-		"robo",
-		"reinhardRobo",
-		"jodieRobo",
-		"jodieRobo2",
-		"jodieReinhard",
-		"jodieReinhard2"
-	};
-	ImGui::Combo( "Tonemapping Mode", &tonemap.tonemapMode, tonemapModesList, IM_ARRAYSIZE( tonemapModesList ) );
-	ImGui::SliderFloat( "Gamma", &tonemap.gamma, 0.0f, 3.0f );
-	ImGui::SliderFloat( "Color Temperature", &tonemap.colorTemp, 1000.0f, 40000.0f, "%.2f", ImGuiSliderFlags_Logarithmic );
-
 	ImGui::End();
 }
 

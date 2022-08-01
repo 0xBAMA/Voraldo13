@@ -93,9 +93,6 @@ void engine::ImguiPass () {
 
 	// if ( true ) ImGui::ShowDemoWindow();	// show the demo window
 
-	// this gets moved into the menu container soon
-	TonemapControlsWindow();
-
 	// menu container
 	static bool showMenu = true;
 	MenuLayout( &showMenu );

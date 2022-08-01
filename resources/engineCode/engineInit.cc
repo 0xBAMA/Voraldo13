@@ -125,14 +125,7 @@ void engine::MenuPopulate () {
 	menu.entries.push_back( menuEntry( "sixth lighting", category_t::lighting ) );
 	menu.entries.push_back( menuEntry( "seventh lighting", category_t::lighting ) );
 
-	menu.entries.push_back( menuEntry( "first setting", category_t::settings ) );
-	menu.entries.push_back( menuEntry( "second setting", category_t::settings ) );
-	menu.entries.push_back( menuEntry( "third setting", category_t::settings ) );
-	menu.entries.push_back( menuEntry( "fourth setting", category_t::settings ) );
-	menu.entries.push_back( menuEntry( "fifth setting", category_t::settings ) );
-	menu.entries.push_back( menuEntry( "sixth setting", category_t::settings ) );
-	menu.entries.push_back( menuEntry( "seventh setting", category_t::settings ) );
-	menu.entries.push_back( menuEntry( "eighth setting", category_t::settings ) );
+	menu.entries.push_back( menuEntry( "Tonemapping", category_t::settings, true ) );
 
 	// if out of order, need to sort - order must be
 		// all shapes, followed by all utilities, then all lighting, then all settings
