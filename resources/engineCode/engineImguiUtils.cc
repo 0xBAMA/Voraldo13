@@ -113,7 +113,6 @@ void engine::MenuLayout( bool* p_open ) {
 				// parse list of layout elements in the menu entry
 
 			} else {
-
 				// do the specific layout for the named elements
 				if ( menu.entries[ currentlySelected ].label == "Tonemapping" ) {
 					OrangeText( " Tonemapping Settings" );
@@ -142,7 +141,25 @@ void engine::MenuLayout( bool* p_open ) {
 					ImGui::SliderFloat( "Gamma", &tonemap.gamma, 0.0f, 3.0f );
 					ImGui::SliderFloat( "Color Temperature", &tonemap.colorTemp, 1000.0f, 40000.0f, "%.2f", ImGuiSliderFlags_Logarithmic );
 					ImGui::Unindent( 16.0f );
-				} // else if (  ) {}
+				} else if ( menu.entries[ currentlySelected ].label == "Application" ) {
+					const char* tridentModesList[] = {
+						"Fractal",
+						"Spherical"
+					};
+					OrangeText( " Application Settings" );
+					ImGui::Separator();
+					ImGui::Combo( "Trident Mode", &trident.modeSelect, tridentModesList, IM_ARRAYSIZE( tridentModesList ) );
+
+					// etc
+
+				} else if ( menu.entries[ currentlySelected ].label == "Rendering" ) {
+					OrangeText( " Rendering Settings" );
+					ImGui::Separator();
+					// alpha power
+					// blablah
+					// etc
+
+				}
 			}
 
 			ImGui::EndChild();

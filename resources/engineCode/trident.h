@@ -56,6 +56,12 @@ public:
 		glBindImageTexture( 0, tridentImage, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
 		glBindImageTexture( 1, writeTarget, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
 
+		static int previousModeSelect = modeSelect;
+		if ( previousModeSelect != modeSelect ) {
+			needsRedraw = true;
+			previousModeSelect = modeSelect;
+		}
+
 		if ( needsRedraw ) { // do the raymarch
 			// while relatively cheap, this is still the most expensive part of this
 			//   operation, so the idea is to write the result to a texture and copy

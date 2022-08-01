@@ -126,6 +126,8 @@ void engine::MenuPopulate () {
 	menu.entries.push_back( menuEntry( "seventh lighting", category_t::lighting ) );
 
 	menu.entries.push_back( menuEntry( "Tonemapping", category_t::settings, true ) );
+	menu.entries.push_back( menuEntry( "Application", category_t::settings, true ) );
+	menu.entries.push_back( menuEntry( "Rendering", category_t::settings, true ) );
 
 	// if out of order, need to sort - order must be
 		// all shapes, followed by all utilities, then all lighting, then all settings
