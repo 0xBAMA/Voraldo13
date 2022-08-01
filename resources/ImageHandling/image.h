@@ -45,7 +45,7 @@ public:
 	}
 
 	Image ( int x, int y, bool randomize = false ) : width( x ), height( y ) {
-		data.resize( width * height * numChannels );
+		data.resize( width * height * numChannels, 0 );
 		if ( randomize ) {
 			std::random_device r;
 			std::seed_seq s{ r(), r(), r(), r(), r(), r(), r(), r(), r() };
@@ -60,7 +60,7 @@ public:
 
 	Image ( std::string path, backend loader = LODEPNG ) {
 		if ( !Load( path, loader ) ) {
-			std::cout << "image load failed" << std::endl << std::flush;
+			std::cout << "image load failed with path " << path << std::endl << std::flush;
 		}
 	}
 
@@ -223,6 +223,103 @@ public:
 			data[ index + 2 ] = set.b;
 			data[ index + 3 ] = set.a;
 		}
+	}
+
+	enum class sortCriteria {
+		red, green, blue, luma
+	};
+
+	struct {
+		bool operator()( rgba a, rgba b ) const {
+			// compute luma and compare
+			float ra = ( a.r / 255.0 );
+			float rb = ( b.r / 255.0 );
+
+			float ga = ( a.g / 255.0 );
+			float gb = ( b.g / 255.0 );
+
+			float ba = ( a.b / 255.0 );
+			float bb = ( b.b / 255.0 );
+
+			float lumaA = sqrt( 0.299 * ra * ra + 0.587 * ga * ga + 0.114 * ba * ba );
+			float lumaB = sqrt( 0.299 * rb * rb + 0.587 * gb * gb + 0.114 * bb * bb );
+			return lumaA < lumaB;
+		}
+	} lumaLess;
+
+	// color channel comparisons
+	struct {
+		bool operator()( rgba a, rgba b ) const {
+			return a.r < b.r;
+		}
+	} redLess;
+
+	struct {
+		bool operator()( rgba a, rgba b ) const {
+			return a.g < b.g;
+		}
+	} greenLess;
+
+	struct {
+		bool operator()( rgba a, rgba b ) const {
+			return a.b < b.b;
+		}
+	} blueLess;
+
+	void SortByRows ( sortCriteria howWeSortin ) {
+		for ( unsigned int entry = 0; entry < height; entry++ ) {
+			// collect the colors
+			std::vector< rgba > row;
+			for ( unsigned int x = 0; x < width; x++ )
+				if ( GetAtXY( x, entry ).a == 0 ) {
+					break;
+				} else {
+					row.push_back( GetAtXY( x, entry ) );
+				}
+
+			// sort them and put them back
+			switch ( howWeSortin ) {
+				case sortCriteria::luma:	std::sort( row.begin(), row.end(), lumaLess );	break;
+				case sortCriteria::red:		std::sort( row.begin(), row.end(), redLess );		break;
+				case sortCriteria::green:	std::sort( row.begin(), row.end(), greenLess );	break;
+				case sortCriteria::blue:	std::sort( row.begin(), row.end(), blueLess );	break;
+			}
+			for ( unsigned int x = 0; x < row.size(); x++ )
+				SetAtXY( x, entry, row[ x ] );
+		}
+	}
+
+	void SortByCols ( sortCriteria howWeSortin ) {
+		for ( unsigned int entry = 0; entry < width; entry++ ) {
+			// collect the colors
+			std::vector< rgba > col;
+			for ( unsigned int y = 0; y < width; y++ )
+				if ( GetAtXY( entry, y ).a == 0 ) {
+					break;
+				} else {
+					col.push_back( GetAtXY( entry, y ) );
+				}
+
+			// sort them and put them back
+			switch ( howWeSortin ) {
+				case sortCriteria::luma:	std::sort( col.begin(), col.end(), lumaLess );	break;
+				case sortCriteria::red:		std::sort( col.begin(), col.end(), redLess );		break;
+				case sortCriteria::green:	std::sort( col.begin(), col.end(), greenLess );	break;
+				case sortCriteria::blue:	std::sort( col.begin(), col.end(), blueLess );	break;
+			}
+			for ( unsigned int y = 0; y < col.size(); y++ )
+				SetAtXY( entry, y, col[ y ] );
+		}
+	}
+
+
+
+	void LumaSortByRows () {
+		SortByRows( sortCriteria::luma );
+	}
+
+	void LumaSortByCols () {
+		SortByCols( sortCriteria::luma );
 	}
 
 	std::vector< uint8_t > data;
