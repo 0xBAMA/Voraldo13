@@ -110,9 +110,14 @@ void engine::MenuLayout( bool* p_open ) {
 
 			ImGui::BeginGroup();
 			ImGui::BeginChild("Contents", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
-			ImGui::Text("MyObject: %d", currentlySelected);
+			// ImGui::Text("MyObject: %d", currentlySelected);
 
-			if ( !menu.entries[ currentlySelected ].requiresSpecialHandling ) {
+			if ( currentlySelected == -1 ) {
+				// splash
+				OrangeText( " Welcome To Voraldo 13" );
+
+
+			} else if ( !menu.entries[ currentlySelected ].requiresSpecialHandling ) {
 				// parse list of layout elements in the menu entry
 
 
@@ -122,71 +127,12 @@ void engine::MenuLayout( bool* p_open ) {
 				// this section requires special handling / manual layout
 
 
-				// do the specific layout for the named elements
 				if ( menu.entries[ currentlySelected ].label == "Application" ) {
-					const char* tridentModesList[] = {
-						"Fractal",
-						"Spherical"
-						// maybe look at doing some more versions of this? might be interesting
-					};
-					OrangeText( " Application Settings" );
-					ImGui::Separator();
-					ImGui::Indent( 16.0f );
-
-					ImGui::Combo( "Trident Mode", &trident.modeSelect, tridentModesList, IM_ARRAYSIZE( tridentModesList ) );
-
-					// etc
-					ImGui::Unindent( 16.0f );
-
+					FillApplicationSettings();
 				} else if ( menu.entries[ currentlySelected ].label == "Rendering" ) {
-					OrangeText( " Rendering Settings" );
-					ImGui::Separator();
-					ImGui::Indent( 16.0f );
-					ImGui::SliderFloat( "Gamma", &tonemap.gamma, 0.0f, 3.0f );
-					ImGui::SliderFloat( "Alpha Correction Power", &render.alphaCorrectionPower, 0.0f, 4.0f );
-					ImGui::SliderFloat( "Jitter Amount", &render.jitterAmount, 0.0f, 2.0f );
-					ImGui::SliderFloat( "Perspective", &render.perspective, -4.0f, 4.0f );
-					ImGui::SliderInt( "Volume Steps", &render.volumeSteps, 0, 1400 );
-					// picker for render mode
-					ImGui::SliderInt( "History Frames", &render.numFramesHistory, 0, 14 );
-					ImGui::Unindent( 16.0f );
+					FillRenderingSettings();
 				} else if ( menu.entries[ currentlySelected ].label == "Post Processing" ) {
-					OrangeText( "Post Process Settings" );
-					ImGui::Separator();
-					ImGui::Indent( 16.0f );
-
-					// color temp adjust is definitely postprocessing territory
-					ImGui::SliderFloat( "Color Temperature", &tonemap.colorTemp, 1000.0f, 40000.0f, "%.2f", ImGuiSliderFlags_Logarithmic );
-
-					const char* tonemapModesList[] = {
-						"None (Linear)",
-						"ACES (Narkowicz 2015)",
-						"Unreal Engine 3",
-						"Unreal Engine 4",
-						"Uncharted 2",
-						"Gran Turismo",
-						"Modified Gran Turismo",
-						"Rienhard",
-						"Modified Rienhard",
-						"jt",
-						"robobo1221s",
-						"robo",
-						"reinhardRobo",
-						"jodieRobo",
-						"jodieRobo2",
-						"jodieReinhard",
-						"jodieReinhard2"
-					};
-					ImGui::Combo( "Tonemapping Mode", &tonemap.tonemapMode, tonemapModesList, IM_ARRAYSIZE( tonemapModesList ) );
-					// probably move tonemapping controls here, and remove the separate tonemapping settings section
-
-					// add dither controls
-						// methodology picker - quantize, palette
-						// color space picker ( quantize or distance metric for palette )
-						// if mode is quantize, give control over bit depth + quantize method ( exponential / bitcrush )
-						// if mode is palette, give a picker for the palette
-
-					ImGui::Unindent( 16.0f );
+					FillPostProcessingSettings();
 				}
 
 			}
@@ -199,6 +145,55 @@ void engine::MenuLayout( bool* p_open ) {
 		}
 	}
 	ImGui::End();
+}
+
+void engine::FillApplicationSettings() {
+	OrangeText( " Application Settings" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+
+	// maybe look at doing some more versions of this? might be interesting
+	const char* tridentModesList[] = { "Fractal", "Spherical" };
+	ImGui::Combo( "Trident Mode", &trident.modeSelect, tridentModesList, IM_ARRAYSIZE( tridentModesList ) );
+
+	// etc
+	ImGui::Unindent( 16.0f );
+}
+
+void engine::FillRenderingSettings () {
+	OrangeText( " Rendering Settings" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::SliderFloat( "Alpha Correction Power", &render.alphaCorrectionPower, 0.0f, 4.0f );
+	ImGui::SliderFloat( "Jitter Amount", &render.jitterAmount, 0.0f, 2.0f );
+	ImGui::SliderFloat( "Perspective", &render.perspective, -4.0f, 4.0f );
+	ImGui::SliderInt( "Volume Steps", &render.volumeSteps, 0, 1400 );
+	// picker for render mode shader
+	ImGui::SliderInt( "History Frames", &render.numFramesHistory, 0, 14 );
+	ImGui::Unindent( 16.0f );
+}
+
+void engine::FillPostProcessingSettings () {
+	OrangeText( "Post Process Settings" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+
+	const char* tonemapModesList[] = { "None (Linear)", "ACES (Narkowicz 2015)", "Unreal Engine 3",
+		"Unreal Engine 4", "Uncharted 2", "Gran Turismo", "Modified Gran Turismo", "Rienhard",
+		"Modified Rienhard", "jt", "robobo1221s", "robo", "reinhardRobo", "jodieRobo", "jodieRobo2",
+		"jodieReinhard", "jodieReinhard2" };
+
+	ImGui::SliderFloat( "Gamma", &tonemap.gamma, 0.0f, 3.0f );
+	ImGui::SliderFloat( "Color Temperature", &tonemap.colorTemp, 1000.0f, 40000.0f, "%.2f", ImGuiSliderFlags_Logarithmic );
+	ImGui::Combo( "Tonemapping Mode", &tonemap.tonemapMode, tonemapModesList, IM_ARRAYSIZE( tonemapModesList ) );
+
+	// add dither controls
+		// methodology picker - quantize, palette
+		// color space picker ( quantize or distance metric for palette )
+		// if mode is quantize, give control over bit depth + quantize method ( exponential / bitcrush )
+		// if mode is palette, give a picker for the palette
+
+	ImGui::Unindent( 16.0f );
 }
 
 

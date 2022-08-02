@@ -64,6 +64,11 @@ private:
 	void MenuLayout ( bool* open );
 	void QuitConf ( bool* open );
 
+	// imgui menu helpers
+	void FillApplicationSettings ();
+	void FillRenderingSettings ();
+	void FillPostProcessingSettings ();
+
 	// shutdown procedures
 	void ImguiQuit ();
 	void SDLQuit ();

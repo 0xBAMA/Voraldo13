@@ -232,7 +232,11 @@ void engine::ImguiSetup () {
 	SDL_GL_SwapWindow( window ); // show clear color
 
 	// setting custom font, if desired
-	// io.Fonts->AddFontFromFileTTF( "resources/fonts/star_trek/titles/TNG_Title.ttf", 16 );
+	// io.Fonts->AddFontFromFileTTF( "resources/fonts/ttf/star_trek/titles/TNG_Title.ttf", 32 );
+	// io.Fonts->AddFontFromFileTTF( "resources/fonts/ttf/star_trek/titles/DS9_Credits.ttf", 32 );
+	// io.Fonts->AddFontFromFileTTF( "resources/fonts/ttf/star_trek/titles/Montalban.ttf", 32 );
+	// io.Fonts->AddFontFromFileTTF( "resources/fonts/ttf/star_trek/text/Beijing.ttf", 32 );
+	// io.Fonts->AddFontFromFileTTF( "resources/fonts/ttf/Braciola MS ExB.ttf", 32 );
 
 	ImVec4 *colors = ImGui::GetStyle().Colors;
 	colors[ ImGuiCol_Text ]										= ImVec4(0.67f, 0.50f, 0.16f, 1.00f);

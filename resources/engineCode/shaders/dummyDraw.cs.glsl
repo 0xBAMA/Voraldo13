@@ -11,7 +11,7 @@ void main () {
 	uvec3 result = uvec3( x ^ y ) / 2;
 
 	// add some blue noise, for shits
-	result += imageLoad( blueNoiseTexture, writeLoc % imageSize( blueNoiseTexture ) ).xyz;
+	result = uvec3( 255 ) - clamp( result * imageLoad( blueNoiseTexture, writeLoc % imageSize( blueNoiseTexture ) ).xyz, uvec3( 0 ), uvec3( 255 ) );
 
 	// write the data to the image
 	imageStore( accumulatorTexture, writeLoc, uvec4( result, 255 ) );
