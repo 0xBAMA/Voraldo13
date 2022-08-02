@@ -97,8 +97,14 @@ void engine::MenuPopulate () {
 	// eventually this will come from a json structure containing records of each menu entry
 	cout << T_BLUE << "    Populating Menu" << RESET << " .................................. ";
 
+	std::ifstream i( "resources/engineCode/menuConfig.json" );
+	json j;
+	i >> j;
 
-
+	for ( auto& element : j[ "entries" ] ) {
+		// construct each menu entry and add
+		cout << "label is " << element[ "label" ] << endl;
+	}
 
 
 	menu.entries.push_back( menuEntry( "zeroth shape", category_t::shapes ) );

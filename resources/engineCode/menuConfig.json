@@ -1,0 +1,20 @@
+{
+	"entries" : [
+		{
+			"label": "first label",
+			"special": false
+		},
+		{
+			"label": "second label",
+			"special": false
+		},
+		{
+			"label": "third label",
+			"special": false
+		},
+		{
+			"label": "fourth label",
+			"special": false
+		}
+	]
+}
