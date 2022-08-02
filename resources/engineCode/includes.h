@@ -98,7 +98,7 @@ constexpr int MSAACount = 1;
 #include "../noise/perlin.h"
 
 // Niels Lohmann - JSON for Modern C++
-#include "../JSON/json.hpp"
+#include "../JSON/json.h"
 using json = nlohmann::json;
 
 // #define WIDTH 640

@@ -152,6 +152,12 @@ void engine::FillApplicationSettings() {
 	ImGui::Separator();
 	ImGui::Indent( 16.0f );
 
+	// add settings for window
+	// change which screen it's displayed on
+		// toggle fullscreen/windowed
+		// can you change bordered/borderless at runtime?
+			// if not, maybe de-init and re-init
+
 	// maybe look at doing some more versions of this? might be interesting
 	const char* tridentModesList[] = { "Fractal", "Spherical" };
 	ImGui::Combo( "Trident Mode", &trident.modeSelect, tridentModesList, IM_ARRAYSIZE( tridentModesList ) );
