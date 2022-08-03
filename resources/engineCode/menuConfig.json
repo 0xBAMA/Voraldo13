@@ -2,18 +2,82 @@
 	"entries" : [
 		{
 			"label": "first label",
+			"type": "shapes",
 			"special": false
 		},
 		{
 			"label": "second label",
+			"type": "shapes",
 			"special": false
 		},
 		{
 			"label": "third label",
+			"type": "shapes",
 			"special": false
 		},
 		{
 			"label": "fourth label",
+			"type": "shapes",
+			"special": false
+		},
+		{
+			"label": "first label",
+			"type": "utilities",
+			"special": false
+		},
+		{
+			"label": "second label",
+			"type": "utilities",
+			"special": false
+		},
+		{
+			"label": "third label",
+			"type": "utilities",
+			"special": false
+		},
+		{
+			"label": "fourth label",
+			"type": "utilities",
+			"special": false
+		},
+		{
+			"label": "first label",
+			"type": "lighting",
+			"special": false
+		},
+		{
+			"label": "second label",
+			"type": "lighting",
+			"special": false
+		},
+		{
+			"label": "third label",
+			"type": "lighting",
+			"special": false
+		},
+		{
+			"label": "fourth label",
+			"type": "lighting",
+			"special": false
+		},
+		{
+			"label": "first label",
+			"type": "settings",
+			"special": false
+		},
+		{
+			"label": "second label",
+			"type": "settings",
+			"special": false
+		},
+		{
+			"label": "third label",
+			"type": "settings",
+			"special": false
+		},
+		{
+			"label": "fourth label",
+			"type": "settings",
 			"special": false
 		}
 	]
