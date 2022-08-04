@@ -159,7 +159,7 @@ void engine::DisplaySetup () {
 	cout << T_RED << "      GLSL version supported : " << T_CYAN << glslVersion << RESET << endl << endl;
 
 	// create the shader for the triangles to cover the screen
-	displayShader = Shader( "resources/engineCode/shaders/blit.vs.glsl", "resources/engineCode/shaders/blit.fs.glsl" ).Program;
+	displayShader = regularShader( "resources/engineCode/shaders/blit.vs.glsl", "resources/engineCode/shaders/blit.fs.glsl" ).shaderHandle;
 
 	// have to have dummy call to this - OpenGL core spec requires a VAO bound when calling glDrawArrays, otherwise it complains
 	glGenVertexArrays( 1, &displayVAO );
@@ -200,22 +200,21 @@ void engine::DisplaySetup () {
 
 void engine::ComputeShaderCompile () {
 	// initialize the text renderer
-	textRenderer.Init( WIDTH, HEIGHT, CShader( "resources/fonts/fontRenderer/font.cs.glsl" ).Program );
+	textRenderer.Init( WIDTH, HEIGHT, computeShader( "resources/fonts/fontRenderer/font.cs.glsl" ).shaderHandle );
 	// get the base point to draw the gizmo/widget/trident from the text renderer
 	trident.basePt = textRenderer.basePt;
 
 	// something to put data in the accumulator texture
-	dummyDrawShader = CShader( "resources/engineCode/shaders/dummyDraw.cs.glsl" ).Program;
+	dummyDrawShader = computeShader( "resources/engineCode/shaders/dummyDraw.cs.glsl" ).shaderHandle;
 
 	// tonemapping shader
-	tonemapShader = CShader( "resources/engineCode/shaders/tonemap.cs.glsl" ).Program;
+	tonemapShader = computeShader( "resources/engineCode/shaders/tonemap.cs.glsl" ).shaderHandle;
 
 	// orientTrident shaders
-	GLuint orientTridentGen = CShader( "resources/engineCode/shaders/tridentGenerate.cs.glsl" ).Program;
-	GLuint orientTridentCopy = CShader( "resources/engineCode/shaders/tridentCopy.cs.glsl" ).Program;
+	GLuint orientTridentGen = computeShader( "resources/engineCode/shaders/tridentGenerate.cs.glsl" ).shaderHandle;
+	GLuint orientTridentCopy = computeShader( "resources/engineCode/shaders/tridentCopy.cs.glsl" ).shaderHandle;
 	trident.PassInShaders( orientTridentGen, orientTridentCopy );
 }
-
 
 void engine::ImguiSetup () {
 	cout << T_BLUE << "    Configuring dearImGUI" << RESET << " ............................ ";
