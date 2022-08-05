@@ -101,47 +101,28 @@ void engine::MenuPopulate () {
 	json j;
 	i >> j;
 
-	for ( auto& element : j[ "entries" ] ) {
+	for ( auto& element : j[ "Entries" ] ) {
 		// construct each menu entry and add
-		cout << "label is " << element[ "label" ] << endl;
+		string entryLabel = element[ "Label" ];
+
+		category_t entryCategory = category_t::none;
+		if ( element[ "Category" ] == string( "Shapes" ) ) {
+			entryCategory = category_t::shapes;
+		} else if ( element[ "Category" ] == string( "Utilities" ) ) {
+			entryCategory = category_t::utilities;
+		} else if ( element[ "Category" ] == string( "Lighting" ) ) {
+			entryCategory = category_t::lighting;
+		} else if ( element[ "Category" ] == string( "Settings" ) ) {
+			entryCategory = category_t::settings;
+		}
+
+		bool entrySpecial = false;
+		if ( element[ "RequiresSpecialHandling" ] == string( "true" ) ) {
+			entrySpecial = true;
+		}
+
+		menu.entries.push_back( menuEntry( entryLabel, entryCategory, entrySpecial ) );
 	}
-
-
-	menu.entries.push_back( menuEntry( "zeroth shape", category_t::shapes ) );
-	menu.entries.push_back( menuEntry( "first shape", category_t::shapes ) );
-	menu.entries.push_back( menuEntry( "second shape", category_t::shapes ) );
-	menu.entries.push_back( menuEntry( "third shape", category_t::shapes ) );
-	menu.entries.push_back( menuEntry( "fourth shape", category_t::shapes ) );
-	menu.entries.push_back( menuEntry( "fifth shape", category_t::shapes ) );
-	menu.entries.push_back( menuEntry( "sixth shape", category_t::shapes ) );
-	menu.entries.push_back( menuEntry( "seventh shape", category_t::shapes ) );
-	menu.entries.push_back( menuEntry( "eighth shape", category_t::shapes ) );
-
-	menu.entries.push_back( menuEntry( "first utility", category_t::utilities ) );
-	menu.entries.push_back( menuEntry( "second utility", category_t::utilities ) );
-	menu.entries.push_back( menuEntry( "third utility", category_t::utilities ) );
-	menu.entries.push_back( menuEntry( "fourth utility", category_t::utilities ) );
-	menu.entries.push_back( menuEntry( "fifth utility", category_t::utilities ) );
-	menu.entries.push_back( menuEntry( "sixth utility", category_t::utilities ) );
-	menu.entries.push_back( menuEntry( "seventh utility", category_t::utilities ) );
-	menu.entries.push_back( menuEntry( "eighth utility", category_t::utilities ) );
-	menu.entries.push_back( menuEntry( "ninth utility", category_t::utilities ) );
-
-	menu.entries.push_back( menuEntry( "first lighting", category_t::lighting ) );
-	menu.entries.push_back( menuEntry( "second lighting", category_t::lighting ) );
-	menu.entries.push_back( menuEntry( "third lighting", category_t::lighting ) );
-	menu.entries.push_back( menuEntry( "fourth lighting", category_t::lighting ) );
-	menu.entries.push_back( menuEntry( "fifth lighting", category_t::lighting ) );
-	menu.entries.push_back( menuEntry( "sixth lighting", category_t::lighting ) );
-	menu.entries.push_back( menuEntry( "seventh lighting", category_t::lighting ) );
-
-	menu.entries.push_back( menuEntry( "Application", category_t::settings, true ) );
-	menu.entries.push_back( menuEntry( "Rendering", category_t::settings, true ) );
-	menu.entries.push_back( menuEntry( "Post Processing", category_t::settings, true ) );
-
-	// if out of order, need to sort - order must be
-		// all shapes, followed by all utilities, then all lighting, then all settings
-
 	cout << T_GREEN << "done." << RESET << endl;
 }
 

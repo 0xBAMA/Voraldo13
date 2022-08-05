@@ -26,6 +26,7 @@ using std::cin;
 using std::cout;
 using std::endl;
 using std::flush;
+using std::string;
 
 // pi definition - definitely sufficient precision
 constexpr double pi = 3.14159265358979323846;

@@ -1,84 +1,161 @@
 {
-	"entries" : [
+	"Entries" : [
 		{
-			"label": "first label",
-			"type": "shapes",
-			"special": false
+			"Label": "AABB",
+			"Category": "Shapes",
+			"RequiresSpecialHandling": false
 		},
 		{
-			"label": "second label",
-			"type": "shapes",
-			"special": false
+			"Label": "Cylinder/Tube",
+			"Category": "Shapes",
+			"RequiresSpecialHandling": false
 		},
 		{
-			"label": "third label",
-			"type": "shapes",
-			"special": false
+			"Label": "Ellipsoid",
+			"Category": "Shapes",
+			"RequiresSpecialHandling": false
 		},
 		{
-			"label": "fourth label",
-			"type": "shapes",
-			"special": false
+			"Label": "Grid",
+			"Category": "Shapes",
+			"RequiresSpecialHandling": false
 		},
 		{
-			"label": "first label",
-			"type": "utilities",
-			"special": false
+			"Label": "Heightmap",
+			"Category": "Shapes",
+			"RequiresSpecialHandling": false
 		},
 		{
-			"label": "second label",
-			"type": "utilities",
-			"special": false
+			"Label": "Icosahedron",
+			"Category": "Shapes",
+			"RequiresSpecialHandling": false
 		},
 		{
-			"label": "third label",
-			"type": "utilities",
-			"special": false
+			"Label": "Noise",
+			"Category": "Shapes",
+			"RequiresSpecialHandling": false
 		},
 		{
-			"label": "fourth label",
-			"type": "utilities",
-			"special": false
+			"Label": "Sphere",
+			"Category": "Shapes",
+			"RequiresSpecialHandling": false
 		},
 		{
-			"label": "first label",
-			"type": "lighting",
-			"special": false
+			"Label": "Triangle",
+			"Category": "Shapes",
+			"RequiresSpecialHandling": false
 		},
 		{
-			"label": "second label",
-			"type": "lighting",
-			"special": false
+			"Label": "User Shader",
+			"Category": "Shapes",
+			"RequiresSpecialHandling": false
 		},
 		{
-			"label": "third label",
-			"type": "lighting",
-			"special": false
+			"Label": "VAT",
+			"Category": "Shapes",
+			"RequiresSpecialHandling": false
 		},
 		{
-			"label": "fourth label",
-			"type": "lighting",
-			"special": false
+			"Label": "Spaceship Generator",
+			"Category": "Shapes",
+			"RequiresSpecialHandling": false
 		},
 		{
-			"label": "first label",
-			"type": "settings",
-			"special": false
+			"Label": "Letters",
+			"Category": "Shapes",
+			"RequiresSpecialHandling": false
 		},
 		{
-			"label": "second label",
-			"type": "settings",
-			"special": false
+			"Label": "XOR",
+			"Category": "Shapes",
+			"RequiresSpecialHandling": false
+		},
+
+
+		{
+			"Label": "Clear",
+			"Category": "Utilities",
+			"RequiresSpecialHandling": false
 		},
 		{
-			"label": "third label",
-			"type": "settings",
-			"special": false
+			"Label": "Masking",
+			"Category": "Utilities",
+			"RequiresSpecialHandling": false
 		},
 		{
-			"label": "fourth label",
-			"type": "settings",
-			"special": false
+			"Label": "Blur",
+			"Category": "Utilities",
+			"RequiresSpecialHandling": false
+		},
+		{
+			"Label": "Shift/Trim",
+			"Category": "Utilities",
+			"RequiresSpecialHandling": false
+		},
+		{
+			"Label": "Load/Save",
+			"Category": "Utilities",
+			"RequiresSpecialHandling": false
+		},
+		{
+			"Label": "Limiter/Compressor",
+			"Category": "Utilities",
+			"RequiresSpecialHandling": false
+		},
+		{
+			"Label": "Copy/Paste",
+			"Category": "Utilities",
+			"RequiresSpecialHandling": false
+		},
+		{
+			"Label": "Logging",
+			"Category": "Utilities",
+			"RequiresSpecialHandling": false
+		},
+
+
+
+		{
+			"Label": "Clear Levels",
+			"Category": "Lighting",
+			"RequiresSpecialHandling": false
+		},
+		{
+			"Label": "Direct",
+			"Category": "Lighting",
+			"RequiresSpecialHandling": false
+		},
+		{
+			"Label": "Fake GI",
+			"Category": "Lighting",
+			"RequiresSpecialHandling": false
+		},
+		{
+			"Label": "AO",
+			"Category": "Lighting",
+			"RequiresSpecialHandling": false
+		},
+		{
+			"Label": "Mash",
+			"Category": "Lighting",
+			"RequiresSpecialHandling": false
+		},
+
+
+		{
+			"Label": "Application",
+			"Category": "Settings",
+			"RequiresSpecialHandling": false
+		},
+		{
+			"Label": "Rendering",
+			"Category": "Settings",
+			"RequiresSpecialHandling": false
+		},
+		{
+			"Label": "Post Processing",
+			"Category": "Settings",
+			"RequiresSpecialHandling": false
 		}
 	]
 }

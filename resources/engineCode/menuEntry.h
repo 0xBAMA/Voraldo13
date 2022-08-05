@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-enum class category_t { shapes, utilities, lighting, settings };
+enum class category_t { none, shapes, utilities, lighting, settings };
 enum class elements_t { separator, sameline, floatSlider /*, ... */ };
 
 struct menuEntry {
