@@ -115,35 +115,65 @@ void engine::MenuLayout( bool* p_open ) {
 			if ( currentlySelected == -1 ) {
 				MenuSplash();
 			} else if ( menu.entries[ currentlySelected ].label == string( "AABB" ) ) {
+				MenuAABB();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Cylinder/Tube" ) ) {
+				MenuCylinderTube();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Ellipsoid" ) ) {
+				MenuEllipsoid();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Grid" ) ) {
+				MenuGrid();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Heightmap" ) ) {
+				MenuHeightmap();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Icosahedron" ) ) {
+				MenuIcosahedron();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Noise" ) ) {
+				MenuNoise();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Sphere" ) ) {
+				MenuSphere();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Triangle" ) ) {
+				MenuTriangle();
 			} else if ( menu.entries[ currentlySelected ].label == string( "User Shader" ) ) {
+				MenuUserShader();
 			} else if ( menu.entries[ currentlySelected ].label == string( "VAT" ) ) {
+				MenuVAT();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Spaceship Generator" ) ) {
+				MenuSpaceship();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Letters" ) ) {
+				MenuLetters();
 			} else if ( menu.entries[ currentlySelected ].label == string( "XOR" ) ) {
+				MenuXOR();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Clear" ) ) {
+				MenuClearBlock();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Masking" ) ) {
+				MenuMasking();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Blur" ) ) {
+				MenuBlur();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Shift/Trim" ) ) {
+				MenuShiftTrim();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Load/Save" ) ) {
+				MenuLoadSave();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Limiter/Compressor" ) ) {
+				MenuLimiterCompressor();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Copy/Paste" ) ) {
+				MenuCopyPaste();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Logging" ) ) {
+				MenuLogging();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Screenshot" ) ) {
+				MenuScreenshot();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Clear Levels" ) ) {
+				MenuClearLightLevels();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Point Light" ) ) {
+				MenuPointLight();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Cone Light" ) ) {
+				MenuConeLight();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Directional Light" ) ) {
+				MenuDirectionalLight();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Fake GI" ) ) {
+				MenuFakeGI();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Ambient Occlusion" ) ) {
+				MenuAmbientOcclusion();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Mash" ) ) {
+				MenuLightMash();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Application Settings" ) ) {
 				MenuApplicationSettings();
 			} else if ( menu.entries[ currentlySelected ].label == string( "Rendering Settings" ) ) {
@@ -164,7 +194,125 @@ void engine::MenuSplash () {
 	OrangeText( " Welcome To Voraldo 13" );
 }
 
+void engine::MenuAABB () {
 
+}
+
+void engine::MenuCylinderTube () {
+
+}
+
+void engine::MenuEllipsoid () {
+
+}
+
+void engine::MenuGrid () {
+
+}
+
+void engine::MenuHeightmap () {
+
+}
+
+void engine::MenuIcosahedron () {
+
+}
+
+void engine::MenuNoise () {
+
+}
+
+void engine::MenuSphere () {
+
+}
+
+void engine::MenuTriangle () {
+
+}
+
+void engine::MenuUserShader () {
+
+}
+
+void engine::MenuVAT () {
+
+}
+
+void engine::MenuSpaceship () {
+
+}
+
+void engine::MenuLetters () {
+
+}
+
+void engine::MenuXOR () {
+
+}
+
+void engine::MenuClearBlock () {
+
+}
+
+void engine::MenuMasking () {
+
+}
+
+void engine::MenuBlur () {
+
+}
+
+void engine::MenuShiftTrim () {
+
+}
+
+void engine::MenuLoadSave () {
+
+}
+
+void engine::MenuLimiterCompressor () {
+
+}
+
+void engine::MenuCopyPaste () {
+
+}
+
+void engine::MenuLogging () {
+
+}
+
+void engine::MenuScreenshot () {
+
+}
+
+void engine::MenuClearLightLevels () {
+
+}
+
+void engine::MenuPointLight () {
+
+}
+
+void engine::MenuConeLight () {
+
+}
+
+void engine::MenuDirectionalLight () {
+
+}
+
+void engine::MenuFakeGI () {
+
+}
+
+void engine::MenuAmbientOcclusion () {
+
+}
+
+void engine::MenuLightMash () {
+
+}
 
 void engine::MenuApplicationSettings() {
 	OrangeText( " Application Settings" );

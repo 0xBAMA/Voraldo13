@@ -62,7 +62,36 @@ private:
 
 	// imgui menu helpers ... will be quite a few of these
 	void MenuSplash ();
-		// ...
+	void MenuAABB ();
+	void MenuCylinderTube ();
+	void MenuEllipsoid ();
+	void MenuGrid ();
+	void MenuHeightmap ();
+	void MenuIcosahedron ();
+	void MenuNoise ();
+	void MenuSphere ();
+	void MenuTriangle ();
+	void MenuUserShader ();
+	void MenuVAT ();
+	void MenuSpaceship ();
+	void MenuLetters ();
+	void MenuXOR ();
+	void MenuClearBlock ();
+	void MenuMasking ();
+	void MenuBlur ();
+	void MenuShiftTrim ();
+	void MenuLoadSave ();
+	void MenuLimiterCompressor ();
+	void MenuCopyPaste ();
+	void MenuLogging ();
+	void MenuScreenshot ();
+	void MenuClearLightLevels ();
+	void MenuPointLight ();
+	void MenuConeLight ();
+	void MenuDirectionalLight ();
+	void MenuFakeGI ();
+	void MenuAmbientOcclusion ();
+	void MenuLightMash ();
 	void MenuApplicationSettings ();
 	void MenuRenderingSettings ();
 	void MenuPostProcessingSettings ();
