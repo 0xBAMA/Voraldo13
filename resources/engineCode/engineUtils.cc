@@ -2,14 +2,14 @@
 
 bool engine::MainLoop () {
 	FrameMarkStart( "Main Loop" );
-	HandleEvents();								// handle keyboard / mouse events
-	ClearColorAndDepth();					// if I just disable depth testing, this can disappear
-	ComputePasses();							// multistage update of displayTexture
-	BlitToScreen();								// fullscreen triangle copying the displayTexture to the screen
-	ImguiPass();									// do all the gui stuff
-	windowHandler.Swap();					// show what is in the back buffer ( displayTexture + ImGui )
-	FrameMark;										// tells tracy that this is the end of a frame
-	return pQuit;									// break main loop when pQuit turns true
+	HandleEvents();				// handle keyboard / mouse events
+	ClearColorAndDepth();	// if I just disable depth testing, this can disappear
+	ComputePasses();			// multistage update of displayTexture
+	BlitToScreen();				// fullscreen triangle copying displayTexture to screen
+	ImguiPass();					// do all the gui stuff
+	windowHandler.Swap();	// show contents of back buffer ( displayTexture + ImGui )
+	FrameMark;						// tells tracy that this is the end of a frame
+	return pQuit;					// break main loop when pQuit turns true
 }
 
 void engine::ComputePasses () {
@@ -60,7 +60,7 @@ void engine::ClearColorAndDepth () {
 	// glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glClear( GL_COLOR_BUFFER_BIT );
 
-	ImGuiIO &io = ImGui::GetIO();
+	const ImGuiIO &io = ImGui::GetIO();
 	const int width = ( int ) io.DisplaySize.x;
 	const int height = ( int ) io.DisplaySize.y;
 	// prevent -1, -1 being passed on first frame, since ImGui hasn't rendered yet
@@ -82,7 +82,7 @@ void engine::BlitToScreen () {
 	glBindImageTexture( 0, displayTexture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
 	glUseProgram( displayShader );
 	glBindVertexArray( displayVAO );
-	ImGuiIO &io = ImGui::GetIO();
+	const ImGuiIO &io = ImGui::GetIO();
 	glUniform2f( glGetUniformLocation( displayShader, "resolution" ), io.DisplaySize.x, io.DisplaySize.y );
 	glDrawArrays( GL_TRIANGLES, 0, 3 );
 }
@@ -107,28 +107,22 @@ void engine::HandleEvents () {
 
 	const uint8_t *state = SDL_GetKeyboardState( NULL );
 
-	float bigStep = 0.120;
-	float lilStep = 0.008;
+	const float bigStep = 0.120;
+	const float lilStep = 0.008;
 
-	// these will operate on the trident, now
+	// these will operate on the trident, now - will also set the basis for the main display
 	if ( state[ SDL_SCANCODE_LEFT ] )
 		trident.RotateY( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep );
-
 	if ( state[ SDL_SCANCODE_RIGHT ] )
 		trident.RotateY( -( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep ) );
-
 	if ( state[ SDL_SCANCODE_UP ] )
 		trident.RotateX( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep );
-
 	if ( state[ SDL_SCANCODE_DOWN ] )
 		trident.RotateX( -( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep ) );
-
 	if ( state[ SDL_SCANCODE_PAGEUP ] )
 		trident.RotateZ( -( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep ) );
-
 	if ( state[ SDL_SCANCODE_PAGEDOWN ] )
 		trident.RotateZ( ( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep ) );
-
 
 
 //==============================================================================

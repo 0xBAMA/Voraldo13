@@ -43,20 +43,18 @@ static void OrangeText ( const char *string ) {
 
 // this needs a formatting pass
 void engine::MenuLayout( bool* p_open ) {
-
-	// ImGui::SetNextWindowSize( ImVec2( 500, 440 ), ImGuiCond_FirstUseEver );
-	auto windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar;
-	if ( ImGui::Begin( "Menu layout", p_open, windowFlags ) ) {
-
-		// I'd like to have a reason to have a menu
+	const auto flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar;
+	if ( ImGui::Begin( "Menu layout", p_open, flags ) ) {
 		if ( ImGui::BeginMenuBar() ) {
 			if ( ImGui::BeginMenu( "File" ) ) {
-				if ( ImGui::MenuItem( "Close" ) ) *p_open = false;
-
-				// probably add swapBlocks() here - this would be a nice, since it is globally accessible
+				if ( ImGui::MenuItem( "Close" ) )
+					*p_open = false;
 
 				ImGui::EndMenu();
-			}
+			} // else if ( ImGui::MenuItem( "Swap Blocks" ) ) {
+			// 	cout << "swapping blocks" << endl; // this is interesting, menu with no contents used as button
+			// 	ImGui::EndMenu(); // some shitty artifacts so maybe don't do this
+			// }
 			ImGui::EndMenuBar();
 		}
 
@@ -66,13 +64,11 @@ void engine::MenuLayout( bool* p_open ) {
 		static int currentlySelected = -1;
 		{
 			ImGui::BeginChild( "TreeView", ImVec2( 185, 0 ), true );
-
-			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_None;
 			int current = 0;
 
 			// remove some redundancy
 			#define COLLAPSING_SECTION(labelString,x) \
-				if ( ImGui::CollapsingHeader( labelString, flags ) ) { \
+				if ( ImGui::CollapsingHeader( labelString ) ) { \
 					while ( menu.entries[ current ].category == x ) { \
 						std::string label = std::string( "  " ) + menu.entries[ current ].label; \
 						if ( ImGui::Selectable( label.c_str(), currentlySelected == current ) ) { \
@@ -195,123 +191,123 @@ void engine::MenuSplash () {
 }
 
 void engine::MenuAABB () {
-
+	OrangeText( "AABB" );
 }
 
 void engine::MenuCylinderTube () {
-
+	OrangeText( "Cylinder/Tube" );
 }
 
 void engine::MenuEllipsoid () {
-
+	OrangeText( "Ellipsoid" );
 }
 
 void engine::MenuGrid () {
-
+	OrangeText( "Regular Grid" );
 }
 
 void engine::MenuHeightmap () {
-
+	OrangeText( "Heightmap" );
 }
 
 void engine::MenuIcosahedron () {
-
+	OrangeText( "Icosahedron" );
 }
 
 void engine::MenuNoise () {
-
+	OrangeText( "Noise" );
 }
 
 void engine::MenuSphere () {
-
+	OrangeText( "Sphere" );
 }
 
 void engine::MenuTriangle () {
-
+	OrangeText( "Triangle" );
 }
 
 void engine::MenuUserShader () {
-
+	OrangeText( "User Shader" );
 }
 
 void engine::MenuVAT () {
-
+	OrangeText( "Voxel Automata Terrain" );
 }
 
 void engine::MenuSpaceship () {
-
+	OrangeText( "Spaceship Generator" );
 }
 
 void engine::MenuLetters () {
-
+	OrangeText( "Letters" );
 }
 
 void engine::MenuXOR () {
-
+	OrangeText( "XOR" );
 }
 
 void engine::MenuClearBlock () {
-
+	OrangeText( "Clear Block" );
 }
 
 void engine::MenuMasking () {
-
+	OrangeText( "Masking Operations" );
 }
 
 void engine::MenuBlur () {
-
+	OrangeText( "Blur" );
 }
 
 void engine::MenuShiftTrim () {
-
+	OrangeText( "Shift/Trim" );
 }
 
 void engine::MenuLoadSave () {
-
+	OrangeText( "Load/Save" );
 }
 
 void engine::MenuLimiterCompressor () {
-
+	OrangeText( "Limiter/Compressor" );
 }
 
 void engine::MenuCopyPaste () {
-
+	OrangeText( "Copy/Paste" );
 }
 
 void engine::MenuLogging () {
-
+	OrangeText( "Logging" );
 }
 
 void engine::MenuScreenshot () {
-
+	OrangeText( "Screenshot" );
 }
 
 void engine::MenuClearLightLevels () {
-
+	OrangeText( "Clear Light Levels" );
 }
 
 void engine::MenuPointLight () {
-
+	OrangeText( "Point Light" );
 }
 
 void engine::MenuConeLight () {
-
+	OrangeText( "Cone Light" );
 }
 
 void engine::MenuDirectionalLight () {
-
+	OrangeText( "Directional Light" );
 }
 
 void engine::MenuFakeGI () {
-
+	OrangeText( "Fake Global Illumination" );
 }
 
 void engine::MenuAmbientOcclusion () {
-
+	OrangeText( "Ambient Occlusion" );
 }
 
 void engine::MenuLightMash () {
-
+	OrangeText( "Light Mash" );
 }
 
 void engine::MenuApplicationSettings() {
