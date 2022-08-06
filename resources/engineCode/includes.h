@@ -62,6 +62,20 @@ constexpr int MSAACount = 1;
 // image load/save/resize/access/manipulation wrapper
 #include "../ImageHandling/image.h"
 
+// #define WIDTH 640
+// #define HEIGHT 480
+
+// #define WIDTH 1280
+// #define HEIGHT 720
+
+#define WIDTH 1920
+#define HEIGHT 1080
+
+#define STARTONWINDOW 3
+
+// wrapper around window management
+#include "windowHandler.h"
+
 // orientation widget implementation, "orientTrident"
 #include "trident.h"
 
@@ -98,17 +112,6 @@ constexpr int MSAACount = 1;
 // Niels Lohmann - JSON for Modern C++
 #include "../JSON/json.h"
 using json = nlohmann::json;
-
-// #define WIDTH 640
-// #define HEIGHT 480
-
-// #define WIDTH 1280
-// #define HEIGHT 720
-
-#define WIDTH 1920
-#define HEIGHT 1080
-
-#define STARTONWINDOW 3
 
 struct colorGradeParameters {
 	int tonemapMode = 6;

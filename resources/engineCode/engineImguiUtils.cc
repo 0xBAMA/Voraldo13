@@ -113,45 +113,60 @@ void engine::MenuLayout( bool* p_open ) {
 			// ImGui::Text("MyObject: %d", currentlySelected);
 
 			if ( currentlySelected == -1 ) {
-				// splash
-				OrangeText( " Welcome To Voraldo 13" );
-
-
-			} else if ( !menu.entries[ currentlySelected ].requiresSpecialHandling ) {
-				// parse list of layout elements in the menu entry
-				for ( auto& interfaceElement : menu.entries[ currentlySelected ].interfaceElements ) {
-
-				}
-			} else {
-				// indicates that this section requires special handling / manual layout
-				if ( 0 ) {
-
-				} else if ( menu.entries[ currentlySelected ].label == string( "Application" ) ) {
-					FillApplicationSettings();
-				} else if ( menu.entries[ currentlySelected ].label == string( "Rendering" ) ) {
-					FillRenderingSettings();
-				} else if ( menu.entries[ currentlySelected ].label == string( "Post Processing" ) ) {
-					FillPostProcessingSettings();
-				}
+				MenuSplash();
+			} else if ( menu.entries[ currentlySelected ].label == string( "AABB" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Cylinder/Tube" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Ellipsoid" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Grid" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Heightmap" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Icosahedron" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Noise" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Sphere" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Triangle" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "User Shader" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "VAT" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Spaceship Generator" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Letters" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "XOR" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Clear" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Masking" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Blur" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Shift/Trim" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Load/Save" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Limiter/Compressor" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Copy/Paste" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Logging" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Screenshot" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Clear Levels" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Point Light" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Cone Light" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Directional Light" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Fake GI" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Ambient Occlusion" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Mash" ) ) {
+			} else if ( menu.entries[ currentlySelected ].label == string( "Application Settings" ) ) {
+				MenuApplicationSettings();
+			} else if ( menu.entries[ currentlySelected ].label == string( "Rendering Settings" ) ) {
+				MenuRenderingSettings();
+			} else if ( menu.entries[ currentlySelected ].label == string( "Post Processing" ) ) {
+				MenuPostProcessingSettings();
 			}
-
 			ImGui::EndChild();
-
-			// buttons at the bottom of the page
-			if ( ImGui::Button( "Revert" ) ) {
-
-			}
-			ImGui::SameLine();
-			if ( ImGui::Button( "Save" ) ) {
-
-			}
+			// add global buttons here, if desired - unlikely
 			ImGui::EndGroup();
 		}
 	}
 	ImGui::End();
 }
+void engine::MenuSplash () {
+	// splash - add any more information to present upon opening
+	// maybe learn how to use the imgui draw lists? tbd, something with an eye could be cool
+	OrangeText( " Welcome To Voraldo 13" );
+}
 
-void engine::FillApplicationSettings() {
+
+
+void engine::MenuApplicationSettings() {
 	OrangeText( " Application Settings" );
 	ImGui::Separator();
 	ImGui::Indent( 16.0f );
@@ -170,7 +185,7 @@ void engine::FillApplicationSettings() {
 	ImGui::Unindent( 16.0f );
 }
 
-void engine::FillRenderingSettings () {
+void engine::MenuRenderingSettings () {
 	OrangeText( " Rendering Settings" );
 	ImGui::Separator();
 	ImGui::Indent( 16.0f );
@@ -183,7 +198,7 @@ void engine::FillRenderingSettings () {
 	ImGui::Unindent( 16.0f );
 }
 
-void engine::FillPostProcessingSettings () {
+void engine::MenuPostProcessingSettings () {
 	OrangeText( "Post Process Settings" );
 	ImGui::Separator();
 	ImGui::Indent( 16.0f );
@@ -245,7 +260,7 @@ void engine::DrawTextEditor () {
 void engine::ImguiFrameStart () {
 	// Start the Dear ImGui frame
 	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplSDL2_NewFrame( window );
+	ImGui_ImplSDL2_NewFrame( windowHandler.window );
 	ImGui::NewFrame();
 }
 

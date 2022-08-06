@@ -11,17 +11,13 @@ public:
 
 private:
 	// application handles + basic data
-	// windowHandler w;
-	SDL_Window * window;
-	SDL_GLContext GLcontext;
-	int totalScreenWidth;
-	int totalScreenHeight;
-	ImVec4 clearColor;
+	windowHandlerWrapper windowHandler;
 
 	// text renderer framework
 	layerManager textRenderer;
 
 	// OpenGL data
+	ImVec4 clearColor; // imgui type, for the picker
 	GLuint blueNoiseTexture;
 	GLuint accumulatorTexture;
 	GLuint displayTexture;
@@ -64,10 +60,12 @@ private:
 	void MenuLayout ( bool* open );
 	void QuitConf ( bool* open );
 
-	// imgui menu helpers
-	void FillApplicationSettings ();
-	void FillRenderingSettings ();
-	void FillPostProcessingSettings ();
+	// imgui menu helpers ... will be quite a few of these
+	void MenuSplash ();
+		// ...
+	void MenuApplicationSettings ();
+	void MenuRenderingSettings ();
+	void MenuPostProcessingSettings ();
 
 	// shutdown procedures
 	void ImguiQuit ();

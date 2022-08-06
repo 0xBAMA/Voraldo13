@@ -19,15 +19,8 @@ void engine::ImguiQuit () {
 	ImGui::DestroyContext();
 }
 
-// terminate SDL2
-void engine::SDLQuit () {
-	SDL_GL_DeleteContext( GLcontext );
-	SDL_DestroyWindow( window );
-	SDL_Quit();
-}
-
 // called from destructor
 void engine::Quit () {
 	ImguiQuit();
-	SDLQuit();
+	windowHandler.Kill();
 }

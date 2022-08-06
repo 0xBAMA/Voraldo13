@@ -8,89 +8,16 @@ void engine::StartMessage () {
 
 void engine::CreateWindowAndContext () {
 	cout << T_BLUE << "    Initializing SDL2" << RESET << " ................................ ";
-	if ( SDL_Init( SDL_INIT_EVERYTHING ) != 0 )
-		cout << "Error: " << SDL_GetError() << endl;
-
-	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER,       1 );
-	SDL_GL_SetAttribute( SDL_GL_ACCELERATED_VISUAL, 1 );
-	SDL_GL_SetAttribute( SDL_GL_RED_SIZE,           8 );
-	SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE,         8 );
-	SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE,          8 );
-	SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE,         8 );
-	SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE,        24 );
-	SDL_GL_SetAttribute( SDL_GL_STENCIL_SIZE,       8 );
-	SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, MSAACount );
-
-
+	windowHandler.PreInit();
 	cout << T_GREEN << "done." << RESET << endl;
 
 	cout << T_BLUE << "    Creating window" << RESET << " .................................. ";
-
-	// prep for window creation
-	int flags;
-	SDL_DisplayMode dm;
-	SDL_GetDesktopDisplayMode( 0, &dm );
-
-	// different window configurations
-	int windowInitMode = 0;
-
-	// putting this on different monitors
-	int baseX = ( STARTONWINDOW - 1 ) * dm.w;
-
-	switch ( windowInitMode ) {
-		case 0: // little window, using WIDTH/HEIGHT defines in includes.h
-			flags = SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE;
-			totalScreenWidth = WIDTH;
-			totalScreenHeight = HEIGHT;
-			window = SDL_CreateWindow( "NQADE", baseX, 0, WIDTH, HEIGHT, flags );
-			break;
-
-		case 1: // fullscreen borderless
-			// first, query the screen resolution
-			totalScreenWidth = dm.w;
-			totalScreenHeight = dm.h;
-			flags = SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS;
-			window = SDL_CreateWindow( "NQADE", baseX, 0, dm.w, dm.h, flags );
-			break;
-
-		case 2: // borderless floating
-			totalScreenWidth = dm.w - 100;
-			totalScreenHeight = dm.h - 100;
-			flags = SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_BORDERLESS;
-			window = SDL_CreateWindow( "NQADE", 50 + baseX, 50, totalScreenWidth, totalScreenHeight, flags );
-			break;
-
-			// other modes?
-	}
-
-	// if init takes some time, don't show the window before it's done
-	SDL_ShowWindow( window );
-
+	windowHandler.Init( 0 );
 	cout << T_GREEN << "done." << RESET << endl;
 
 	cout << T_BLUE << "    Setting up OpenGL context" << RESET << " ........................ ";
-	// initialize OpenGL 4.3 + GLSL version 430
-	SDL_GL_SetAttribute( SDL_GL_CONTEXT_FLAGS, 0 );
-	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
-	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 4 );
-	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 3 );
-	GLcontext = SDL_GL_CreateContext( window );
-	SDL_GL_MakeCurrent( window, GLcontext );
-
-	SDL_GL_SetSwapInterval( 1 ); // Enable vsync
-	// SDL_GL_SetSwapInterval( 0 ); // Disables vsync
-
-	// load OpenGL functions
-	if ( gl3wInit() != 0 ) { cout << "Failed to initialize OpenGL loader!" << endl; abort(); }
-
-	// basic OpenGL Config
-	// glEnable( GL_DEPTH_TEST );
-	// glEnable( GL_LINE_SMOOTH );
-	// glPointSize( 3.0 );
-	glEnable( GL_BLEND );
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	windowHandler.OpenGLSetup();
 	cout << T_GREEN << "done." << RESET << endl;
-
 }
 
 void engine::MenuPopulate () {
@@ -116,12 +43,7 @@ void engine::MenuPopulate () {
 			entryCategory = category_t::settings;
 		}
 
-		bool entrySpecial = false;
-		if ( element[ "RequiresSpecialHandling" ] == string( "true" ) ) {
-			entrySpecial = true;
-		}
-
-		menu.entries.push_back( menuEntry( entryLabel, entryCategory, entrySpecial ) );
+		menu.entries.push_back( menuEntry( entryLabel, entryCategory ) );
 	}
 	cout << T_GREEN << "done." << RESET << endl;
 }
@@ -210,16 +132,16 @@ void engine::ImguiSetup () {
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
 	// Setup Platform/Renderer bindings
-	ImGui_ImplSDL2_InitForOpenGL( window, GLcontext );
+	ImGui_ImplSDL2_InitForOpenGL( windowHandler.window, windowHandler.GLcontext );
 	const char *glsl_version = "#version 430";
 	ImGui_ImplOpenGL3_Init( glsl_version );
 
 	// initial value for clear color
 	// clearColor = ImVec4( 0.295f, 0.295f, 0.295f, 0.5f );
 	clearColor = ImVec4( 0.0f, 0.0f, 0.0f, 1.0f );
-	glClearColor( clearColor.x, clearColor.y, clearColor.z, clearColor.w );
-	glClear( GL_COLOR_BUFFER_BIT );
-	SDL_GL_SwapWindow( window ); // show clear color
+	// glClearColor( clearColor.x, clearColor.y, clearColor.z, clearColor.w );
+	// glClear( GL_COLOR_BUFFER_BIT );
+	// SDL_GL_SwapWindow( window ); // show clear color
 
 	// setting custom font, if desired
 	// io.Fonts->AddFontFromFileTTF( "resources/fonts/ttf/star_trek/titles/TNG_Title.ttf", 32 );

@@ -1,161 +1,141 @@
-{
-	"Entries" : [
+{ "Entries" : [
 		{
 			"Label": "AABB",
-			"Category": "Shapes",
-			"RequiresSpecialHandling": false
+			"Category": "Shapes"
 		},
 		{
 			"Label": "Cylinder/Tube",
-			"Category": "Shapes",
-			"RequiresSpecialHandling": false
+			"Category": "Shapes"
 		},
 		{
 			"Label": "Ellipsoid",
-			"Category": "Shapes",
-			"RequiresSpecialHandling": false
+			"Category": "Shapes"
 		},
 		{
 			"Label": "Grid",
-			"Category": "Shapes",
-			"RequiresSpecialHandling": false
+			"Category": "Shapes"
 		},
 		{
 			"Label": "Heightmap",
-			"Category": "Shapes",
-			"RequiresSpecialHandling": false
+			"Category": "Shapes"
 		},
 		{
 			"Label": "Icosahedron",
-			"Category": "Shapes",
-			"RequiresSpecialHandling": false
+			"Category": "Shapes"
 		},
 		{
 			"Label": "Noise",
-			"Category": "Shapes",
-			"RequiresSpecialHandling": false
+			"Category": "Shapes"
 		},
 		{
 			"Label": "Sphere",
-			"Category": "Shapes",
-			"RequiresSpecialHandling": false
+			"Category": "Shapes"
 		},
 		{
 			"Label": "Triangle",
-			"Category": "Shapes",
-			"RequiresSpecialHandling": false
+			"Category": "Shapes"
 		},
 		{
 			"Label": "User Shader",
-			"Category": "Shapes",
-			"RequiresSpecialHandling": false
+			"Category": "Shapes"
 		},
 		{
 			"Label": "VAT",
-			"Category": "Shapes",
-			"RequiresSpecialHandling": false
+			"Category": "Shapes"
 		},
 		{
 			"Label": "Spaceship Generator",
-			"Category": "Shapes",
-			"RequiresSpecialHandling": false
+			"Category": "Shapes"
 		},
 		{
 			"Label": "Letters",
-			"Category": "Shapes",
-			"RequiresSpecialHandling": false
+			"Category": "Shapes"
 		},
 		{
 			"Label": "XOR",
-			"Category": "Shapes",
-			"RequiresSpecialHandling": false
+			"Category": "Shapes"
 		},
 
 
 		{
 			"Label": "Clear",
-			"Category": "Utilities",
-			"RequiresSpecialHandling": false
+			"Category": "Utilities"
 		},
 		{
 			"Label": "Masking",
-			"Category": "Utilities",
-			"RequiresSpecialHandling": false
+			"Category": "Utilities"
 		},
 		{
 			"Label": "Blur",
-			"Category": "Utilities",
-			"RequiresSpecialHandling": false
+			"Category": "Utilities"
 		},
 		{
 			"Label": "Shift/Trim",
-			"Category": "Utilities",
-			"RequiresSpecialHandling": false
+			"Category": "Utilities"
 		},
 		{
 			"Label": "Load/Save",
-			"Category": "Utilities",
-			"RequiresSpecialHandling": false
+			"Category": "Utilities"
 		},
 		{
 			"Label": "Limiter/Compressor",
-			"Category": "Utilities",
-			"RequiresSpecialHandling": false
+			"Category": "Utilities"
 		},
 		{
 			"Label": "Copy/Paste",
-			"Category": "Utilities",
-			"RequiresSpecialHandling": false
+			"Category": "Utilities"
 		},
 		{
 			"Label": "Logging",
-			"Category": "Utilities",
-			"RequiresSpecialHandling": false
+			"Category": "Utilities"
 		},
-
+		{
+			"Label": "Screenshot",
+			"Category": "Utilities"
+		},
 
 
 		{
 			"Label": "Clear Levels",
-			"Category": "Lighting",
-			"RequiresSpecialHandling": false
+			"Category": "Lighting"
 		},
 		{
-			"Label": "Direct",
-			"Category": "Lighting",
-			"RequiresSpecialHandling": false
+			"Label": "Point Light",
+			"Category": "Lighting"
+		},
+		{
+			"Label": "Cone Light",
+			"Category": "Lighting"
+		},
+		{
+			"Label": "Directional Light",
+			"Category": "Lighting"
 		},
 		{
 			"Label": "Fake GI",
-			"Category": "Lighting",
-			"RequiresSpecialHandling": false
+			"Category": "Lighting"
 		},
 		{
-			"Label": "AO",
-			"Category": "Lighting",
-			"RequiresSpecialHandling": false
+			"Label": "Ambient Occlusion",
+			"Category": "Lighting"
 		},
 		{
 			"Label": "Mash",
-			"Category": "Lighting",
-			"RequiresSpecialHandling": false
+			"Category": "Lighting"
 		},
 
 
 		{
-			"Label": "Application",
-			"Category": "Settings",
-			"RequiresSpecialHandling": true
+			"Label": "Application Settings",
+			"Category": "Settings"
 		},
 		{
-			"Label": "Rendering",
-			"Category": "Settings",
-			"RequiresSpecialHandling": true
+			"Label": "Rendering Settings",
+			"Category": "Settings"
 		},
 		{
 			"Label": "Post Processing",
-			"Category": "Settings",
-			"RequiresSpecialHandling": true
+			"Category": "Settings"
 		}
 	]
 }
