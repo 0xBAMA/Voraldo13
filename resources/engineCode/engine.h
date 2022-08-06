@@ -60,39 +60,42 @@ private:
 	void MenuLayout ( bool* open );
 	void QuitConf ( bool* open );
 
-	// imgui menu helpers ... will be quite a few of these
+	// imgui menu helpers
 	int currentlySelectedMenuItem = -1;
 	void MenuSplash ();
-	void MenuAABB ();
-	void MenuCylinderTube ();
-	void MenuEllipsoid ();
-	void MenuGrid ();
-	void MenuHeightmap ();
-	void MenuIcosahedron ();
-	void MenuNoise ();
-	void MenuSphere ();
-	void MenuTriangle ();
-	void MenuUserShader ();
-	void MenuVAT ();
-	void MenuSpaceship ();
-	void MenuLetters ();
-	void MenuXOR ();
-	void MenuClearBlock ();
-	void MenuMasking ();
-	void MenuBlur ();
-	void MenuShiftTrim ();
-	void MenuLoadSave ();
-	void MenuLimiterCompressor ();
-	void MenuCopyPaste ();
-	void MenuLogging ();
-	void MenuScreenshot ();
-	void MenuClearLightLevels ();
-	void MenuPointLight ();
-	void MenuConeLight ();
-	void MenuDirectionalLight ();
-	void MenuFakeGI ();
-	void MenuAmbientOcclusion ();
-	void MenuLightMash ();
+
+	// arguments to operation functions tbd
+	void MenuAABB ();								float OperationAABB ();
+	void MenuCylinderTube ();				float OperationCylinderTube ();
+	void MenuEllipsoid ();					float OperationEllipsoid ();
+	void MenuGrid ();								float OperationGrid ();
+	void MenuHeightmap ();					float OperationHeightmap ();
+	void MenuIcosahedron ();				float OperationIcosahedron ();
+	void MenuNoise ();							float OperationNoise ();
+	void MenuSphere ();							float OperationSphere ();
+	void MenuTriangle ();						float OperationTriangle ();
+	void MenuUserShader ();					float OperationUserShader ();
+	void MenuVAT ();								float OperationVAT ();
+	void MenuSpaceship ();					float OperationSpaceship ();
+	void MenuLetters ();						float OperationLetters ();
+	void MenuXOR ();								float OperationXOR ();
+	void MenuClearBlock ();					float OperationClearBlock ();
+	void MenuMasking ();						float OperationMasking ();
+	void MenuBlur ();								float OperationBlur ();
+	void MenuShiftTrim ();					float OperationShiftTrim ();
+	void MenuLoadSave ();						float OperationLoadSave ();
+	void MenuLimiterCompressor ();	float OperationLimiterCompressor ();
+	void MenuCopyPaste ();					float OperationCopyPaste ();
+	void MenuLogging ();						float OperationLogging ();
+	void MenuScreenshot ();					float OperationScreenshot ();
+	void MenuClearLightLevels ();		float OperationClearLightLevels ();
+	void MenuPointLight ();					float OperationPointLight ();
+	void MenuConeLight ();					float OperationConeLight ();
+	void MenuDirectionalLight ();		float OperationDirectionalLight ();
+	void MenuFakeGI ();							float OperationFakeGI ();
+	void MenuAmbientOcclusion ();		float OperationAmbientOcclusion ();
+	void MenuLightMash ();					float OperationLightMash ();
+
 	void MenuApplicationSettings ();
 	void MenuRenderingSettings ();
 	void MenuPostProcessingSettings ();

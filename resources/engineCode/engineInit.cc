@@ -24,7 +24,7 @@ void engine::MenuPopulate () {
 	// eventually this will come from a json structure containing records of each menu entry
 	cout << T_BLUE << "    Populating Menu" << RESET << " .................................. ";
 
-	std::ifstream i( "resources/engineCode/menuConfig.json" );
+	std::ifstream i( "resources/engineCode/config/menuConfig.json" );
 	json j;
 	i >> j;
 
@@ -45,7 +45,7 @@ void engine::MenuPopulate () {
 
 		menu.entries.push_back( menuEntry( entryLabel, entryCategory ) );
 	}
-	cout << T_GREEN << "done." << RESET << endl;
+	cout << T_GREEN << "done." << T_RED << " ( " << menu.entries.size() << " entries )" << RESET << endl;
 }
 
 void engine::DisplaySetup () {
