@@ -61,6 +61,7 @@ private:
 	void QuitConf ( bool* open );
 
 	// imgui menu helpers ... will be quite a few of these
+	int currentlySelectedMenuItem = -1;
 	void MenuSplash ();
 	void MenuAABB ();
 	void MenuCylinderTube ();

@@ -59,20 +59,18 @@ void engine::MenuLayout( bool* p_open ) {
 		}
 
 // =============================================================================
-// Left Side
+// Left Side shows all the menu entries from menu.entries array
 // =============================================================================
-		static int currentlySelected = -1;
 		{
 			ImGui::BeginChild( "TreeView", ImVec2( 185, 0 ), true );
 			int current = 0;
 
-			// remove some redundancy
 			#define COLLAPSING_SECTION(labelString,x) \
 				if ( ImGui::CollapsingHeader( labelString ) ) { \
 					while ( menu.entries[ current ].category == x ) { \
 						std::string label = std::string( "  " ) + menu.entries[ current ].label; \
-						if ( ImGui::Selectable( label.c_str(), currentlySelected == current ) ) { \
-							currentlySelected = current; \
+						if ( ImGui::Selectable( label.c_str(), currentlySelectedMenuItem == current ) ) { \
+							currentlySelectedMenuItem = current; \
 						} \
 						current++; \
 					} \
@@ -95,90 +93,87 @@ void engine::MenuLayout( bool* p_open ) {
 
 /* =============================================================================
 	Right Side
-		At this stage, the currently selected option is currentlySelected - this can
+		At this stage, the currently selected option is currentlySelectedMenuItem - this can
 	be used to index into the menu.entries[] array, to get any menu layout
 	information that will be relevant for this particular menu entry.
 
 		Special reserve value -1 used for a welcome splash screen, shown on startup.
 ============================================================================= */
 		{
-
-
 			ImGui::BeginGroup();
-			ImGui::BeginChild("Contents", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
-			// ImGui::Text("MyObject: %d", currentlySelected);
-
-			if ( currentlySelected == -1 ) {
+			ImGui::BeginChild("Contents", ImVec2( 0, -ImGui::GetFrameHeightWithSpacing() ) );
+			#define isPicked(x) menu.entries[currentlySelectedMenuItem].label==string(x)
+			if ( currentlySelectedMenuItem == -1 ) {
 				MenuSplash();
-			} else if ( menu.entries[ currentlySelected ].label == string( "AABB" ) ) {
+			} else if ( isPicked( "AABB" ) ) {
 				MenuAABB();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Cylinder/Tube" ) ) {
+			} else if ( isPicked( "Cylinder/Tube" ) ) {
 				MenuCylinderTube();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Ellipsoid" ) ) {
+			} else if ( isPicked( "Ellipsoid" ) ) {
 				MenuEllipsoid();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Grid" ) ) {
+			} else if ( isPicked( "Grid" ) ) {
 				MenuGrid();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Heightmap" ) ) {
+			} else if ( isPicked( "Heightmap" ) ) {
 				MenuHeightmap();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Icosahedron" ) ) {
+			} else if ( isPicked( "Icosahedron" ) ) {
 				MenuIcosahedron();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Noise" ) ) {
+			} else if ( isPicked( "Noise" ) ) {
 				MenuNoise();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Sphere" ) ) {
+			} else if ( isPicked( "Sphere" ) ) {
 				MenuSphere();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Triangle" ) ) {
+			} else if ( isPicked( "Triangle" ) ) {
 				MenuTriangle();
-			} else if ( menu.entries[ currentlySelected ].label == string( "User Shader" ) ) {
+			} else if ( isPicked( "User Shader" ) ) {
 				MenuUserShader();
-			} else if ( menu.entries[ currentlySelected ].label == string( "VAT" ) ) {
+			} else if ( isPicked( "VAT" ) ) {
 				MenuVAT();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Spaceship Generator" ) ) {
+			} else if ( isPicked( "Spaceship Generator" ) ) {
 				MenuSpaceship();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Letters" ) ) {
+			} else if ( isPicked( "Letters" ) ) {
 				MenuLetters();
-			} else if ( menu.entries[ currentlySelected ].label == string( "XOR" ) ) {
+			} else if ( isPicked( "XOR" ) ) {
 				MenuXOR();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Clear" ) ) {
+			} else if ( isPicked( "Clear" ) ) {
 				MenuClearBlock();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Masking" ) ) {
+			} else if ( isPicked( "Masking" ) ) {
 				MenuMasking();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Blur" ) ) {
+			} else if ( isPicked( "Blur" ) ) {
 				MenuBlur();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Shift/Trim" ) ) {
+			} else if ( isPicked( "Shift/Trim" ) ) {
 				MenuShiftTrim();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Load/Save" ) ) {
+			} else if ( isPicked( "Load/Save" ) ) {
 				MenuLoadSave();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Limiter/Compressor" ) ) {
+			} else if ( isPicked( "Limiter/Compressor" ) ) {
 				MenuLimiterCompressor();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Copy/Paste" ) ) {
+			} else if ( isPicked( "Copy/Paste" ) ) {
 				MenuCopyPaste();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Logging" ) ) {
+			} else if ( isPicked( "Logging" ) ) {
 				MenuLogging();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Screenshot" ) ) {
+			} else if ( isPicked( "Screenshot" ) ) {
 				MenuScreenshot();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Clear Levels" ) ) {
+			} else if ( isPicked( "Clear Levels" ) ) {
 				MenuClearLightLevels();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Point Light" ) ) {
+			} else if ( isPicked( "Point Light" ) ) {
 				MenuPointLight();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Cone Light" ) ) {
+			} else if ( isPicked( "Cone Light" ) ) {
 				MenuConeLight();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Directional Light" ) ) {
+			} else if ( isPicked( "Directional Light" ) ) {
 				MenuDirectionalLight();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Fake GI" ) ) {
+			} else if ( isPicked( "Fake GI" ) ) {
 				MenuFakeGI();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Ambient Occlusion" ) ) {
+			} else if ( isPicked( "Ambient Occlusion" ) ) {
 				MenuAmbientOcclusion();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Mash" ) ) {
+			} else if ( isPicked( "Mash" ) ) {
 				MenuLightMash();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Application Settings" ) ) {
+			} else if ( isPicked( "Application Settings" ) ) {
 				MenuApplicationSettings();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Rendering Settings" ) ) {
+			} else if ( isPicked( "Rendering Settings" ) ) {
 				MenuRenderingSettings();
-			} else if ( menu.entries[ currentlySelected ].label == string( "Post Processing" ) ) {
+			} else if ( isPicked( "Post Processing" ) ) {
 				MenuPostProcessingSettings();
 			}
+			#undef isPicked
 			ImGui::EndChild();
-			// add global buttons here, if desired - unlikely
 			ImGui::EndGroup();
 		}
 	}
@@ -192,122 +187,212 @@ void engine::MenuSplash () {
 
 void engine::MenuAABB () {
 	OrangeText( "AABB" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuCylinderTube () {
 	OrangeText( "Cylinder/Tube" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuEllipsoid () {
 	OrangeText( "Ellipsoid" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuGrid () {
 	OrangeText( "Regular Grid" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuHeightmap () {
 	OrangeText( "Heightmap" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuIcosahedron () {
 	OrangeText( "Icosahedron" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuNoise () {
 	OrangeText( "Noise" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuSphere () {
 	OrangeText( "Sphere" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuTriangle () {
 	OrangeText( "Triangle" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuUserShader () {
 	OrangeText( "User Shader" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuVAT () {
 	OrangeText( "Voxel Automata Terrain" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuSpaceship () {
 	OrangeText( "Spaceship Generator" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuLetters () {
 	OrangeText( "Letters" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuXOR () {
 	OrangeText( "XOR" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuClearBlock () {
 	OrangeText( "Clear Block" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuMasking () {
 	OrangeText( "Masking Operations" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuBlur () {
 	OrangeText( "Blur" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuShiftTrim () {
 	OrangeText( "Shift/Trim" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuLoadSave () {
 	OrangeText( "Load/Save" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuLimiterCompressor () {
 	OrangeText( "Limiter/Compressor" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuCopyPaste () {
 	OrangeText( "Copy/Paste" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuLogging () {
 	OrangeText( "Logging" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuScreenshot () {
 	OrangeText( "Screenshot" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuClearLightLevels () {
 	OrangeText( "Clear Light Levels" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuPointLight () {
 	OrangeText( "Point Light" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuConeLight () {
 	OrangeText( "Cone Light" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuDirectionalLight () {
 	OrangeText( "Directional Light" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuFakeGI () {
 	OrangeText( "Fake Global Illumination" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuAmbientOcclusion () {
 	OrangeText( "Ambient Occlusion" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuLightMash () {
 	OrangeText( "Light Mash" );
+	ImGui::Separator();
+	ImGui::Indent( 16.0f );
+	ImGui::Unindent( 16.0f );
 }
 
 void engine::MenuApplicationSettings() {
