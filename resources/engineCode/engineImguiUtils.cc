@@ -119,28 +119,32 @@ void engine::MenuLayout( bool* p_open ) {
 
 			} else if ( !menu.entries[ currentlySelected ].requiresSpecialHandling ) {
 				// parse list of layout elements in the menu entry
+				for ( auto& interfaceElement : menu.entries[ currentlySelected ].interfaceElements ) {
 
-
-
-
+				}
 			} else {
-				// this section requires special handling / manual layout
+				// indicates that this section requires special handling / manual layout
+				if ( 0 ) {
 
-
-				if ( menu.entries[ currentlySelected ].label == "Application" ) {
+				} else if ( menu.entries[ currentlySelected ].label == string( "Application" ) ) {
 					FillApplicationSettings();
-				} else if ( menu.entries[ currentlySelected ].label == "Rendering" ) {
+				} else if ( menu.entries[ currentlySelected ].label == string( "Rendering" ) ) {
 					FillRenderingSettings();
-				} else if ( menu.entries[ currentlySelected ].label == "Post Processing" ) {
+				} else if ( menu.entries[ currentlySelected ].label == string( "Post Processing" ) ) {
 					FillPostProcessingSettings();
 				}
-
 			}
 
 			ImGui::EndChild();
-			if (ImGui::Button("Revert")) {}
+
+			// buttons at the bottom of the page
+			if ( ImGui::Button( "Revert" ) ) {
+
+			}
 			ImGui::SameLine();
-			if (ImGui::Button("Save")) {}
+			if ( ImGui::Button( "Save" ) ) {
+
+			}
 			ImGui::EndGroup();
 		}
 	}

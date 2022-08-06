@@ -145,17 +145,17 @@
 		{
 			"Label": "Application",
 			"Category": "Settings",
-			"RequiresSpecialHandling": false
+			"RequiresSpecialHandling": true
 		},
 		{
 			"Label": "Rendering",
 			"Category": "Settings",
-			"RequiresSpecialHandling": false
+			"RequiresSpecialHandling": true
 		},
 		{
 			"Label": "Post Processing",
 			"Category": "Settings",
-			"RequiresSpecialHandling": false
+			"RequiresSpecialHandling": true
 		}
 	]
 }
