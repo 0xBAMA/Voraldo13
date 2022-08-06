@@ -2,14 +2,14 @@
 
 bool engine::MainLoop () {
 	FrameMarkStart( "Main Loop" );
-	HandleEvents();				// handle keyboard / mouse events
+	HandleEvents();			// handle keyboard / mouse events
 	ClearColorAndDepth();	// if I just disable depth testing, this can disappear
-	ComputePasses();			// multistage update of displayTexture
-	BlitToScreen();				// fullscreen triangle copying displayTexture to screen
-	ImguiPass();					// do all the gui stuff
+	ComputePasses();		// multistage update of displayTexture
+	BlitToScreen();			// fullscreen triangle copying displayTexture to screen
+	ImguiPass();			// do all the gui stuff
 	windowHandler.Swap();	// show contents of back buffer ( displayTexture + ImGui )
-	FrameMark;						// tells tracy that this is the end of a frame
-	return pQuit;					// break main loop when pQuit turns true
+	FrameMark;				// tells tracy that this is the end of a frame
+	return pQuit;			// break main loop when pQuit turns true
 }
 
 void engine::ComputePasses () {
@@ -89,7 +89,7 @@ void engine::BlitToScreen () {
 
 void engine::ImguiPass () {
 	ZoneScoped;
-	ImguiFrameStart();					// start the imgui frame
+	ImguiFrameStart();			// start the imgui frame
 
 	// if ( true ) ImGui::ShowDemoWindow();	// show the demo window
 
@@ -98,8 +98,8 @@ void engine::ImguiPass () {
 	MenuLayout( &showMenu );
 
 	// this has to be the final thing, because apparently order matters with modals
-	QuitConf( &quitConfirm );		// show quit confirm window, if triggered
-	ImguiFrameEnd();						// finish up the imgui stuff and put it in the framebuffer
+	QuitConf( &quitConfirm );	// show quit confirm window, if triggered
+	ImguiFrameEnd();			// finish up the imgui stuff and put it in the framebuffer
 }
 
 void engine::HandleEvents () {
