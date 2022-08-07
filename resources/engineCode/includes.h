@@ -19,6 +19,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 // iostream stuff
 using std::cerr;

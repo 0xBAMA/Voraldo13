@@ -18,13 +18,13 @@ private:
 
 	// OpenGL data
 	ImVec4 clearColor; // imgui type, for the picker
-	GLuint blueNoiseTexture;
-	GLuint accumulatorTexture;
-	GLuint displayTexture;
 	GLuint displayShader;
 	GLuint displayVAO;
 	GLuint dummyDrawShader;
 	GLuint tonemapShader;
+
+	// labeled strings
+	std::unordered_map<string,GLuint> textures;
 
 	// tracks and visualizes current block orientation
 	orientTrident trident;

@@ -17,8 +17,8 @@ void engine::ComputePasses () {
 
 // dummy draw
 	// set up environment ( 0:blue noise, 1: accumulator )
-	glBindImageTexture( 0, blueNoiseTexture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
-	glBindImageTexture( 1, accumulatorTexture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
+	glBindImageTexture( 0, textures[ "Blue Noise" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
+	glBindImageTexture( 1, textures[ "Accumulator" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
 
 	// blablah draw something into accumulatorTexture
 	glUseProgram( dummyDrawShader );
@@ -27,8 +27,8 @@ void engine::ComputePasses () {
 
 // postprocessing
 	// set up environment ( 0:accumulator, 1:display )
-	glBindImageTexture( 0, accumulatorTexture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
-	glBindImageTexture( 1, displayTexture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
+	glBindImageTexture( 0, textures[ "Accumulator" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
+	glBindImageTexture( 1, textures[ "Display Texture" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
 
 	// shader for color grading ( color temp, contrast, gamma ... ) + tonemapping
 	glUseProgram( tonemapShader );
@@ -43,12 +43,12 @@ void engine::ComputePasses () {
 		// ...
 
 	// draw the orientation trident/gizmo
-	trident.Update( displayTexture );
+	trident.Update( textures[ "Display Texture" ] );
 	glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 
 	// text rendering timestamp, as final step - required texture binds are handled internally
 	textRenderer.Update( ImGui::GetIO().DeltaTime );
-	textRenderer.Draw( displayTexture ); // displayTexture is the writeTarget
+	textRenderer.Draw( textures[ "Display Texture" ] ); // displayTexture is the writeTarget
 	glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
@@ -79,7 +79,7 @@ void engine::BlitToScreen () {
 	ZoneScoped;
 
 	// bind the displayTexture and display its current state
-	glBindImageTexture( 0, displayTexture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
+	glBindImageTexture( 0, textures[ "Display Texture" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
 	glUseProgram( displayShader );
 	glBindVertexArray( displayVAO );
 	const ImGuiIO &io = ImGui::GetIO();
