@@ -18,13 +18,11 @@ private:
 
 	// OpenGL data
 	ImVec4 clearColor; // imgui type, for the picker
-	GLuint displayShader;
 	GLuint displayVAO;
-	GLuint dummyDrawShader;
-	GLuint tonemapShader;
 
-	// labeled strings
-	std::unordered_map<string,GLuint> textures;
+	// labeled strings for textures, shaders
+	unordered_map<string,GLuint> textures;
+	unordered_map<string,GLuint> shaders;
 
 	// tracks and visualizes current block orientation
 	orientTrident trident;
@@ -44,9 +42,11 @@ private:
 	void StartMessage ();
 	void CreateWindowAndContext ();
 	void DisplaySetup ();
-	void ComputeShaderCompile ();
+	void ShaderCompile ();
 	void ImguiSetup ();
 	void MenuPopulate ();
+	void CreateTextures ();
+	void ReportStartupStats ();
 
 	// main loop functions
 	void BlitToScreen ();

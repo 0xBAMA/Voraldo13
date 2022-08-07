@@ -1,7 +1,7 @@
 #ifndef INCLUDES
 #define INCLUDES
 
-#include <stdio.h>
+// #include <stdio.h>
 
 // stl includes
 #include <algorithm>
@@ -21,6 +21,9 @@
 #include <vector>
 #include <unordered_map>
 
+// tick() / tock()
+#include "coreUtils/timer.h"
+
 // iostream stuff
 using std::cerr;
 using std::cin;
@@ -28,6 +31,7 @@ using std::cout;
 using std::endl;
 using std::flush;
 using std::string;
+using std::unordered_map;
 
 // pi definition - definitely sufficient precision
 constexpr double pi = 3.14159265358979323846;
@@ -75,13 +79,13 @@ constexpr int MSAACount = 1;
 #define STARTONWINDOW 3
 
 // wrapper around window management
-#include "windowHandler.h"
+#include "coreUtils/windowHandler.h"
 
 // orientation widget implementation, "orientTrident"
-#include "trident.h"
+#include "coreUtils/trident.h"
 
 // menu layout stuff
-#include "menuEntry.h"
+#include "coreUtils/menuEntry.h"
 
 // tracy profiler annotation
 #include "../tracy/public/tracy/Tracy.hpp"

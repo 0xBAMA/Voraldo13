@@ -21,7 +21,7 @@ void engine::ComputePasses () {
 	glBindImageTexture( 1, textures[ "Accumulator" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
 
 	// blablah draw something into accumulatorTexture
-	glUseProgram( dummyDrawShader );
+	glUseProgram( shaders[ "Dummy Draw" ] );
 	glDispatchCompute( ( WIDTH + 15 ) / 16, ( HEIGHT + 15 ) / 16, 1 );
 	glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 
@@ -31,7 +31,7 @@ void engine::ComputePasses () {
 	glBindImageTexture( 1, textures[ "Display Texture" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
 
 	// shader for color grading ( color temp, contrast, gamma ... ) + tonemapping
-	glUseProgram( tonemapShader );
+	glUseProgram( shaders[ "Tonemap" ] );
 	SendTonemappingParameters();
 	glDispatchCompute( ( WIDTH + 15 ) / 16, ( HEIGHT + 15 ) / 16, 1 );
 	glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
@@ -70,9 +70,9 @@ void engine::ClearColorAndDepth () {
 void engine::SendTonemappingParameters () {
 	ZoneScoped;
 
-	glUniform3fv( glGetUniformLocation( tonemapShader, "colorTempAdjust" ), 1, glm::value_ptr( GetColorForTemperature( tonemap.colorTemp ) ) );
-	glUniform1i( glGetUniformLocation( tonemapShader, "tonemapMode" ), tonemap.tonemapMode );
-	glUniform1f( glGetUniformLocation( tonemapShader, "gamma" ), tonemap.gamma );
+	glUniform3fv( glGetUniformLocation( shaders[ "Tonemap" ], "colorTempAdjust" ), 1, glm::value_ptr( GetColorForTemperature( tonemap.colorTemp ) ) );
+	glUniform1i( glGetUniformLocation( shaders[ "Tonemap" ], "tonemapMode" ), tonemap.tonemapMode );
+	glUniform1f( glGetUniformLocation( shaders[ "Tonemap" ], "gamma" ), tonemap.gamma );
 }
 
 void engine::BlitToScreen () {
@@ -80,10 +80,10 @@ void engine::BlitToScreen () {
 
 	// bind the displayTexture and display its current state
 	glBindImageTexture( 0, textures[ "Display Texture" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
-	glUseProgram( displayShader );
+	glUseProgram( shaders[ "Display" ] );
 	glBindVertexArray( displayVAO );
 	const ImGuiIO &io = ImGui::GetIO();
-	glUniform2f( glGetUniformLocation( displayShader, "resolution" ), io.DisplaySize.x, io.DisplaySize.y );
+	glUniform2f( glGetUniformLocation( shaders[ "Display" ], "resolution" ), io.DisplaySize.x, io.DisplaySize.y );
 	glDrawArrays( GL_TRIANGLES, 0, 3 );
 }
 
@@ -105,12 +105,11 @@ void engine::ImguiPass () {
 void engine::HandleEvents () {
 	ZoneScoped;
 
+	constexpr float bigStep = 0.120;
+	constexpr float lilStep = 0.008;
+
 	const uint8_t *state = SDL_GetKeyboardState( NULL );
-
-	const float bigStep = 0.120;
-	const float lilStep = 0.008;
-
-	// these will operate on the trident, now - will also set the basis for the main display
+	// these will operate on the trident object, which retains state for block orientation
 	if ( state[ SDL_SCANCODE_LEFT ] )
 		trident.RotateY( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep );
 	if ( state[ SDL_SCANCODE_RIGHT ] )

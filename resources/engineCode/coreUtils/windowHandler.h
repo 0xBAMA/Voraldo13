@@ -1,6 +1,6 @@
 #ifndef WINDOWHANDLER_H
 #define WINDOWHANDLER_H
-#include "includes.h"
+#include "../includes.h"
 
 class windowHandlerWrapper {
 public:

@@ -7,9 +7,11 @@ void engine::Init () {
 	CreateWindowAndContext();
 	GlDebugEnable();
 	DisplaySetup();
-	ComputeShaderCompile();
+	CreateTextures();
+	ShaderCompile();
 	ImguiSetup();
 	MenuPopulate();
+	ReportStartupStats();
 }
 
 // terminate ImGUI

@@ -69,7 +69,7 @@ add_library( STB_ImageUtilsWrapper
 add_subdirectory( ${PROJECT_SOURCE_DIR}/resources/ImageHandling/fpng )
 
 add_library( CompilerFlags INTERFACE )
-target_compile_options( CompilerFlags INTERFACE -Wall -O3 -std=c++17 -lGL -lstdc++fs -lSDL2 -ldl -Wno-uninitialized )
+target_compile_options( CompilerFlags INTERFACE -Wall -O3 -std=c++17 -lGL -lstdc++fs -lSDL2 -ldl -Wno-uninitialized -Wno-unused-function )
 
 # this builds the final executable
 add_executable( exe
