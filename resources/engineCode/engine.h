@@ -21,8 +21,8 @@ private:
 	GLuint displayVAO;
 
 	// labeled strings for textures, shaders
-	unordered_map<string,GLuint> textures;
-	unordered_map<string,GLuint> shaders;
+	unordered_map< string, GLuint > textures;
+	unordered_map< string, GLuint > shaders;
 
 	// tracks and visualizes current block orientation
 	orientTrident trident;

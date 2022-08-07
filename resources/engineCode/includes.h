@@ -21,9 +21,6 @@
 #include <vector>
 #include <unordered_map>
 
-// tick() / tock()
-#include "coreUtils/timer.h"
-
 // iostream stuff
 using std::cerr;
 using std::cin;
@@ -39,6 +36,9 @@ constexpr double pi = 3.14159265358979323846;
 // MSAA count - effects OpenGL geometry evaluation
 constexpr int MSAACount = 1;
 
+// tick() / tock()
+#include "coreUtils/timer.h"
+
 // vector math library GLM
 #define GLM_FORCE_SWIZZLE
 #define GLM_SWIZZLE_XYZW
@@ -50,6 +50,9 @@ constexpr int MSAACount = 1;
 
 // not sure as to the utility of this
 #define GLX_GLEXT_PROTOTYPES
+
+// structs for menus / operations
+#include "coreUtils/dataStructs.h"
 
 // OpenGL Loader
 #include "../ImGUI/gl3w.h"
@@ -81,10 +84,10 @@ constexpr int MSAACount = 1;
 // wrapper around window management
 #include "coreUtils/windowHandler.h"
 
-// orientation widget implementation, "orientTrident"
+// orientation widget implementation
 #include "coreUtils/trident.h"
 
-// menu layout stuff
+// menu entry list + categories
 #include "coreUtils/menuEntry.h"
 
 // tracy profiler annotation
@@ -96,10 +99,10 @@ constexpr int MSAACount = 1;
 // wrapper for TinyOBJLoader
 #include "../TinyOBJLoader/objLoader.h"
 
-// shader compilation wrapper
+// new shader compilation wrapper
 #include "shaders/lib/shaderWrapper.h"
 
-// coloring of CLI output
+// color codes for CLI output
 #include "../fonts/colors.h"
 
 // diamond square heightmap generation
@@ -111,27 +114,12 @@ constexpr int MSAACount = 1;
 // more general noise solution
 #include "../noise/FastNoise2/include/FastNoise/FastNoise.h"
 
-// bringing the old perlin impl back
+// old perlin implementation
 #include "../noise/perlin.h"
 
 // Niels Lohmann - JSON for Modern C++
 #include "../JSON/json.h"
 using json = nlohmann::json;
-
-struct colorGradeParameters {
-	int tonemapMode = 6;
-	float gamma = 1.337f;
-	float colorTemp = 6500.0f;
-};
-
-struct renderSettings {
-	float alphaCorrectionPower = 2.0f;
-	float jitterAmount = 1.0f;
-	float perspective = 0.2f;
-	int volumeSteps = 400;
-	int renderMode = 3;
-	int numFramesHistory = 8;
-};
 
 // Function to get color temperature from shadertoy user BeRo
 // from the author:
