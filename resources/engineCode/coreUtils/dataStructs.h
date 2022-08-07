@@ -17,6 +17,7 @@ struct colorGradeParameters {
 };
 
 struct renderSettings {
+	ImVec4 clearColor;
 	float alphaCorrectionPower = 2.0f;
 	float jitterAmount = 1.0f;
 	float perspective = 0.2f;

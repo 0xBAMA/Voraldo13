@@ -56,7 +56,8 @@ void engine::ClearColorAndDepth () {
 	ZoneScoped;
 
 	// clear the screen
-	glClearColor( clearColor.x, clearColor.y, clearColor.z, clearColor.w );
+	ImVec4 c = render.clearColor;
+	glClearColor( c.x, c.y, c.z, c.w );
 	// glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glClear( GL_COLOR_BUFFER_BIT );
 

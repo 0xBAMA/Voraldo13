@@ -10,33 +10,29 @@ public:
 	bool MainLoop (); // called from main
 
 private:
-	// application handles + basic data
-	windowHandlerWrapper windowHandler;
-
-	// text renderer framework
-	layerManager textRenderer;
-
-	// OpenGL data
-	ImVec4 clearColor; // imgui type, for the picker
+// OpenGL data
 	GLuint displayVAO;
-
 	// labeled strings for textures, shaders
 	unordered_map< string, GLuint > textures;
 	unordered_map< string, GLuint > shaders;
 
+//==============================================================================
+	// application handles + basic data
+	windowHandlerWrapper windowHandler;
+	// text renderer framework
+	layerManager textRenderer;
 	// tracks and visualizes current block orientation
 	orientTrident trident;
-
 	// contains the menu entries ( labels + interface layout blocks )
 	menuContainer menu;
 
+	// render settings, will probably end up with more, tbd
+	renderSettings render;
 	// tonemapping parameters + adjustment
 	colorGradeParameters tonemap;
 	void SendTonemappingParameters ();
 
-	// render settings, will probably end up with more, tbd
-	renderSettings render;
-
+//==============================================================================
 	// initialization
 	void Init ();
 	void StartMessage ();
@@ -48,6 +44,7 @@ private:
 	void CreateTextures ();
 	void ReportStartupStats ();
 
+//==============================================================================
 	// main loop functions
 	void BlitToScreen ();
 	void HandleEvents ();
@@ -60,10 +57,12 @@ private:
 	void MenuLayout ( bool* open );
 	void QuitConf ( bool* open );
 
+//==============================================================================
 	// imgui menu helpers
 	int currentlySelectedMenuItem = -1;
 	void MenuSplash ();
 
+//==============================================================================
 	// arguments to operation functions tbd
 	void MenuAABB ();				float OperationAABB ();
 	void MenuCylinderTube ();		float OperationCylinderTube ();
@@ -100,12 +99,13 @@ private:
 	void MenuRenderingSettings ();
 	void MenuPostProcessingSettings ();
 
+//==============================================================================
 	// shutdown procedures
 	void ImguiQuit ();
 	void SDLQuit ();
 	void Quit ();
 
-	// program flags
+	// program state flags
 	bool quitConfirm = false;
 	bool pQuit = false;
 };

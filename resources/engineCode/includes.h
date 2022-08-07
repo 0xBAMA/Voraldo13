@@ -51,9 +51,6 @@ constexpr int MSAACount = 1;
 // not sure as to the utility of this
 #define GLX_GLEXT_PROTOTYPES
 
-// structs for menus / operations
-#include "coreUtils/dataStructs.h"
-
 // OpenGL Loader
 #include "../ImGUI/gl3w.h"
 
@@ -62,6 +59,9 @@ constexpr int MSAACount = 1;
 #include "../ImGUI/imgui.h"
 #include "../ImGUI/imgui_impl_sdl.h"
 #include "../ImGUI/imgui_impl_opengl3.h"
+
+// structs for menus / operations
+#include "coreUtils/dataStructs.h"
 
 // SDL includes - windowing, gl context, system info
 #include <SDL2/SDL.h>

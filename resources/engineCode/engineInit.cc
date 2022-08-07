@@ -169,12 +169,12 @@ void engine::ImguiSetup () {
 
 	// Setup Platform/Renderer bindings
 	ImGui_ImplSDL2_InitForOpenGL( windowHandler.window, windowHandler.GLcontext );
-	const char *glsl_version = "#version 430";
-	ImGui_ImplOpenGL3_Init( glsl_version );
+	const char *glslVersion = "#version 430";
+	ImGui_ImplOpenGL3_Init( glslVersion );
 
 	// initial value for clear color
 	// clearColor = ImVec4( 0.295f, 0.295f, 0.295f, 0.5f );
-	clearColor = ImVec4( 0.0f, 0.0f, 0.0f, 1.0f );
+	render.clearColor = ImVec4( 0.0f, 0.0f, 0.0f, 1.0f );
 	// glClearColor( clearColor.x, clearColor.y, clearColor.z, clearColor.w );
 	// glClear( GL_COLOR_BUFFER_BIT );
 	// SDL_GL_SwapWindow( window ); // show clear color
