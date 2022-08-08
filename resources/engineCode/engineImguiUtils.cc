@@ -409,6 +409,8 @@ void engine::MenuApplicationSettings() {
 	// maybe look at doing some more versions of this? might be interesting
 	const char* tridentModesList[] = { "Fractal", "Spherical" };
 	ImGui::Combo( "Trident Mode", &trident.modeSelect, tridentModesList, IM_ARRAYSIZE( tridentModesList ) );
+	ImGui::Checkbox( "Show Trident", &render.showTrident );
+	ImGui::Checkbox( "Show Timing", &render.showTiming );
 
 	// etc
 	ImGui::Unindent( 16.0f );

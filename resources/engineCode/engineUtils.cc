@@ -63,14 +63,18 @@ void engine::ComputePasses () {
 	// other postprocessing
 		// ...
 
-	// draw the orientation trident/gizmo
-	trident.Update( textures[ "Display Texture" ] );
-	glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
+	if ( render.showTrident ) {
+		// draw the orientation trident/gizmo
+		trident.Update( textures[ "Display Texture" ] );
+		glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
+	}
 
-	// text rendering timestamp, as final step - required texture binds are handled internally
-	textRenderer.Update( ImGui::GetIO().DeltaTime );
-	textRenderer.Draw( textures[ "Display Texture" ] ); // displayTexture is the writeTarget
-	glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
+	if ( render.showTiming ) {
+		// text rendering timestamp, as final step - required texture binds are handled internally
+		textRenderer.Update( ImGui::GetIO().DeltaTime );
+		textRenderer.Draw( textures[ "Display Texture" ] ); // displayTexture is the writeTarget
+		glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
+	}
 }
 
 void engine::ClearColorAndDepth () {

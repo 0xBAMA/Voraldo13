@@ -17,6 +17,8 @@ struct colorGradeParameters {
 };
 
 struct renderSettings {
+	bool showTrident = true;
+	bool showTiming = true;
 	ImVec4 clearColor;
 	float scaleFactor = -5.0f;
 	float alphaCorrectionPower = 2.0f;
