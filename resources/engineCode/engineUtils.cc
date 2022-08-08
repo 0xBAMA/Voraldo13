@@ -137,17 +137,17 @@ void engine::HandleEvents () {
 	const uint8_t *state = SDL_GetKeyboardState( NULL );
 	// these will operate on the trident object, which retains state for block orientation
 	if ( state[ SDL_SCANCODE_LEFT ] )
-		trident.RotateY( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep );
+		trident.RotateY( ( SDL_GetModState() & KMOD_SHIFT ) ?  bigStep :  lilStep );
 	if ( state[ SDL_SCANCODE_RIGHT ] )
-		trident.RotateY( -( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep ) );
+		trident.RotateY( ( SDL_GetModState() & KMOD_SHIFT ) ? -bigStep : -lilStep );
 	if ( state[ SDL_SCANCODE_UP ] )
-		trident.RotateX( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep );
+		trident.RotateX( ( SDL_GetModState() & KMOD_SHIFT ) ?  bigStep :  lilStep );
 	if ( state[ SDL_SCANCODE_DOWN ] )
-		trident.RotateX( -( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep ) );
+		trident.RotateX( ( SDL_GetModState() & KMOD_SHIFT ) ? -bigStep : -lilStep );
 	if ( state[ SDL_SCANCODE_PAGEUP ] )
-		trident.RotateZ( -( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep ) );
+		trident.RotateZ( ( SDL_GetModState() & KMOD_SHIFT ) ? -bigStep : -lilStep );
 	if ( state[ SDL_SCANCODE_PAGEDOWN ] )
-		trident.RotateZ( ( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep ) );
+		trident.RotateZ( ( SDL_GetModState() & KMOD_SHIFT ) ?  bigStep :  lilStep );
 
 	if ( state[ SDL_SCANCODE_1 ] )
 		trident.SetViewFront();
