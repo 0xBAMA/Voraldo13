@@ -18,7 +18,7 @@ void engine::ComputePasses () {
 // dummy draw
 	// set up environment ( 0:blue noise, 1: accumulator )
 	glBindImageTexture( 0, textures[ "Blue Noise" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
-	glBindImageTexture( 1, textures[ "Accumulator" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
+	glBindImageTexture( 1, textures[ "Accumulator" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F );
 
 	// blablah draw something into accumulatorTexture
 	// glUseProgram( shaders[ "Dummy Draw" ] );
@@ -32,23 +32,22 @@ void engine::ComputePasses () {
 	glUniformMatrix3fv( glGetUniformLocation( shaders[ "Raymarch" ], "invBasis" ), 1, false, glm::value_ptr( inverseBasisMat ) );
 	glUniform1f( glGetUniformLocation( shaders[ "Raymarch" ], "scale" ), render.scaleFactor );
 
-	// tile action - TODO: implement the SSFACTOR stuff
-	// for (int x = 0; x < SSFACTOR * screen_width; x += TILESIZE) {
-	//   for (int y = 0; y < SSFACTOR * screen_height; y += TILESIZE) {
-	const int tileSize = 64;
-	for ( int x = 0; x < WIDTH; x += tileSize ) {
-		for ( int y = 0; y < HEIGHT; y += tileSize ) {
+
+	// tiled update of the accumulator texture
+	constexpr int w = SSFACTOR * WIDTH;
+	constexpr int h = SSFACTOR * HEIGHT;
+	constexpr int t = TILESIZE;
+	for ( int x = 0; x < w; x += t ) {
+		for ( int y = 0; y < h; y += t ) {
 			glUniform2i( glGetUniformLocation( shaders[ "Raymarch" ], "tileOffset"), x, y );
-			glDispatchCompute( tileSize / 16, tileSize / 16, 1 );
+			glDispatchCompute( t / 16, t / 16, 1 );
 		}
 	}
 
 
-
-
 // postprocessing
 	// set up environment ( 0:accumulator, 1:display )
-	glBindImageTexture( 0, textures[ "Accumulator" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
+	glBindImageTexture( 0, textures[ "Accumulator" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F );
 	glBindImageTexture( 1, textures[ "Display Texture" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
 
 	// shader for color grading ( color temp, contrast, gamma ... ) + tonemapping
@@ -104,9 +103,9 @@ void engine::SendTonemappingParameters () {
 void engine::BlitToScreen () {
 	ZoneScoped;
 
+	glUseProgram( shaders[ "Display" ] );
 	// bind the displayTexture and display its current state
 	glBindImageTexture( 0, textures[ "Display Texture" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
-	glUseProgram( shaders[ "Display" ] );
 	glBindVertexArray( displayVAO );
 	const ImGuiIO &io = ImGui::GetIO();
 	glUniform2f( glGetUniformLocation( shaders[ "Display" ], "resolution" ), io.DisplaySize.x, io.DisplaySize.y );

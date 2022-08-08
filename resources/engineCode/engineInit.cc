@@ -83,11 +83,11 @@ void engine::CreateTextures () {
 	GLuint blueNoiseTexture;
 
 	// create the image textures
-	Image initial( WIDTH, HEIGHT );
+	Image initial( WIDTH * SSFACTOR, HEIGHT * SSFACTOR );
 	glGenTextures( 1, &accumulatorTexture );
 	glActiveTexture( GL_TEXTURE3 );
 	glBindTexture( GL_TEXTURE_2D, accumulatorTexture );
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, WIDTH, HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, &initial.data.data()[ 0 ] );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA16F, WIDTH * SSFACTOR, HEIGHT * SSFACTOR, 0, GL_RGBA, GL_UNSIGNED_BYTE, &initial.data.data()[ 0 ] );
 	textures[ "Accumulator" ] = accumulatorTexture;
 
 	glGenTextures( 1, &displayTexture );
