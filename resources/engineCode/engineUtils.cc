@@ -28,7 +28,7 @@ void engine::ComputePasses () {
 	glUseProgram( shaders[ "Raymarch" ] );
 
 	// minimum set of required parameters, for now
-	const glm::mat3 inverseBasisMat = inverse( glm::mat3( trident.basisX, trident.basisY, trident.basisZ ) );
+	const glm::mat3 inverseBasisMat = inverse( glm::mat3( -trident.basisX, -trident.basisY, -trident.basisZ ) );
 	glUniformMatrix3fv( glGetUniformLocation( shaders[ "Raymarch" ], "invBasis" ), 1, false, glm::value_ptr( inverseBasisMat ) );
 	glUniform1f( glGetUniformLocation( shaders[ "Raymarch" ], "scale" ), render.scaleFactor );
 
@@ -149,6 +149,19 @@ void engine::HandleEvents () {
 	if ( state[ SDL_SCANCODE_PAGEDOWN ] )
 		trident.RotateZ( ( ( SDL_GetModState() & KMOD_SHIFT ) ? bigStep : lilStep ) );
 
+	if ( state[ SDL_SCANCODE_1 ] )
+		trident.SetViewFront();
+	if ( state[ SDL_SCANCODE_2 ] )
+		trident.SetViewRight();
+	if ( state[ SDL_SCANCODE_3 ] )
+		trident.SetViewBack();
+	if ( state[ SDL_SCANCODE_4 ] )
+		trident.SetViewLeft();
+	if ( state[ SDL_SCANCODE_5 ] )
+		trident.SetViewUp();
+	if ( state[ SDL_SCANCODE_6 ] )
+		trident.SetViewDown();
+
 
 //==============================================================================
 // Need to keep this for pQuit handling ( force quit )
@@ -165,5 +178,16 @@ void engine::HandleEvents () {
 		// this has to stay because it doesn't seem like ImGui::IsKeyReleased is stable enough to use
 		if ( ( event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_ESCAPE ) || ( event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_X1 )  )
 			quitConfirm = !quitConfirm;
+
+		if ( !ImGui::GetIO().WantCaptureMouse ) {
+			if ( event.type == SDL_MOUSEWHEEL ) {
+			// allow scroll to do the same thing as +/-
+				if (event.wheel.y > 0) {
+					render.scaleFactor += 0.1f;
+				} else if (event.wheel.y < 0) {
+					render.scaleFactor -= 0.1f;
+				}
+			}
+		}
 	}
 }

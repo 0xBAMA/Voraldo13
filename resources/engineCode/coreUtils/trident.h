@@ -11,10 +11,7 @@
 class orientTrident {
 public:
 	orientTrident () {
-		needsRedraw = true;
-		basisX = glm::vec3( 1.0f, 0.0f, 0.0f );
-		basisY = glm::vec3( 0.0f, 1.0f, 0.0f );
-		basisZ = glm::vec3( 0.0f, 0.0f, 1.0f );
+		InitBasis();
 	}
 
 	void PassInShaders ( GLuint generate, GLuint copy ) {
@@ -24,30 +21,6 @@ public:
 
 	void PassInImage ( GLuint textureHandle ) {
 		tridentImage = textureHandle;
-	}
-
-	// rotate functions X,Y,Z with an amount to rotate by ( pos/neg )
-		// each of these will set needsRedraw to true, since the state changes
-
-	void RotateX ( float amnt ) {
-		basisX = glm::rotate( basisX, amnt, glm::vec3( 1.0f, 0.0f, 0.0f ) );
-		basisY = glm::rotate( basisY, amnt, glm::vec3( 1.0f, 0.0f, 0.0f ) );
-		basisZ = glm::rotate( basisZ, amnt, glm::vec3( 1.0f, 0.0f, 0.0f ) );
-		needsRedraw = true;
-	}
-
-	void RotateY ( float amnt ) {
-		basisX = glm::rotate( basisX, amnt, glm::vec3( 0.0f, 1.0f, 0.0f ) );
-		basisY = glm::rotate( basisY, amnt, glm::vec3( 0.0f, 1.0f, 0.0f ) );
-		basisZ = glm::rotate( basisZ, amnt, glm::vec3( 0.0f, 1.0f, 0.0f ) );
-		needsRedraw = true;
-	}
-
-	void RotateZ ( float amnt ) {
-		basisX = glm::rotate( basisX, amnt, glm::vec3( 0.0f, 0.0f, 1.0f ) );
-		basisY = glm::rotate( basisY, amnt, glm::vec3( 0.0f, 0.0f, 1.0f ) );
-		basisZ = glm::rotate( basisZ, amnt, glm::vec3( 0.0f, 0.0f, 1.0f ) );
-		needsRedraw = true;
 	}
 
 	void Update ( GLuint writeTarget ) {
@@ -91,6 +64,66 @@ public:
 
 	// size in terms of font glyphs - sizes the dispatches
 	glm::ivec2 blockDimensions{ 20, 7 };
+
+	void InitBasis () {
+		basisX = glm::vec3( 1.0f, 0.0f, 0.0f );
+		basisY = glm::vec3( 0.0f, 1.0f, 0.0f );
+		basisZ = glm::vec3( 0.0f, 0.0f, 1.0f );
+		needsRedraw = true;
+	}
+
+	// rotate functions X,Y,Z with an amount to rotate by ( pos/neg )
+		// each of these will set needsRedraw to true, since the state changes
+
+	void RotateX ( float amnt ) {
+		basisX = glm::rotate( basisX, amnt, glm::vec3( 1.0f, 0.0f, 0.0f ) );
+		basisY = glm::rotate( basisY, amnt, glm::vec3( 1.0f, 0.0f, 0.0f ) );
+		basisZ = glm::rotate( basisZ, amnt, glm::vec3( 1.0f, 0.0f, 0.0f ) );
+		needsRedraw = true;
+	}
+
+	void RotateY ( float amnt ) {
+		basisX = glm::rotate( basisX, amnt, glm::vec3( 0.0f, 1.0f, 0.0f ) );
+		basisY = glm::rotate( basisY, amnt, glm::vec3( 0.0f, 1.0f, 0.0f ) );
+		basisZ = glm::rotate( basisZ, amnt, glm::vec3( 0.0f, 1.0f, 0.0f ) );
+		needsRedraw = true;
+	}
+
+	void RotateZ ( float amnt ) {
+		basisX = glm::rotate( basisX, amnt, glm::vec3( 0.0f, 0.0f, 1.0f ) );
+		basisY = glm::rotate( basisY, amnt, glm::vec3( 0.0f, 0.0f, 1.0f ) );
+		basisZ = glm::rotate( basisZ, amnt, glm::vec3( 0.0f, 0.0f, 1.0f ) );
+		needsRedraw = true;
+	}
+
+	void SetViewFront () {
+		InitBasis();
+	}
+
+	void SetViewBack () {
+		InitBasis();
+		RotateY( pi );
+	}
+
+	void SetViewRight () {
+		InitBasis();
+		RotateY( pi / 2.0 );
+	}
+
+	void SetViewLeft () {
+		InitBasis();
+		RotateY( -pi / 2.0 );
+	}
+
+	void SetViewUp () {
+		InitBasis();
+		RotateX( -pi / 2.0 );
+	}
+
+	void SetViewDown () {
+		InitBasis();
+		RotateX( pi / 2.0 );
+	}
 
 private:
 	GLuint tridentImage;
