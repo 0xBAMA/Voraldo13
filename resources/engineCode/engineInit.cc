@@ -129,13 +129,19 @@ void engine::ShaderCompile () {
 	Tick();
 	cout << T_BLUE << "    Compiling Shaders" << RESET << " ................................ ";
 
+	const string base( "resources/engineCode/shaders/" );
 
 	// main display blit
-	shaders[ "Display" ] = regularShader( "resources/engineCode/shaders/blit.vs.glsl", "resources/engineCode/shaders/blit.fs.glsl" ).shaderHandle;
+	shaders[ "Display" ] = regularShader( base + "blit.vs.glsl", base + "blit.fs.glsl" ).shaderHandle;
+
 	// something to put data in the accumulator texture
-	shaders[ "Dummy Draw" ] = computeShader( "resources/engineCode/shaders/dummyDraw.cs.glsl" ).shaderHandle;
+	shaders[ "Dummy Draw" ] = computeShader( base + "dummyDraw.cs.glsl" ).shaderHandle;
+
 	// color adjustments
-	shaders[ "Tonemap" ] = computeShader( "resources/engineCode/shaders/tonemap.cs.glsl" ).shaderHandle;
+	shaders[ "Tonemap" ] = computeShader( base + "tonemap.cs.glsl" ).shaderHandle;
+
+	// basic image based raymarch
+	shaders[ "Raymarch" ] = computeShader( base + "raymarch.cs.glsl" ).shaderHandle;
 
 	// initialize the text renderer
 	shaders[ "Font Renderer" ] = computeShader( "resources/fonts/fontRenderer/font.cs.glsl" ).shaderHandle;
@@ -144,8 +150,8 @@ void engine::ShaderCompile () {
 	trident.basePt = textRenderer.basePt;
 
 	// orientation trident shaders
-	shaders[ "Trident Raymarch" ] = computeShader( "resources/engineCode/shaders/tridentGenerate.cs.glsl" ).shaderHandle;
-	shaders[ "Trident Blit" ] = computeShader( "resources/engineCode/shaders/tridentCopy.cs.glsl" ).shaderHandle;
+	shaders[ "Trident Raymarch" ] = computeShader( base + "tridentGenerate.cs.glsl" ).shaderHandle;
+	shaders[ "Trident Blit" ] = computeShader( base + "tridentCopy.cs.glsl" ).shaderHandle;
 	trident.PassInShaders( shaders[ "Trident Raymarch" ], shaders[ "Trident Blit" ] );
 
 		// ...

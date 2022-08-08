@@ -12,7 +12,7 @@ public:
 private:
 // OpenGL data
 	GLuint displayVAO;
-	// labeled strings for textures, shaders
+	// access to textures, shaders by string label
 	unordered_map< string, GLuint > textures;
 	unordered_map< string, GLuint > shaders;
 

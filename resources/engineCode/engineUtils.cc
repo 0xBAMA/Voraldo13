@@ -21,9 +21,31 @@ void engine::ComputePasses () {
 	glBindImageTexture( 1, textures[ "Accumulator" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
 
 	// blablah draw something into accumulatorTexture
-	glUseProgram( shaders[ "Dummy Draw" ] );
-	glDispatchCompute( ( WIDTH + 15 ) / 16, ( HEIGHT + 15 ) / 16, 1 );
-	glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
+	// glUseProgram( shaders[ "Dummy Draw" ] );
+	// glDispatchCompute( ( WIDTH + 15 ) / 16, ( HEIGHT + 15 ) / 16, 1 );
+	// glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
+
+	glUseProgram( shaders[ "Raymarch" ] );
+
+	// minimum set of required parameters, for now
+	// const glm::mat3 inverseBasisMat = inverse( glm::mat3( trident.basisX, trident.basisY, trident.basisZ ) );
+	const glm::mat3 inverseBasisMat = glm::mat3( trident.basisX, trident.basisY, trident.basisZ );
+	glUniformMatrix3fv( glGetUniformLocation( shaders[ "Raymarch" ], "invBasis" ), 1, false, glm::value_ptr( inverseBasisMat ) );
+	glUniform1f( glGetUniformLocation( shaders[ "Raymarch" ], "scale" ), render.scaleFactor );
+
+	// tile action - TODO: implement the SSFACTOR stuff
+	// for (int x = 0; x < SSFACTOR * screen_width; x += TILESIZE) {
+	//   for (int y = 0; y < SSFACTOR * screen_height; y += TILESIZE) {
+	const int tileSize = 64;
+	for ( int x = 0; x < WIDTH; x += tileSize ) {
+		for ( int y = 0; y < HEIGHT; y += tileSize ) {
+			glUniform2i( glGetUniformLocation( shaders[ "Raymarch" ], "tileOffset"), x, y );
+			glDispatchCompute( tileSize / 16, tileSize / 16, 1 );
+		}
+	}
+
+
+
 
 // postprocessing
 	// set up environment ( 0:accumulator, 1:display )
