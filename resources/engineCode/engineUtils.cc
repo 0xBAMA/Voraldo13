@@ -28,8 +28,7 @@ void engine::ComputePasses () {
 	glUseProgram( shaders[ "Raymarch" ] );
 
 	// minimum set of required parameters, for now
-	// const glm::mat3 inverseBasisMat = inverse( glm::mat3( trident.basisX, trident.basisY, trident.basisZ ) );
-	const glm::mat3 inverseBasisMat = glm::mat3( trident.basisX, trident.basisY, trident.basisZ );
+	const glm::mat3 inverseBasisMat = inverse( glm::mat3( trident.basisX, trident.basisY, trident.basisZ ) );
 	glUniformMatrix3fv( glGetUniformLocation( shaders[ "Raymarch" ], "invBasis" ), 1, false, glm::value_ptr( inverseBasisMat ) );
 	glUniform1f( glGetUniformLocation( shaders[ "Raymarch" ], "scale" ), render.scaleFactor );
 

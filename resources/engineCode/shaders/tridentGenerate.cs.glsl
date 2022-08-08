@@ -9,7 +9,7 @@ uniform vec3 basisZ;
 // what to draw at the center
 uniform int mode;
 
-#define MAXSTEPS 35
+#define MAXSTEPS 40
 #define MAXDIST 2.5
 #define EPSILON 0.001
 
@@ -95,11 +95,11 @@ float cDist ( vec3 p ) {
 vec4 deMat ( vec3 p ) {
 	// return value has .rgb color and .a is distance
 	vec4 result = vec4( 1000.0 );
-	float x = deRoundedCone( p, vec3( 0.0 ), basisX / 2.0 );
+	float x = deRoundedCone( p, vec3( 0.0 ), -basisX / 2.0 );
 	vec3 xc = vec3( 1.0, 0.0, 0.0 );
-	float y = deRoundedCone( p, vec3( 0.0 ), basisY / 2.0 );
+	float y = deRoundedCone( p, vec3( 0.0 ), -basisY / 2.0 );
 	vec3 yc = vec3( 0.0, 1.0, 0.0 );
-	float z = deRoundedCone( p, vec3( 0.0 ), basisZ / 2.0 );
+	float z = deRoundedCone( p, vec3( 0.0 ), -basisZ / 2.0 );
 	vec3 zc = vec3( 0.0, 0.0, 1.0 );
 	float c = cDist( p );
 	// vec3 cc = vec3( 0.16 );
@@ -114,9 +114,9 @@ vec4 deMat ( vec3 p ) {
 
 // without materials
 float de ( vec3 p ) {
-	float x = deRoundedCone( p, vec3( 0.0 ), basisX / 2.0 );
-	float y = deRoundedCone( p, vec3( 0.0 ), basisY / 2.0 );
-	float z = deRoundedCone( p, vec3( 0.0 ), basisZ / 2.0 );
+	float x = deRoundedCone( p, vec3( 0.0 ), -basisX / 2.0 );
+	float y = deRoundedCone( p, vec3( 0.0 ), -basisY / 2.0 );
+	float z = deRoundedCone( p, vec3( 0.0 ), -basisZ / 2.0 );
 	float c = cDist( p );
 	return SdSmoothMin( SdSmoothMin( SdSmoothMin( x, y ), z ), c );
 }

@@ -65,7 +65,8 @@ void main () {
 	vec4 color = clearColor;
 	if ( invocation.x < iDimensions.x && invocation.y < iDimensions.y ) {
 		if ( Intersect( rayOrigin, rayDirection ) ) {
-			color = vec4( vec3( tMin ), 1.0 );
+ 			color.xyz = tMin * rayDirection + rayOrigin;
+			color.a = 1.0;
 		} else {
 			color = clearColor;
 		}
