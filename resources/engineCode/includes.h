@@ -81,7 +81,7 @@ constexpr int MSAACount = 1;
 
 #define STARTONWINDOW 3
 
-#define SSFACTOR 1.5
+#define SSFACTOR 1.75
 #define TILESIZE 64
 
 // wrapper around window management

@@ -83,7 +83,7 @@ void engine::CreateTextures () {
 	GLuint blueNoiseTexture;
 
 	// create the image textures
-	Image initial( WIDTH * SSFACTOR, HEIGHT * SSFACTOR );
+	Image initial( WIDTH * std::max( SSFACTOR, 1.0 ), HEIGHT * std::max( SSFACTOR, 1.0 ) );
 	glGenTextures( 1, &accumulatorTexture );
 	glActiveTexture( GL_TEXTURE3 );
 	glBindTexture( GL_TEXTURE_2D, accumulatorTexture );
