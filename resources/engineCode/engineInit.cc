@@ -119,9 +119,6 @@ void engine::CreateTextures () {
 	trident.PassInImage( tridentImage );
 	textures[ "Trident" ] = tridentImage;
 
-
-
-
 	cout << T_GREEN << "done." << T_RED << " ( " << Tock() << " us )" << RESET << endl;
 }
 

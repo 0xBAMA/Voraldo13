@@ -54,6 +54,8 @@ constexpr int MSAACount = 1;
 // OpenGL Loader
 #include "../ImGUI/gl3w.h"
 
+// ags
+
 // GUI library (dear ImGUI)
 #include "../ImGUI/TextEditor.h"
 #include "../ImGUI/imgui.h"
@@ -81,7 +83,7 @@ constexpr int MSAACount = 1;
 
 #define STARTONWINDOW 3
 
-#define SSFACTOR 1.75
+#define SSFACTOR 0.2
 #define TILESIZE 64
 
 // wrapper around window management

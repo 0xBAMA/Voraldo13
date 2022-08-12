@@ -1,8 +1,12 @@
 #ifndef OBJLOAD
 #define OBJLOAD
 
+#include <string>
+#include <vector>
+#include "../GLM/glm.hpp"
 #include "tiny_obj_loader.h"
-#include "../engineCode/includes.h"
+
+using std::cout, std::endl;
 
 class objLoader {
 public:
