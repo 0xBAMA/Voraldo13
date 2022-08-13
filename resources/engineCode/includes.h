@@ -54,8 +54,6 @@ constexpr int MSAACount = 1;
 // OpenGL Loader
 #include "../ImGUI/gl3w.h"
 
-// ags
-
 // GUI library (dear ImGUI)
 #include "../ImGUI/TextEditor.h"
 #include "../ImGUI/imgui.h"
@@ -80,10 +78,9 @@ constexpr int MSAACount = 1;
 
 #define WIDTH 1920
 #define HEIGHT 1080
-
 #define STARTONWINDOW 3
 
-#define SSFACTOR 0.2
+#define SSFACTOR 1.0
 #define TILESIZE 64
 
 // wrapper around window management
@@ -126,28 +123,5 @@ constexpr int MSAACount = 1;
 #include "../JSON/json.h"
 using json = nlohmann::json;
 
-// Function to get color temperature from shadertoy user BeRo
-// from the author:
-//   Color temperature (sRGB) stuff
-//   Copyright (C) 2014 by Benjamin 'BeRo' Rosseaux
-//   Because the german law knows no public domain in the usual sense,
-//   this code is licensed under the CC0 license
-//   http://creativecommons.org/publicdomain/zero/1.0/
-// Valid from 1000 to 40000 K (and additionally 0 for pure full white)
-inline glm::vec3 GetColorForTemperature ( double temperature ) {
-	// Values from:
-	// http://blenderartists.org/forum/showthread.php?270332-OSL-Goodness&p=2268693&viewfull=1#post2268693
-	glm::mat3 m =
-		( temperature <= 6500.0 )
-			? glm::mat3(glm::vec3( 0.0, -2902.1955373783176, -8257.7997278925690 ),
-							glm::vec3( 0.0, 1669.5803561666639, 2575.2827530017594 ),
-							glm::vec3( 1.0, 1.3302673723350029, 1.8993753891711275 ) )
-			: glm::mat3(glm::vec3( 1745.0425298314172, 1216.6168361476490, -8257.7997278925690 ),
-							glm::vec3( -2666.3474220535695, -2173.1012343082230, 2575.2827530017594 ),
-							glm::vec3( 0.55995389139931482, 0.70381203140554553, 1.8993753891711275 ) );
-
-	return glm::mix( glm::clamp( glm::vec3( m[ 0 ] / ( glm::vec3( glm::clamp( temperature, 1000.0, 40000.0 ) ) +
-		m[ 1 ] ) + m[ 2 ] ), glm::vec3( 0.0 ), glm::vec3( 1.0 ) ), glm::vec3( 1.0 ), glm::smoothstep( 1000.0, 0.0, temperature ) );
-}
 
 #endif

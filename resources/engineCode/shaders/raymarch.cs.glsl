@@ -10,6 +10,7 @@ uniform vec4 clearColor;
 uniform float scale;
 uniform float perspectiveFactor;
 uniform float alphaPower;
+uniform float blendFactor;
 
 // basis vectors used to construct view ray
 uniform mat3 invBasis;
@@ -61,6 +62,7 @@ void main () {
 	const vec2 mappedPos    = scale * ( uv - vec2( 0.5 ) ) * vec2( 1.0, aspectRatio );
 	const vec3 rayOrigin    = invBasis * vec3( mappedPos, 2.0 );
 	const vec3 rayDirection = invBasis * vec3( perspectiveFactor * mappedPos, -2.0 );
+	const vec4 prevColor    = imageLoad( accumulatorTexture, location );
 
 	vec4 color = clearColor;
 	if ( invocation.x < iDimensions.x && invocation.y < iDimensions.y ) {
@@ -70,6 +72,6 @@ void main () {
 		} else {
 			color = clearColor;
 		}
-		imageStore( accumulatorTexture, location, color );
+		imageStore( accumulatorTexture, location, color * ( 1.0 - blendFactor ) + prevColor * blendFactor );
 	}
 }

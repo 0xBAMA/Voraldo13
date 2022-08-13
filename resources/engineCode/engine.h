@@ -100,6 +100,9 @@ private:
 	void MenuPostProcessingSettings ();
 
 //==============================================================================
+	glm::vec3 GetColorForTemperature( float temperature ); // 6500.0 is white
+
+//==============================================================================
 	// shutdown procedures
 	void ImguiQuit ();
 	void SDLQuit ();
