@@ -75,6 +75,38 @@ void engine::DisplaySetup () {
 	cout << T_RED << "      GLSL version supported : " << T_CYAN << glslVersion << RESET << endl << endl;
 }
 
+std::vector<uint8_t> engine::Bayer ( int dimension ) {
+	if ( dimension == 4 ) {
+		std::vector<uint8_t> pattern4 = {
+			0,  8,  2,  10,	/* values begin scaled to the range 0..15 */
+			12, 4,  14, 6,	/* so they need to be rescaled by 16 */
+			3,  11, 1,  9,
+			15, 7,  13, 5 };
+
+		for ( auto &x : pattern4 )
+			x *= 16;
+
+		return pattern4;
+	} else if ( dimension == 8 ) {
+		std::vector<uint8_t> pattern8 = {
+			0, 32,  8, 40,  2, 34, 10, 42,   /* 8x8 Bayer ordered dithering  */
+			48, 16, 56, 24, 50, 18, 58, 26,  /* pattern. Each input pixel */
+			12, 44,  4, 36, 14, 46,  6, 38,  /* starts scaled to the 0..63 range */
+			60, 28, 52, 20, 62, 30, 54, 22,  /* before looking in this table */
+			3, 35, 11, 43,  1, 33,  9, 41,   /* to determine the action. */
+			51, 19, 59, 27, 49, 17, 57, 25,
+			15, 47,  7, 39, 13, 45,  5, 37,
+			63, 31, 55, 23, 61, 29, 53, 21 };
+
+		for ( auto &x : pattern8 )
+			x *= 4;
+
+		return pattern8;
+	} else {
+		return std::vector<uint8_t>{ 0 };
+	}
+}
+
 void engine::CreateTextures () {
 	Tick();
 	cout << T_BLUE << "    Creating Textures" << RESET << " ................................ ";
@@ -114,13 +146,31 @@ void engine::CreateTextures () {
 	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, blueNoiseImage.width, blueNoiseImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &blueNoiseImage.data.data()[ 0 ] );
 	textures[ "Blue Noise" ] = blueNoiseTexture;
 
-	// bayer pattern
+	// bayer patterns
+	GLuint bayer4, bayer8;
+	glActiveTexture( GL_TEXTURE5 );
+	glBindTexture( GL_TEXTURE_2D, bayer4 );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_R8, 4, 4, 0, GL_RED, GL_UNSIGNED_BYTE, &Bayer( 4 )[0] );
+	textures[ "Bayer4" ] = bayer4;
+
+	glActiveTexture( GL_TEXTURE6 );
+	glBindTexture( GL_TEXTURE_2D, bayer8 );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_R8, 8, 8, 0, GL_RED, GL_UNSIGNED_BYTE, &Bayer( 8 )[0] );
+	textures[ "Bayer8" ] = bayer8;
 
 	// create the image for the trident
 	GLuint tridentImage;
-	Image initialT( trident.blockDimensions.x * 8, trident.blockDimensions.y * 16, true );
+	Image initialT( trident.blockDimensions.x * 8, trident.blockDimensions.y * 16 );
 	glGenTextures( 1, &tridentImage );
-	glActiveTexture( GL_TEXTURE5 );
+	glActiveTexture( GL_TEXTURE7 );
 	glBindTexture( GL_TEXTURE_2D, tridentImage );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
@@ -130,17 +180,96 @@ void engine::CreateTextures () {
 	trident.PassInImage( tridentImage );
 	textures[ "Trident" ] = tridentImage;
 
+	// color blocks ( front and back )
+	size_t numBytesBlock = BLOCKDIM * BLOCKDIM * BLOCKDIM * 4;
+	std::vector<uint8_t> zeroes;
+	zeroes.resize( numBytesBlock, 0 );
+	std::vector<uint8_t> initialXOR;
+	initialXOR.reserve( numBytesBlock );
+	for ( unsigned int x = 0; x < BLOCKDIM; x++ ) {
+		for ( unsigned int y = 0; y < BLOCKDIM; y++ ) {
+			for ( unsigned int z = 0; z < BLOCKDIM; z++ ) {
+				initialXOR.push_back( x ^ y ^ z );
+			}
+		}
+	}
 
-	// voxel data
-		// color blocks 1, 2
-		// mask blocks 1, 2
-		// lighting data
-			// lighting cache ( how would this be used for anything? )
-	// copy/paste buffer ( how is this going to happen? )
+	GLuint colorTextures[ 2 ];
+	glGenTextures( 2, &colorTextures[ 0 ] );
+	glActiveTexture( GL_TEXTURE8 );
+	glBindTexture( GL_TEXTURE_3D, colorTextures[ 0 ] );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT );
+	glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &initialXOR.data()[ 0 ] );
+	textures[ "Color Block Front" ] = colorTextures[ 0 ];
+
+	glActiveTexture( GL_TEXTURE9 );
+	glBindTexture( GL_TEXTURE_3D, colorTextures[ 1 ] );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT );
+	glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &initialXOR.data()[ 0 ] );
+	textures[ "Color Block Back" ] = colorTextures[ 1 ];
+
+	// mask blocks ( front and back - can this be consolidated? not sure if two are needed )
+	GLuint maskTextures[ 2 ];
+	glGenTextures( 2, &maskTextures[ 0 ] );
+	glActiveTexture( GL_TEXTURE10 );
+	glBindTexture( GL_TEXTURE_3D, maskTextures[ 0 ] );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT );
+	glTexImage3D( GL_TEXTURE_3D, 0, GL_R8UI, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, &zeroes.data()[ 0 ] );
+	textures[ "Mask Block Front" ] = maskTextures[ 0 ];
+
+	glActiveTexture( GL_TEXTURE11 );
+	glBindTexture( GL_TEXTURE_3D, maskTextures[ 1 ] );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT );
+	glTexImage3D( GL_TEXTURE_3D, 0, GL_R8UI, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, &zeroes.data()[ 0 ] );
+	textures[ "Mask Block Back" ] = maskTextures[ 1 ];
+
+	// lighting data ( can probably get away with just the one buffer, tbd )
+	GLuint lightTexture;
+	glGenTextures( 1, &lightTexture );
+	glActiveTexture( GL_TEXTURE12 );
+	glBindTexture( GL_TEXTURE_3D, lightTexture );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT );
+	glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &zeroes.data()[ 0 ] );
+	textures[ "Lighting Block" ] = lightTexture;
+
+	// loadbuffer for VAT + load/save
+	GLuint loadBuffer;
+	glGenTextures( 1, &loadBuffer );
+	glActiveTexture( GL_TEXTURE13 );
+	glBindTexture( GL_TEXTURE_3D, loadBuffer );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT );
+	glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &zeroes.data()[ 0 ] );
+	textures[ "Loadbuffer" ] = loadBuffer;
+
 	// heightmap
-	// noise buffer
-	// loadbuffer for VAT, load/save
 
+	// noise buffer
+
+	// copy/paste buffer ( how is this going to happen? )
 
 	cout << T_GREEN << "done." << T_RED << " ( " << Tock() << " us )" << RESET << endl;
 }
@@ -213,54 +342,54 @@ void engine::ImguiSetup () {
 	// io.Fonts->AddFontFromFileTTF( "resources/fonts/ttf/Braciola MS ExB.ttf", 32 );
 
 	ImVec4 *colors = ImGui::GetStyle().Colors;
-	colors[ ImGuiCol_Text ]						= ImVec4( 0.67f, 0.50f, 0.16f, 1.00f );
-	colors[ ImGuiCol_TextDisabled ]				= ImVec4( 0.33f, 0.27f, 0.16f, 1.00f );
-	colors[ ImGuiCol_WindowBg ]					= ImVec4( 0.10f, 0.05f, 0.00f, 1.00f );
-	colors[ ImGuiCol_ChildBg ]					= ImVec4( 0.23f, 0.17f, 0.02f, 0.05f );
-	colors[ ImGuiCol_PopupBg ]					= ImVec4( 0.30f, 0.12f, 0.06f, 0.94f );
-	colors[ ImGuiCol_Border ]					= ImVec4( 0.25f, 0.18f, 0.09f, 0.33f );
-	colors[ ImGuiCol_BorderShadow ]				= ImVec4( 0.33f, 0.15f, 0.02f, 0.17f );
-	colors[ ImGuiCol_FrameBg ]					= ImVec4( 0.561f, 0.082f, 0.04f, 0.17f );
-	colors[ ImGuiCol_FrameBgHovered ]			= ImVec4( 0.19f, 0.09f, 0.02f, 0.17f );
-	colors[ ImGuiCol_FrameBgActive ]			= ImVec4( 0.25f, 0.12f, 0.01f, 0.78f );
-	colors[ ImGuiCol_TitleBg ]					= ImVec4( 0.25f, 0.12f, 0.01f, 1.00f );
-	colors[ ImGuiCol_TitleBgActive ]			= ImVec4( 0.33f, 0.15f, 0.02f, 1.00f );
-	colors[ ImGuiCol_TitleBgCollapsed ]			= ImVec4( 0.25f, 0.12f, 0.01f, 1.00f );
-	colors[ ImGuiCol_MenuBarBg ]				= ImVec4( 0.14f, 0.07f, 0.02f, 1.00f );
-	colors[ ImGuiCol_ScrollbarBg ]				= ImVec4( 0.13f, 0.10f, 0.08f, 0.53f );
-	colors[ ImGuiCol_ScrollbarGrab ]			= ImVec4( 0.25f, 0.12f, 0.01f, 0.78f );
-	colors[ ImGuiCol_ScrollbarGrabHovered ]		= ImVec4( 0.33f, 0.15f, 0.02f, 1.00f );
-	colors[ ImGuiCol_ScrollbarGrabActive ]		= ImVec4( 0.25f, 0.12f, 0.01f, 0.78f );
-	colors[ ImGuiCol_CheckMark ]				= ImVec4( 0.69f, 0.45f, 0.11f, 1.00f );
-	colors[ ImGuiCol_SliderGrab ]				= ImVec4( 0.28f, 0.18f, 0.06f, 1.00f );
-	colors[ ImGuiCol_SliderGrabActive ]			= ImVec4( 0.36f, 0.22f, 0.06f, 1.00f );
-	colors[ ImGuiCol_Button ]					= ImVec4( 0.25f, 0.12f, 0.01f, 0.78f );
-	colors[ ImGuiCol_ButtonHovered ]			= ImVec4( 0.33f, 0.15f, 0.02f, 1.00f );
-	colors[ ImGuiCol_ButtonActive ]				= ImVec4( 0.25f, 0.12f, 0.01f, 0.78f );
-	colors[ ImGuiCol_Header ]					= ImVec4( 0.25f, 0.12f, 0.01f, 0.78f );
-	colors[ ImGuiCol_HeaderHovered ]			= ImVec4( 0.33f, 0.15f, 0.02f, 1.00f );
-	colors[ ImGuiCol_HeaderActive ]				= ImVec4( 0.25f, 0.12f, 0.01f, 0.78f );
-	colors[ ImGuiCol_Separator ]				= ImVec4( 0.28f, 0.18f, 0.06f, 0.37f );
-	colors[ ImGuiCol_SeparatorHovered ]			= ImVec4( 0.33f, 0.15f, 0.02f, 0.17f );
-	colors[ ImGuiCol_SeparatorActive ]			= ImVec4( 0.42f, 0.18f, 0.06f, 0.17f );
-	colors[ ImGuiCol_ResizeGrip ]				= ImVec4( 0.25f, 0.12f, 0.01f, 0.78f );
-	colors[ ImGuiCol_ResizeGripHovered ]		= ImVec4( 0.33f, 0.15f, 0.02f, 1.00f );
-	colors[ ImGuiCol_ResizeGripActive ]			= ImVec4( 0.25f, 0.12f, 0.01f, 0.78f );
-	colors[ ImGuiCol_Tab ]						= ImVec4( 0.25f, 0.12f, 0.01f, 0.78f );
-	colors[ ImGuiCol_TabHovered ]				= ImVec4( 0.33f, 0.15f, 0.02f, 1.00f );
-	colors[ ImGuiCol_TabActive ]				= ImVec4( 0.34f, 0.14f, 0.01f, 1.00f );
-	colors[ ImGuiCol_TabUnfocused ]				= ImVec4( 0.33f, 0.15f, 0.02f, 1.00f );
-	colors[ ImGuiCol_TabUnfocusedActive ]		= ImVec4( 0.42f, 0.18f, 0.06f, 1.00f );
-	colors[ ImGuiCol_PlotLines ]				= ImVec4( 0.61f, 0.61f, 0.61f, 1.00f );
-	colors[ ImGuiCol_PlotLinesHovered ]			= ImVec4( 1.00f, 0.43f, 0.35f, 1.00f );
-	colors[ ImGuiCol_PlotHistogram ]			= ImVec4( 0.90f, 0.70f, 0.00f, 1.00f );
-	colors[ ImGuiCol_PlotHistogramHovered ]		= ImVec4( 1.00f, 0.60f, 0.00f, 1.00f );
-	colors[ ImGuiCol_TextSelectedBg ]			= ImVec4( 0.06f, 0.03f, 0.01f, 0.78f );
-	colors[ ImGuiCol_DragDropTarget ]			= ImVec4( 0.64f, 0.42f, 0.09f, 0.90f );
-	colors[ ImGuiCol_NavHighlight ]				= ImVec4( 0.64f, 0.42f, 0.09f, 0.90f );
-	colors[ ImGuiCol_NavWindowingHighlight ]	= ImVec4( 1.00f, 1.00f, 1.00f, 0.70f );
-	colors[ ImGuiCol_NavWindowingDimBg ]		= ImVec4( 0.80f, 0.80f, 0.80f, 0.20f );
-	colors[ ImGuiCol_ModalWindowDimBg ]			= ImVec4( 0.80f, 0.80f, 0.80f, 0.35f );
+	colors[ ImGuiCol_Text ]						= ImVec4( 0.670f, 0.500f, 0.160f, 1.000f );
+	colors[ ImGuiCol_TextDisabled ]				= ImVec4( 0.330f, 0.270f, 0.160f, 1.000f );
+	colors[ ImGuiCol_WindowBg ]					= ImVec4( 0.100f, 0.050f, 0.000f, 1.000f );
+	colors[ ImGuiCol_ChildBg ]					= ImVec4( 0.230f, 0.170f, 0.020f, 0.050f );
+	colors[ ImGuiCol_PopupBg ]					= ImVec4( 0.300f, 0.120f, 0.060f, 0.940f );
+	colors[ ImGuiCol_Border ]					= ImVec4( 0.250f, 0.180f, 0.090f, 0.330f );
+	colors[ ImGuiCol_BorderShadow ]				= ImVec4( 0.330f, 0.150f, 0.020f, 0.170f );
+	colors[ ImGuiCol_FrameBg ]					= ImVec4( 0.561f, 0.082f, 0.040f, 0.170f );
+	colors[ ImGuiCol_FrameBgHovered ]			= ImVec4( 0.190f, 0.090f, 0.020f, 0.170f );
+	colors[ ImGuiCol_FrameBgActive ]			= ImVec4( 0.250f, 0.120f, 0.010f, 0.780f );
+	colors[ ImGuiCol_TitleBg ]					= ImVec4( 0.250f, 0.120f, 0.010f, 1.000f );
+	colors[ ImGuiCol_TitleBgActive ]			= ImVec4( 0.330f, 0.150f, 0.020f, 1.000f );
+	colors[ ImGuiCol_TitleBgCollapsed ]			= ImVec4( 0.250f, 0.120f, 0.010f, 1.000f );
+	colors[ ImGuiCol_MenuBarBg ]				= ImVec4( 0.140f, 0.070f, 0.020f, 1.000f );
+	colors[ ImGuiCol_ScrollbarBg ]				= ImVec4( 0.130f, 0.100f, 0.080f, 0.530f );
+	colors[ ImGuiCol_ScrollbarGrab ]			= ImVec4( 0.250f, 0.120f, 0.010f, 0.780f );
+	colors[ ImGuiCol_ScrollbarGrabHovered ]		= ImVec4( 0.330f, 0.150f, 0.020f, 1.000f );
+	colors[ ImGuiCol_ScrollbarGrabActive ]		= ImVec4( 0.250f, 0.120f, 0.010f, 0.780f );
+	colors[ ImGuiCol_CheckMark ]				= ImVec4( 0.690f, 0.450f, 0.110f, 1.000f );
+	colors[ ImGuiCol_SliderGrab ]				= ImVec4( 0.280f, 0.180f, 0.060f, 1.000f );
+	colors[ ImGuiCol_SliderGrabActive ]			= ImVec4( 0.360f, 0.220f, 0.060f, 1.000f );
+	colors[ ImGuiCol_Button ]					= ImVec4( 0.250f, 0.120f, 0.010f, 0.780f );
+	colors[ ImGuiCol_ButtonHovered ]			= ImVec4( 0.330f, 0.150f, 0.020f, 1.000f );
+	colors[ ImGuiCol_ButtonActive ]				= ImVec4( 0.250f, 0.120f, 0.010f, 0.780f );
+	colors[ ImGuiCol_Header ]					= ImVec4( 0.250f, 0.120f, 0.010f, 0.780f );
+	colors[ ImGuiCol_HeaderHovered ]			= ImVec4( 0.330f, 0.150f, 0.020f, 1.000f );
+	colors[ ImGuiCol_HeaderActive ]				= ImVec4( 0.250f, 0.120f, 0.010f, 0.780f );
+	colors[ ImGuiCol_Separator ]				= ImVec4( 0.280f, 0.180f, 0.060f, 0.370f );
+	colors[ ImGuiCol_SeparatorHovered ]			= ImVec4( 0.330f, 0.150f, 0.020f, 0.170f );
+	colors[ ImGuiCol_SeparatorActive ]			= ImVec4( 0.420f, 0.180f, 0.060f, 0.170f );
+	colors[ ImGuiCol_ResizeGrip ]				= ImVec4( 0.250f, 0.120f, 0.010f, 0.780f );
+	colors[ ImGuiCol_ResizeGripHovered ]		= ImVec4( 0.330f, 0.150f, 0.020f, 1.000f );
+	colors[ ImGuiCol_ResizeGripActive ]			= ImVec4( 0.250f, 0.120f, 0.010f, 0.780f );
+	colors[ ImGuiCol_Tab ]						= ImVec4( 0.250f, 0.120f, 0.010f, 0.780f );
+	colors[ ImGuiCol_TabHovered ]				= ImVec4( 0.330f, 0.150f, 0.020f, 1.000f );
+	colors[ ImGuiCol_TabActive ]				= ImVec4( 0.340f, 0.140f, 0.010f, 1.000f );
+	colors[ ImGuiCol_TabUnfocused ]				= ImVec4( 0.330f, 0.150f, 0.020f, 1.000f );
+	colors[ ImGuiCol_TabUnfocusedActive ]		= ImVec4( 0.420f, 0.180f, 0.060f, 1.000f );
+	colors[ ImGuiCol_PlotLines ]				= ImVec4( 0.610f, 0.610f, 0.610f, 1.000f );
+	colors[ ImGuiCol_PlotLinesHovered ]			= ImVec4( 1.000f, 0.430f, 0.350f, 1.000f );
+	colors[ ImGuiCol_PlotHistogram ]			= ImVec4( 0.900f, 0.700f, 0.000f, 1.000f );
+	colors[ ImGuiCol_PlotHistogramHovered ]		= ImVec4( 1.000f, 0.600f, 0.000f, 1.000f );
+	colors[ ImGuiCol_TextSelectedBg ]			= ImVec4( 0.060f, 0.030f, 0.010f, 0.780f );
+	colors[ ImGuiCol_DragDropTarget ]			= ImVec4( 0.640f, 0.420f, 0.090f, 0.900f );
+	colors[ ImGuiCol_NavHighlight ]				= ImVec4( 0.640f, 0.420f, 0.090f, 0.900f );
+	colors[ ImGuiCol_NavWindowingHighlight ]	= ImVec4( 1.000f, 1.000f, 1.000f, 0.700f );
+	colors[ ImGuiCol_NavWindowingDimBg ]		= ImVec4( 0.800f, 0.800f, 0.800f, 0.200f );
+	colors[ ImGuiCol_ModalWindowDimBg ]			= ImVec4( 0.800f, 0.800f, 0.800f, 0.350f );
 
 	ImGuiStyle &style = ImGui::GetStyle();
 

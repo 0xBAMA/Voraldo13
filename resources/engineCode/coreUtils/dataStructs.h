@@ -16,12 +16,20 @@ struct colorGradeParameters {
 	float colorTemp = 6500.0f;
 };
 
+struct rendererState {
+	// mipmaps need to be regenerated
+	bool lightMipmapFlag = true;
+	bool colorMipmapFlag = true;
+	uint32_t framesSinceLastInput = 0;
+	//...
+};
+
 struct renderSettings {
 	bool showTrident = true;
 	bool showTiming = true;
 	ImVec4 clearColor;
 	float blendFactor = 0.1f;
-	float scaleFactor = -5.0f;
+	float scaleFactor = 5.0f;
 	float alphaCorrectionPower = 2.0f;
 	float jitterAmount = 1.0f;
 	float perspective = 0.2f;

@@ -30,9 +30,9 @@ void engine::ComputePasses () {
 	// minimum set of required parameters, for now
 	const glm::mat3 inverseBasisMat = inverse( glm::mat3( -trident.basisX, -trident.basisY, -trident.basisZ ) );
 	glUniformMatrix3fv( glGetUniformLocation( shaders[ "Raymarch" ], "invBasis" ), 1, false, glm::value_ptr( inverseBasisMat ) );
-	glUniform1f( glGetUniformLocation( shaders[ "Raymarch" ], "scale" ), render.scaleFactor );
+	glUniform1f( glGetUniformLocation( shaders[ "Raymarch" ], "scale" ), -render.scaleFactor );
 	glUniform1f( glGetUniformLocation( shaders[ "Raymarch" ], "blendFactor" ), render.blendFactor );
-
+	glUniform1f( glGetUniformLocation( shaders[ "Raymarch" ], "perspectiveFactor" ), render.perspective );
 
 	// tiled update of the accumulator texture
 	constexpr int w = SSFACTOR * WIDTH;
@@ -183,9 +183,9 @@ void engine::HandleEvents () {
 			if ( event.type == SDL_MOUSEWHEEL ) {
 			// allow scroll to do the same thing as +/-
 				if (event.wheel.y > 0) {
-					render.scaleFactor += 0.1f;
-				} else if (event.wheel.y < 0) {
 					render.scaleFactor -= 0.1f;
+				} else if (event.wheel.y < 0) {
+					render.scaleFactor += 0.1f;
 				}
 			}
 		}

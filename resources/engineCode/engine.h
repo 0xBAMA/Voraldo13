@@ -100,7 +100,9 @@ private:
 	void MenuPostProcessingSettings ();
 
 //==============================================================================
+	// probably refactor these into some other utilites header or something
 	glm::vec3 GetColorForTemperature( float temperature ); // 6500.0 is white
+	std::vector<uint8_t> Bayer ( int dimension );
 
 //==============================================================================
 	// shutdown procedures

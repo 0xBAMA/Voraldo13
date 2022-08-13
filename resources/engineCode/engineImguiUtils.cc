@@ -423,7 +423,7 @@ void engine::MenuRenderingSettings () {
 	ImGui::SliderFloat( "Alpha Correction Power", &render.alphaCorrectionPower, 0.0f, 4.0f );
 	ImGui::SliderFloat( "Jitter Amount", &render.jitterAmount, 0.0f, 2.0f );
 	ImGui::SliderFloat( "Perspective", &render.perspective, -4.0f, 4.0f );
-	ImGui::SliderFloat( "Scale", &render.scaleFactor, -4.0f, 4.0f );
+	ImGui::SliderFloat( "Scale", &render.scaleFactor, 0.0f, 40.0f );
 	ImGui::SliderFloat( "Blend Factor", &render.blendFactor, 0.0f, 1.0f );
 	ImGui::SliderInt( "Volume Steps", &render.volumeSteps, 0, 1400 );
 	// picker for render mode shader
