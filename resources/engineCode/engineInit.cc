@@ -106,8 +106,15 @@ void engine::CreateTextures () {
 	glGenTextures( 1, &blueNoiseTexture );
 	glActiveTexture( GL_TEXTURE4 );
 	glBindTexture( GL_TEXTURE_2D, blueNoiseTexture );
+	// make sure that these are complete textures, apparently some drivers require these to be set
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, blueNoiseImage.width, blueNoiseImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &blueNoiseImage.data.data()[ 0 ] );
 	textures[ "Blue Noise" ] = blueNoiseTexture;
+
+	// bayer pattern
 
 	// create the image for the trident
 	GLuint tridentImage;
@@ -115,9 +122,25 @@ void engine::CreateTextures () {
 	glGenTextures( 1, &tridentImage );
 	glActiveTexture( GL_TEXTURE5 );
 	glBindTexture( GL_TEXTURE_2D, tridentImage );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, initialT.width, initialT.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &initialT.data.data()[ 0 ] );
 	trident.PassInImage( tridentImage );
 	textures[ "Trident" ] = tridentImage;
+
+
+	// voxel data
+		// color blocks 1, 2
+		// mask blocks 1, 2
+		// lighting data
+			// lighting cache ( how would this be used for anything? )
+	// copy/paste buffer ( how is this going to happen? )
+	// heightmap
+	// noise buffer
+	// loadbuffer for VAT, load/save
+
 
 	cout << T_GREEN << "done." << T_RED << " ( " << Tock() << " us )" << RESET << endl;
 }
