@@ -98,79 +98,46 @@ void engine::MenuLayout( bool* p_open ) {
 	information that will be relevant for this particular menu entry.
 
 		Special reserve value -1 used for a welcome splash screen, shown on startup.
+		( Never uses -1 index to reference array because it is checked for first )
 ============================================================================= */
 		{
 			ImGui::BeginGroup();
 			ImGui::BeginChild("Contents", ImVec2( 0, -ImGui::GetFrameHeightWithSpacing() ) );
 			#define isPicked(x) menu.entries[currentlySelectedMenuItem].label==string(x)
-			if ( currentlySelectedMenuItem == -1 ) {
-				MenuSplash();
-			} else if ( isPicked( "AABB" ) ) {
-				MenuAABB();
-			} else if ( isPicked( "Cylinder/Tube" ) ) {
-				MenuCylinderTube();
-			} else if ( isPicked( "Ellipsoid" ) ) {
-				MenuEllipsoid();
-			} else if ( isPicked( "Grid" ) ) {
-				MenuGrid();
-			} else if ( isPicked( "Heightmap" ) ) {
-				MenuHeightmap();
-			} else if ( isPicked( "Icosahedron" ) ) {
-				MenuIcosahedron();
-			} else if ( isPicked( "Noise" ) ) {
-				MenuNoise();
-			} else if ( isPicked( "Sphere" ) ) {
-				MenuSphere();
-			} else if ( isPicked( "Triangle" ) ) {
-				MenuTriangle();
-			} else if ( isPicked( "User Shader" ) ) {
-				MenuUserShader();
-			} else if ( isPicked( "VAT" ) ) {
-				MenuVAT();
-			} else if ( isPicked( "Spaceship Generator" ) ) {
-				MenuSpaceship();
-			} else if ( isPicked( "Letters" ) ) {
-				MenuLetters();
-			} else if ( isPicked( "XOR" ) ) {
-				MenuXOR();
-			} else if ( isPicked( "Clear" ) ) {
-				MenuClearBlock();
-			} else if ( isPicked( "Masking" ) ) {
-				MenuMasking();
-			} else if ( isPicked( "Blur" ) ) {
-				MenuBlur();
-			} else if ( isPicked( "Shift/Trim" ) ) {
-				MenuShiftTrim();
-			} else if ( isPicked( "Load/Save" ) ) {
-				MenuLoadSave();
-			} else if ( isPicked( "Limiter/Compressor" ) ) {
-				MenuLimiterCompressor();
-			} else if ( isPicked( "Copy/Paste" ) ) {
-				MenuCopyPaste();
-			} else if ( isPicked( "Logging" ) ) {
-				MenuLogging();
-			} else if ( isPicked( "Screenshot" ) ) {
-				MenuScreenshot();
-			} else if ( isPicked( "Clear Levels" ) ) {
-				MenuClearLightLevels();
-			} else if ( isPicked( "Point Light" ) ) {
-				MenuPointLight();
-			} else if ( isPicked( "Cone Light" ) ) {
-				MenuConeLight();
-			} else if ( isPicked( "Directional Light" ) ) {
-				MenuDirectionalLight();
-			} else if ( isPicked( "Fake GI" ) ) {
-				MenuFakeGI();
-			} else if ( isPicked( "Ambient Occlusion" ) ) {
-				MenuAmbientOcclusion();
-			} else if ( isPicked( "Mash" ) ) {
-				MenuLightMash();
-			} else if ( isPicked( "Application Settings" ) ) {
-				MenuApplicationSettings();
-			} else if ( isPicked( "Rendering Settings" ) ) {
-				MenuRenderingSettings();
-			} else if ( isPicked( "Post Processing" ) ) {
-				MenuPostProcessingSettings();
+			if ( currentlySelectedMenuItem == -1 ) {			MenuSplash();
+			} else if ( isPicked( "AABB" ) ) {					MenuAABB();
+			} else if ( isPicked( "Cylinder/Tube" ) ) {			MenuCylinderTube();
+			} else if ( isPicked( "Ellipsoid" ) ) {				MenuEllipsoid();
+			} else if ( isPicked( "Grid" ) ) {					MenuGrid();
+			} else if ( isPicked( "Heightmap" ) ) {				MenuHeightmap();
+			} else if ( isPicked( "Icosahedron" ) ) {			MenuIcosahedron();
+			} else if ( isPicked( "Noise" ) ) {					MenuNoise();
+			} else if ( isPicked( "Sphere" ) ) {				MenuSphere();
+			} else if ( isPicked( "Triangle" ) ) {				MenuTriangle();
+			} else if ( isPicked( "User Shader" ) ) {			MenuUserShader();
+			} else if ( isPicked( "VAT" ) ) {					MenuVAT();
+			} else if ( isPicked( "Spaceship Generator" ) ) {	MenuSpaceship();
+			} else if ( isPicked( "Letters" ) ) {				MenuLetters();
+			} else if ( isPicked( "XOR" ) ) {					MenuXOR();
+			} else if ( isPicked( "Clear" ) ) {					MenuClearBlock();
+			} else if ( isPicked( "Masking" ) ) {				MenuMasking();
+			} else if ( isPicked( "Blur" ) ) {					MenuBlur();
+			} else if ( isPicked( "Shift/Trim" ) ) {			MenuShiftTrim();
+			} else if ( isPicked( "Load/Save" ) ) {				MenuLoadSave();
+			} else if ( isPicked( "Limiter/Compressor" ) ) {	MenuLimiterCompressor();
+			} else if ( isPicked( "Copy/Paste" ) ) {			MenuCopyPaste();
+			} else if ( isPicked( "Logging" ) ) {				MenuLogging();
+			} else if ( isPicked( "Screenshot" ) ) {			MenuScreenshot();
+			} else if ( isPicked( "Clear Levels" ) ) {			MenuClearLightLevels();
+			} else if ( isPicked( "Point Light" ) ) {			MenuPointLight();
+			} else if ( isPicked( "Cone Light" ) ) {			MenuConeLight();
+			} else if ( isPicked( "Directional Light" ) ) {		MenuDirectionalLight();
+			} else if ( isPicked( "Fake GI" ) ) {				MenuFakeGI();
+			} else if ( isPicked( "Ambient Occlusion" ) ) {		MenuAmbientOcclusion();
+			} else if ( isPicked( "Mash" ) ) {					MenuLightMash();
+			} else if ( isPicked( "Application Settings" ) ) {	MenuApplicationSettings();
+			} else if ( isPicked( "Rendering Settings" ) ) {	MenuRenderingSettings();
+			} else if ( isPicked( "Post Processing" ) ) {		MenuPostProcessingSettings();
 			}
 			#undef isPicked
 			ImGui::EndChild();
@@ -411,6 +378,7 @@ void engine::MenuApplicationSettings() {
 	ImGui::Combo( "Trident Mode", &trident.modeSelect, tridentModesList, IM_ARRAYSIZE( tridentModesList ) );
 	ImGui::Checkbox( "Show Trident", &render.showTrident );
 	ImGui::Checkbox( "Show Timing", &render.showTiming );
+	ImGui::ColorEdit3( "Clear Color", (float *) &render.clearColor );
 
 	// etc
 	ImGui::Unindent( 16.0f );

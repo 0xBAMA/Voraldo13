@@ -33,6 +33,7 @@ void engine::ComputePasses () {
 	glUniform1f( glGetUniformLocation( shaders[ "Raymarch" ], "scale" ), -render.scaleFactor );
 	glUniform1f( glGetUniformLocation( shaders[ "Raymarch" ], "blendFactor" ), render.blendFactor );
 	glUniform1f( glGetUniformLocation( shaders[ "Raymarch" ], "perspectiveFactor" ), render.perspective );
+	glUniform4fv( glGetUniformLocation( shaders[ "Raymarch" ], "clearColor" ), 1, glm::value_ptr( render.clearColor ) );
 
 	// tiled update of the accumulator texture
 	constexpr int w = SSFACTOR * WIDTH;
@@ -81,8 +82,7 @@ void engine::ClearColorAndDepth () {
 	ZoneScoped;
 
 	// clear the screen
-	ImVec4 c = render.clearColor;
-	glClearColor( c.x, c.y, c.z, c.w );
+	glClearColor( render.clearColor.x, render.clearColor.y, render.clearColor.z, render.clearColor.w );
 	// glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glClear( GL_COLOR_BUFFER_BIT );
 
@@ -131,43 +131,9 @@ void engine::ImguiPass () {
 void engine::HandleEvents () {
 	ZoneScoped;
 
-	constexpr float bigStep = 0.120;
-	constexpr float lilStep = 0.008;
-
-	const uint8_t *state = SDL_GetKeyboardState( NULL );
-	// these will operate on the trident object, which retains state for block orientation
-	if ( state[ SDL_SCANCODE_LEFT ] )
-		trident.RotateY( ( SDL_GetModState() & KMOD_SHIFT ) ?  bigStep :  lilStep );
-	if ( state[ SDL_SCANCODE_RIGHT ] )
-		trident.RotateY( ( SDL_GetModState() & KMOD_SHIFT ) ? -bigStep : -lilStep );
-	if ( state[ SDL_SCANCODE_UP ] )
-		trident.RotateX( ( SDL_GetModState() & KMOD_SHIFT ) ?  bigStep :  lilStep );
-	if ( state[ SDL_SCANCODE_DOWN ] )
-		trident.RotateX( ( SDL_GetModState() & KMOD_SHIFT ) ? -bigStep : -lilStep );
-	if ( state[ SDL_SCANCODE_PAGEUP ] )
-		trident.RotateZ( ( SDL_GetModState() & KMOD_SHIFT ) ? -bigStep : -lilStep );
-	if ( state[ SDL_SCANCODE_PAGEDOWN ] )
-		trident.RotateZ( ( SDL_GetModState() & KMOD_SHIFT ) ?  bigStep :  lilStep );
-
-	if ( state[ SDL_SCANCODE_1 ] )
-		trident.SetViewFront();
-	if ( state[ SDL_SCANCODE_2 ] )
-		trident.SetViewRight();
-	if ( state[ SDL_SCANCODE_3 ] )
-		trident.SetViewBack();
-	if ( state[ SDL_SCANCODE_4 ] )
-		trident.SetViewLeft();
-	if ( state[ SDL_SCANCODE_5 ] )
-		trident.SetViewUp();
-	if ( state[ SDL_SCANCODE_6 ] )
-		trident.SetViewDown();
-
-
 //==============================================================================
-// Need to keep this for pQuit handling ( force quit )
-// In particular - checking for window close and the SDL_QUIT event can't really be determined
-//  via the keyboard state, and then imgui needs it too, so can't completely kill the event
-//  polling loop - maybe eventually I'll find a solution for this
+// Need to keep this for pQuit handling ( force quit ), and it makes scolling easier, too
+//==============================================================================
 	SDL_Event event;
 	while ( SDL_PollEvent( &event ) ) {
 		SDL_PumpEvents();
@@ -178,17 +144,57 @@ void engine::HandleEvents () {
 		// this has to stay because it doesn't seem like ImGui::IsKeyReleased is stable enough to use
 		if ( ( event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_ESCAPE ) || ( event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_X1 )  )
 			quitConfirm = !quitConfirm;
-
 		if ( !ImGui::GetIO().WantCaptureMouse ) {
 			if ( event.type == SDL_MOUSEWHEEL ) {
-			// allow scroll to do the same thing as +/-
-				if (event.wheel.y > 0) {
+				if ( event.wheel.y > 0 ) {
 					render.scaleFactor -= 0.1f;
-				} else if (event.wheel.y < 0) {
+				} else if ( event.wheel.y < 0 ) {
 					render.scaleFactor += 0.1f;
 				}
 			}
 		}
+	}
+
+//==============================================================================
+// the rest of the event checking just looks at the current input state
+//==============================================================================
+	if ( !ImGui::GetIO().WantCaptureKeyboard ) {
+		constexpr float bigStep = 0.120;
+		constexpr float lilStep = 0.008;
+		const uint8_t *state = SDL_GetKeyboardState( NULL );
+		// these will operate on the trident object, which retains state for block orientation
+		if ( state[ SDL_SCANCODE_LEFT ] )
+			trident.RotateY( ( SDL_GetModState() & KMOD_SHIFT ) ?  bigStep :  lilStep );
+		if ( state[ SDL_SCANCODE_RIGHT ] )
+			trident.RotateY( ( SDL_GetModState() & KMOD_SHIFT ) ? -bigStep : -lilStep );
+		if ( state[ SDL_SCANCODE_UP ] )
+			trident.RotateX( ( SDL_GetModState() & KMOD_SHIFT ) ?  bigStep :  lilStep );
+		if ( state[ SDL_SCANCODE_DOWN ] )
+			trident.RotateX( ( SDL_GetModState() & KMOD_SHIFT ) ? -bigStep : -lilStep );
+		if ( state[ SDL_SCANCODE_PAGEUP ] )
+			trident.RotateZ( ( SDL_GetModState() & KMOD_SHIFT ) ? -bigStep : -lilStep );
+		if ( state[ SDL_SCANCODE_PAGEDOWN ] )
+			trident.RotateZ( ( SDL_GetModState() & KMOD_SHIFT ) ?  bigStep :  lilStep );
+
+		if ( state[ SDL_SCANCODE_1 ] )
+			trident.SetViewFront();
+		if ( state[ SDL_SCANCODE_2 ] )
+			trident.SetViewRight();
+		if ( state[ SDL_SCANCODE_3 ] )
+			trident.SetViewBack();
+		if ( state[ SDL_SCANCODE_4 ] )
+			trident.SetViewLeft();
+		if ( state[ SDL_SCANCODE_5 ] )
+			trident.SetViewUp();
+		if ( state[ SDL_SCANCODE_6 ] )
+			trident.SetViewDown();
+
+		// panning around, vim style
+		// if ( state[ SDL_SCANCODE_H ] )
+		// if ( state[ SDL_SCANCODE_J ] )
+		// if ( state[ SDL_SCANCODE_K ] )
+		// if ( state[ SDL_SCANCODE_L ] )
+
 	}
 }
 

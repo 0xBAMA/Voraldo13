@@ -75,7 +75,7 @@ void engine::DisplaySetup () {
 	cout << T_RED << "      GLSL version supported : " << T_CYAN << glslVersion << RESET << endl << endl;
 }
 
-std::vector<uint8_t> engine::Bayer ( int dimension ) {
+std::vector<uint8_t> engine::BayerData ( int dimension ) {
 	if ( dimension == 4 ) {
 		std::vector<uint8_t> pattern4 = {
 			0,  8,  2,  10,	/* values begin scaled to the range 0..15 */
@@ -110,9 +110,32 @@ std::vector<uint8_t> engine::Bayer ( int dimension ) {
 void engine::CreateTextures () {
 	Tick();
 	cout << T_BLUE << "    Creating Textures" << RESET << " ................................ ";
+
+	// color blocks ( front and back )
+	size_t numBytesBlock = BLOCKDIM * BLOCKDIM * BLOCKDIM * 4;
+	std::vector<uint8_t> zeroes;
+	zeroes.resize( numBytesBlock, 0 );
+	std::vector<float> ones;
+	ones.resize( numBytesBlock, 1.0f );
+	std::vector<uint8_t> initialXOR;
+	initialXOR.reserve( numBytesBlock );
+	for ( unsigned int x = 0; x < BLOCKDIM; x++ ) {
+		for ( unsigned int y = 0; y < BLOCKDIM; y++ ) {
+			for ( unsigned int z = 0; z < BLOCKDIM; z++ ) {
+				initialXOR.push_back( x ^ y ^ z );
+			}
+		}
+	}
+
 	GLuint displayTexture;
 	GLuint accumulatorTexture;
 	GLuint blueNoiseTexture;
+	GLuint bayer4, bayer8;
+	GLuint tridentImage;
+	GLuint colorTextures[ 2 ];
+	GLuint maskTextures[ 2 ];
+	GLuint lightTexture;
+	GLuint loadBuffer;
 
 	// create the image textures
 	Image initial( WIDTH * std::max( SSFACTOR, 1.0 ), HEIGHT * std::max( SSFACTOR, 1.0 ) );
@@ -147,14 +170,13 @@ void engine::CreateTextures () {
 	textures[ "Blue Noise" ] = blueNoiseTexture;
 
 	// bayer patterns
-	GLuint bayer4, bayer8;
 	glActiveTexture( GL_TEXTURE5 );
 	glBindTexture( GL_TEXTURE_2D, bayer4 );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_R8, 4, 4, 0, GL_RED, GL_UNSIGNED_BYTE, &Bayer( 4 )[0] );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_R8, 4, 4, 0, GL_RED, GL_UNSIGNED_BYTE, &BayerData( 4 )[0] );
 	textures[ "Bayer4" ] = bayer4;
 
 	glActiveTexture( GL_TEXTURE6 );
@@ -163,11 +185,10 @@ void engine::CreateTextures () {
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_R8, 8, 8, 0, GL_RED, GL_UNSIGNED_BYTE, &Bayer( 8 )[0] );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_R8, 8, 8, 0, GL_RED, GL_UNSIGNED_BYTE, &BayerData( 8 )[0] );
 	textures[ "Bayer8" ] = bayer8;
 
 	// create the image for the trident
-	GLuint tridentImage;
 	Image initialT( trident.blockDimensions.x * 8, trident.blockDimensions.y * 16 );
 	glGenTextures( 1, &tridentImage );
 	glActiveTexture( GL_TEXTURE7 );
@@ -180,21 +201,6 @@ void engine::CreateTextures () {
 	trident.PassInImage( tridentImage );
 	textures[ "Trident" ] = tridentImage;
 
-	// color blocks ( front and back )
-	size_t numBytesBlock = BLOCKDIM * BLOCKDIM * BLOCKDIM * 4;
-	std::vector<uint8_t> zeroes;
-	zeroes.resize( numBytesBlock, 0 );
-	std::vector<uint8_t> initialXOR;
-	initialXOR.reserve( numBytesBlock );
-	for ( unsigned int x = 0; x < BLOCKDIM; x++ ) {
-		for ( unsigned int y = 0; y < BLOCKDIM; y++ ) {
-			for ( unsigned int z = 0; z < BLOCKDIM; z++ ) {
-				initialXOR.push_back( x ^ y ^ z );
-			}
-		}
-	}
-
-	GLuint colorTextures[ 2 ];
 	glGenTextures( 2, &colorTextures[ 0 ] );
 	glActiveTexture( GL_TEXTURE8 );
 	glBindTexture( GL_TEXTURE_3D, colorTextures[ 0 ] );
@@ -217,7 +223,6 @@ void engine::CreateTextures () {
 	textures[ "Color Block Back" ] = colorTextures[ 1 ];
 
 	// mask blocks ( front and back - can this be consolidated? not sure if two are needed )
-	GLuint maskTextures[ 2 ];
 	glGenTextures( 2, &maskTextures[ 0 ] );
 	glActiveTexture( GL_TEXTURE10 );
 	glBindTexture( GL_TEXTURE_3D, maskTextures[ 0 ] );
@@ -240,7 +245,6 @@ void engine::CreateTextures () {
 	textures[ "Mask Block Back" ] = maskTextures[ 1 ];
 
 	// lighting data ( can probably get away with just the one buffer, tbd )
-	GLuint lightTexture;
 	glGenTextures( 1, &lightTexture );
 	glActiveTexture( GL_TEXTURE12 );
 	glBindTexture( GL_TEXTURE_3D, lightTexture );
@@ -249,11 +253,10 @@ void engine::CreateTextures () {
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT );
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT );
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT );
-	glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &zeroes.data()[ 0 ] );
+	glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA16F, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_FLOAT, &ones.data()[ 0 ] );
 	textures[ "Lighting Block" ] = lightTexture;
 
 	// loadbuffer for VAT + load/save
-	GLuint loadBuffer;
 	glGenTextures( 1, &loadBuffer );
 	glActiveTexture( GL_TEXTURE13 );
 	glBindTexture( GL_TEXTURE_3D, loadBuffer );
@@ -329,7 +332,8 @@ void engine::ImguiSetup () {
 
 	// initial value for clear color
 	// clearColor = ImVec4( 0.295f, 0.295f, 0.295f, 0.5f );
-	render.clearColor = ImVec4( 0.0f, 0.0f, 0.0f, 1.0f );
+	// render.clearColor = ImVec4( 0.0f, 0.0f, 0.0f, 1.0f );
+	render.clearColor = glm::vec4( 0.0f, 0.0f, 0.0f, 1.0f );
 	// glClearColor( clearColor.x, clearColor.y, clearColor.z, clearColor.w );
 	// glClear( GL_COLOR_BUFFER_BIT );
 	// SDL_GL_SwapWindow( window ); // show clear color
