@@ -25,9 +25,8 @@ private:
 	orientTrident trident;
 	// contains the menu entries ( labels + interface layout blocks )
 	menuContainer menu;
-
-	// render settings, will probably end up with more, tbd
-	renderSettings render;
+	// render settings
+	renderState render;
 	// tonemapping parameters + adjustment
 	colorGradeParameters tonemap;
 	void SendTonemappingParameters ();
@@ -50,6 +49,9 @@ private:
 	void HandleEvents ();
 	void ClearColorAndDepth ();
 	void ComputePasses ();
+	void Raymarch ();
+	void Tonemap ();
+	void TridentAndTiming ();
 	void ImguiPass ();
 	void ImguiFrameStart ();
 	void ImguiFrameEnd ();

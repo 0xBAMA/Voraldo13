@@ -7,7 +7,7 @@ layout( binding = 1, rgba8ui ) uniform uimage2D displayTexture;
 uniform int tonemapMode;
 uniform float gamma;
 uniform vec3 colorTempAdjust;
-
+uniform int frameNumber;
 
 vec4 linearInterpolatedSample ( vec2 location ) {
 	const vec2 fractionalPart = fract( location );
@@ -33,10 +33,8 @@ void main () {
 	vec2 scalar = vec2( imageSize( accumulatorTexture ) ) / vec2( imageSize( displayTexture ) );
 	vec2 samplePosition = scalar * vec2( loc );
 
-
-	// uvec4 originalValue = imageLoad( accumulatorTexture, loc );
+	// TODO: take a couple samples, jittered with blue noise
 	vec4 originalValue = linearInterpolatedSample( samplePosition );
-
 
 	// vec3 color = tonemap( tonemapMode, colorTempAdjust * originalValue.xyz * 255.0 );
 	vec3 color = tonemap( tonemapMode, colorTempAdjust * originalValue.xyz );

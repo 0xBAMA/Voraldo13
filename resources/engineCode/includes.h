@@ -1,8 +1,6 @@
 #ifndef INCLUDES
 #define INCLUDES
 
-// #include <stdio.h>
-
 // stl includes
 #include <algorithm>
 #include <chrono>
@@ -78,7 +76,9 @@ constexpr int MSAACount = 1;
 
 #define WIDTH 1920
 #define HEIGHT 1080
+
 #define STARTONWINDOW 3
+
 #define BLOCKDIM 256
 #define SSFACTOR 1.0
 #define TILESIZE 64

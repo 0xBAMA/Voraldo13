@@ -378,9 +378,8 @@ void engine::MenuApplicationSettings() {
 	ImGui::Combo( "Trident Mode", &trident.modeSelect, tridentModesList, IM_ARRAYSIZE( tridentModesList ) );
 	ImGui::Checkbox( "Show Trident", &render.showTrident );
 	ImGui::Checkbox( "Show Timing", &render.showTiming );
-	ImGui::ColorEdit3( "Clear Color", (float *) &render.clearColor );
-
 	// etc
+
 	ImGui::Unindent( 16.0f );
 }
 
@@ -388,12 +387,16 @@ void engine::MenuRenderingSettings () {
 	OrangeText( " Rendering Settings" );
 	ImGui::Separator();
 	ImGui::Indent( 16.0f );
+	ImGui::ColorEdit3( "Clear Color", (float *) &render.clearColor );
 	ImGui::SliderFloat( "Alpha Correction Power", &render.alphaCorrectionPower, 0.0f, 4.0f );
 	ImGui::SliderFloat( "Jitter Amount", &render.jitterAmount, 0.0f, 2.0f );
 	ImGui::SliderFloat( "Perspective", &render.perspective, -4.0f, 4.0f );
 	ImGui::SliderFloat( "Scale", &render.scaleFactor, 0.0f, 40.0f );
 	ImGui::SliderFloat( "Blend Factor", &render.blendFactor, 0.0f, 1.0f );
 	ImGui::SliderInt( "Volume Steps", &render.volumeSteps, 0, 1400 );
+
+	// render mode - then set what shaders[ "Raymarch" ] points to
+
 	// picker for render mode shader
 	ImGui::SliderInt( "History Frames", &render.numFramesHistory, 0, 14 );
 	ImGui::Unindent( 16.0f );

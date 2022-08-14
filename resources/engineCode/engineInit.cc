@@ -268,9 +268,9 @@ void engine::CreateTextures () {
 	glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &zeroes.data()[ 0 ] );
 	textures[ "Loadbuffer" ] = loadBuffer;
 
-	// heightmap
+	// heightmap - diamond square initially
 
-	// noise buffer
+	// noise buffer - some placeholder noise, maybe for now
 
 	// copy/paste buffer ( how is this going to happen? )
 
@@ -331,20 +331,6 @@ void engine::ImguiSetup () {
 	ImGui_ImplOpenGL3_Init( glslVersion );
 
 	// initial value for clear color
-	// clearColor = ImVec4( 0.295f, 0.295f, 0.295f, 0.5f );
-	// render.clearColor = ImVec4( 0.0f, 0.0f, 0.0f, 1.0f );
-	render.clearColor = glm::vec4( 0.0f, 0.0f, 0.0f, 1.0f );
-	// glClearColor( clearColor.x, clearColor.y, clearColor.z, clearColor.w );
-	// glClear( GL_COLOR_BUFFER_BIT );
-	// SDL_GL_SwapWindow( window ); // show clear color
-
-	// setting custom font, if desired
-	// io.Fonts->AddFontFromFileTTF( "resources/fonts/ttf/star_trek/titles/TNG_Title.ttf", 32 );
-	// io.Fonts->AddFontFromFileTTF( "resources/fonts/ttf/star_trek/titles/DS9_Credits.ttf", 32 );
-	// io.Fonts->AddFontFromFileTTF( "resources/fonts/ttf/star_trek/titles/Montalban.ttf", 32 );
-	// io.Fonts->AddFontFromFileTTF( "resources/fonts/ttf/star_trek/text/Beijing.ttf", 32 );
-	// io.Fonts->AddFontFromFileTTF( "resources/fonts/ttf/Braciola MS ExB.ttf", 32 );
-
 	ImVec4 *colors = ImGui::GetStyle().Colors;
 	colors[ ImGuiCol_Text ]						= ImVec4( 0.670f, 0.500f, 0.160f, 1.000f );
 	colors[ ImGuiCol_TextDisabled ]				= ImVec4( 0.330f, 0.270f, 0.160f, 1.000f );

@@ -16,18 +16,19 @@ struct colorGradeParameters {
 	float colorTemp = 6500.0f;
 };
 
-struct renderSettings {
+struct renderState {
 	// application-wide
 	bool showTrident = true;
 	bool showTiming = true;
 	// ImVec4 clearColor;
-	glm::vec4 clearColor;
+	glm::vec4 clearColor = glm::vec4( 0.0f, 0.0f, 0.0f, 1.0f );
 
 	// mipmaps need to be regenerated initially
 	bool lightMipmapFlag = true;
 	bool colorMipmapFlag = true;
 
 	// render inputs
+	glm::vec2 renderOffset = glm::vec2( 0.0, 0.0 );
 	float scaleFactor = 5.0f;
 	float alphaCorrectionPower = 2.0f;
 	float jitterAmount = 1.0f;
@@ -40,7 +41,8 @@ struct renderSettings {
 	int renderMode = 3;
 
 	// accumulation stuff
-	float blendFactor = 0.1f;
+	float blendFactor = 0.45f;
+	uint32_t framesSinceStartup = 0;
 	uint32_t framesSinceLastInput = 0;
 	int numFramesHistory = 8; // how long to run after the last input - configurable via menu
 };

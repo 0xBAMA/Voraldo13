@@ -2,6 +2,7 @@
 
 bool engine::MainLoop () {
 	FrameMarkStart( "Main Loop" );
+	render.framesSinceStartup++;
 	HandleEvents();			// handle keyboard / mouse events
 	ClearColorAndDepth();	// if I just disable depth testing, this can disappear
 	ComputePasses();		// multistage update of displayTexture
@@ -14,26 +15,29 @@ bool engine::MainLoop () {
 
 void engine::ComputePasses () {
 	ZoneScoped;
+	Raymarch();
+	Tonemap();
+	// shader to apply dithering
+	// other postprocessing
+	TridentAndTiming();
+}
 
-// dummy draw
-	// set up environment ( 0:blue noise, 1: accumulator )
+void engine::Raymarch () {
+	ZoneScoped;
+	// set up environment ( 0:blue noise, 1: accumulator ... )
 	glBindImageTexture( 0, textures[ "Blue Noise" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
 	glBindImageTexture( 1, textures[ "Accumulator" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F );
 
-	// blablah draw something into accumulatorTexture
-	// glUseProgram( shaders[ "Dummy Draw" ] );
-	// glDispatchCompute( ( WIDTH + 15 ) / 16, ( HEIGHT + 15 ) / 16, 1 );
-	// glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
-
 	glUseProgram( shaders[ "Raymarch" ] );
-
-	// minimum set of required parameters, for now
 	const glm::mat3 inverseBasisMat = inverse( glm::mat3( -trident.basisX, -trident.basisY, -trident.basisZ ) );
 	glUniformMatrix3fv( glGetUniformLocation( shaders[ "Raymarch" ], "invBasis" ), 1, false, glm::value_ptr( inverseBasisMat ) );
 	glUniform1f( glGetUniformLocation( shaders[ "Raymarch" ], "scale" ), -render.scaleFactor );
 	glUniform1f( glGetUniformLocation( shaders[ "Raymarch" ], "blendFactor" ), render.blendFactor );
 	glUniform1f( glGetUniformLocation( shaders[ "Raymarch" ], "perspectiveFactor" ), render.perspective );
 	glUniform4fv( glGetUniformLocation( shaders[ "Raymarch" ], "clearColor" ), 1, glm::value_ptr( render.clearColor ) );
+	glUniform2f( glGetUniformLocation( shaders[ "Raymarch" ], "renderOffset" ), render.renderOffset.x, render.renderOffset.y );
+
+	cout << "Offset is " << render.renderOffset.x << " " << render.renderOffset.y << endl;
 
 	// tiled update of the accumulator texture
 	constexpr int w = SSFACTOR * WIDTH;
@@ -45,31 +49,27 @@ void engine::ComputePasses () {
 			glDispatchCompute( t / 16, t / 16, 1 );
 		}
 	}
+}
 
-
-// postprocessing
+void engine::Tonemap () {
+	// shader for color grading ( color temp, contrast, gamma ... ) + tonemapping
+	ZoneScoped;
 	// set up environment ( 0:accumulator, 1:display )
 	glBindImageTexture( 0, textures[ "Accumulator" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F );
 	glBindImageTexture( 1, textures[ "Display Texture" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
-
-	// shader for color grading ( color temp, contrast, gamma ... ) + tonemapping
 	glUseProgram( shaders[ "Tonemap" ] );
 	SendTonemappingParameters();
 	glDispatchCompute( ( WIDTH + 15 ) / 16, ( HEIGHT + 15 ) / 16, 1 );
 	glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
+}
 
-	// shader to apply dithering
-		// ...
-
-	// other postprocessing
-		// ...
-
+void engine::TridentAndTiming () {
+	ZoneScoped;
 	if ( render.showTrident ) {
 		// draw the orientation trident/gizmo
 		trident.Update( textures[ "Display Texture" ] );
 		glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 	}
-
 	if ( render.showTiming ) {
 		// text rendering timestamp, as final step - required texture binds are handled internally
 		textRenderer.Update( ImGui::GetIO().DeltaTime );
@@ -190,10 +190,14 @@ void engine::HandleEvents () {
 			trident.SetViewDown();
 
 		// panning around, vim style
-		// if ( state[ SDL_SCANCODE_H ] )
-		// if ( state[ SDL_SCANCODE_J ] )
-		// if ( state[ SDL_SCANCODE_K ] )
-		// if ( state[ SDL_SCANCODE_L ] )
+		if ( state[ SDL_SCANCODE_H ] )
+			render.renderOffset.x += ( SDL_GetModState() & KMOD_SHIFT ) ?  10.0f :  1.0f;
+		if ( state[ SDL_SCANCODE_L ] )
+			render.renderOffset.x -= ( SDL_GetModState() & KMOD_SHIFT ) ?  10.0f :  1.0f;
+		if ( state[ SDL_SCANCODE_J ] )
+			render.renderOffset.y += ( SDL_GetModState() & KMOD_SHIFT ) ?  10.0f :  1.0f;
+		if ( state[ SDL_SCANCODE_K ] )
+			render.renderOffset.y -= ( SDL_GetModState() & KMOD_SHIFT ) ?  10.0f :  1.0f;
 
 	}
 }
