@@ -17,12 +17,18 @@ void engine::ComputePasses () {
 	ZoneScoped;
 	Raymarch();
 	Tonemap();
+
 	// shader to apply dithering
 	// other postprocessing
+
+	if ( wantCapturePostprocessScreenshot ) {
+		CapturePostprocessScreenshot();
+	}
+
 	TridentAndTiming();
 }
 
-void engine::SendRaymarchParamters () {
+void engine::SendRaymarchParameters () {
 	ZoneScoped;
 	const glm::mat3 inverseBasisMat = inverse( glm::mat3( -trident.basisX, -trident.basisY, -trident.basisZ ) );
 	glUniformMatrix3fv( glGetUniformLocation( shaders[ "Raymarch" ], "invBasis" ), 1, false, glm::value_ptr( inverseBasisMat ) );
@@ -32,6 +38,7 @@ void engine::SendRaymarchParamters () {
 	glUniform4fv( glGetUniformLocation( shaders[ "Raymarch" ], "clearColor" ), 1, glm::value_ptr( render.clearColor ) );
 	glUniform2f( glGetUniformLocation( shaders[ "Raymarch" ], "renderOffset" ), render.renderOffset.x, render.renderOffset.y );
 }
+
 void engine::Raymarch () {
 	ZoneScoped;
 	// set up environment ( 0:blue noise, 1: accumulator ... )
@@ -39,7 +46,7 @@ void engine::Raymarch () {
 	glBindImageTexture( 1, textures[ "Accumulator" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F );
 
 	glUseProgram( shaders[ "Raymarch" ] );
-	SendRaymarchParamters();
+	SendRaymarchParameters();
 
 	static std::random_device r;
 	static std::seed_seq s{ r(), r(), r(), r(), r(), r(), r(), r(), r() };
@@ -235,4 +242,19 @@ glm::vec3 engine::GetColorForTemperature ( float temperature ) {
 
 	return glm::mix( glm::clamp( glm::vec3( m[ 0 ] / ( glm::vec3( glm::clamp( temperature, 1000.0f, 40000.0f ) ) +
 		m[ 1 ] ) + m[ 2 ] ), glm::vec3( 0.0f ), glm::vec3( 1.0f ) ), glm::vec3( 1.0f ), glm::smoothstep( 1000.0f, 0.0f, temperature ) );
+}
+
+void engine::CapturePostprocessScreenshot () {
+	wantCapturePostprocessScreenshot = false;
+	std::vector<uint8_t> imageBytesToSaveP;
+	imageBytesToSaveP.resize( WIDTH * HEIGHT * 4 );
+	glBindTexture( GL_TEXTURE_2D, textures[ "Display Texture" ] );
+	glGetTexImage( GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, &imageBytesToSaveP.data()[ 0 ] );
+	Image screenshotP( WIDTH, HEIGHT, &imageBytesToSaveP.data()[ 0 ] );
+	screenshotP.FlipVertical();
+	auto nowP = std::chrono::system_clock::now();
+	auto inTime_tP = std::chrono::system_clock::to_time_t( nowP );
+	std::stringstream ssP;
+	ssP << std::put_time( std::localtime( &inTime_tP ), "screenshots/Voraldo13ssP-%Y-%m-%d %X.png" );
+	screenshotP.Save( ssP.str(), LODEPNG );
 }

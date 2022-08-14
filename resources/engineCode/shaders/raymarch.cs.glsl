@@ -59,7 +59,7 @@ void main () {
 	const ivec2 iDimensions  = imageSize( accumulatorTexture );
 	const vec2 dimensions    = vec2( iDimensions );
 	const float aspectRatio  = dimensions.y / dimensions.x;
-	const ivec2 noiseLoc     = ( noiseOffset + location ) % imageSize( blueNoiseTexture );
+	const ivec2 noiseLoc     = ( noiseOffset + invocation ) % imageSize( blueNoiseTexture );
 	const vec2 blueNoiseRead = imageLoad( blueNoiseTexture, noiseLoc ).xy / 255.0;
 	const vec2 uv            = ( location + blueNoiseRead ) / dimensions;
 	const vec2 mappedPos     = scale * ( ( uv - vec2( 0.5 ) ) * vec2( 1.0, aspectRatio ) );

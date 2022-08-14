@@ -30,17 +30,25 @@ void main () {
 	vec2 samplePosition = scalar * vec2( loc );
 
 	// TODO: take a couple samples, jittered with blue noise
-	vec4 jitter[ 2 ];
+	vec4 jitter[ 4 ];
 	ivec2 position = ivec2( gl_GlobalInvocationID.xy ) % ivec2( imageSize( blueNoise ) );
 	jitter[ 0 ] = imageLoad( blueNoise, position ) / 255.0;
 	position = ivec2( gl_GlobalInvocationID.xy + ivec2( 256 ) ) % ivec2( imageSize( blueNoise ) );
 	jitter[ 1 ] = imageLoad( blueNoise, position ) / 255.0;
+	position = ivec2( gl_GlobalInvocationID.xy + ivec2( 127 ) ) % ivec2( imageSize( blueNoise ) );
+	jitter[ 2 ] = imageLoad( blueNoise, position ) / 255.0;
+	position = ivec2( gl_GlobalInvocationID.xy + ivec2( 383 ) ) % ivec2( imageSize( blueNoise ) );
+	jitter[ 3 ] = imageLoad( blueNoise, position ) / 255.0;
 
 	vec4 originalValue = vec4( 0.0 );
 	originalValue += linearInterpolatedSample( samplePosition + jitter[ 0 ].xy );
 	originalValue += linearInterpolatedSample( samplePosition + jitter[ 0 ].zw );
 	originalValue += linearInterpolatedSample( samplePosition + jitter[ 1 ].xy );
 	originalValue += linearInterpolatedSample( samplePosition + jitter[ 1 ].zw );
+	originalValue += linearInterpolatedSample( samplePosition + jitter[ 2 ].xy );
+	originalValue += linearInterpolatedSample( samplePosition + jitter[ 2 ].zw );
+	originalValue += linearInterpolatedSample( samplePosition + jitter[ 3 ].xy );
+	originalValue += linearInterpolatedSample( samplePosition + jitter[ 3 ].zw );
 	originalValue /= 8.0;
 
 	// vec3 color = tonemap( tonemapMode, colorTempAdjust * originalValue.xyz * 255.0 );

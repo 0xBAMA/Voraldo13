@@ -48,7 +48,7 @@ private:
 	void HandleEvents ();
 	void ClearColorAndDepth ();
 	void ComputePasses ();
-	void SendRaymarchParamters ();
+	void SendRaymarchParameters ();
 	void Raymarch ();
 	void SendTonemappingParameters ();
 	void Tonemap ();
@@ -64,6 +64,7 @@ private:
 	// imgui menu helpers
 	int currentlySelectedMenuItem = -1;
 	void MenuSplash ();
+	bool wantCapturePostprocessScreenshot = false;
 
 //==============================================================================
 	// arguments to operation functions tbd
@@ -106,6 +107,7 @@ private:
 	// probably refactor these into some other utilites header or something
 	glm::vec3 GetColorForTemperature( float temperature ); // 6500.0 is white
 	std::vector<uint8_t> BayerData ( int dimension );
+	void CapturePostprocessScreenshot ();
 
 //==============================================================================
 	// shutdown procedures

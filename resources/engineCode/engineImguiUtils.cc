@@ -310,6 +310,60 @@ void engine::MenuScreenshot () {
 	OrangeText( "Screenshot" );
 	ImGui::Separator();
 	ImGui::Indent( 16.0f );
+
+	ImGui::Text( " " );
+	ImGui::Text( " " );
+	ImGui::Separator();
+	ImGui::TextWrapped( "Accumulator texture just has the averaged samples. This is before tonemapping, etc, and does not include any filtering. It will be the size of the image buffer times the SSFACTOR on each x and y." );
+	ImGui::Indent( 16.0f );
+	if ( ImGui::Button( "Accumulator Screenshot" ) ) {
+		std::vector<uint8_t> imageBytesToSaveA;
+		imageBytesToSaveA.resize( WIDTH * HEIGHT * SSFACTOR * SSFACTOR * 4 );
+		glBindTexture( GL_TEXTURE_2D, textures[ "Accumulator" ] );
+		glGetTexImage( GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, &imageBytesToSaveA.data()[ 0 ] );
+		Image screenshotA( WIDTH * SSFACTOR, HEIGHT * SSFACTOR, &imageBytesToSaveA.data()[ 0 ] );
+		screenshotA.FlipVertical();
+		auto nowA = std::chrono::system_clock::now();
+		auto inTime_tA = std::chrono::system_clock::to_time_t( nowA );
+		std::stringstream ssA;
+		ssA << std::put_time( std::localtime( &inTime_tA ), "screenshots/Voraldo13ssA-%Y-%m-%d %X.png" );
+		screenshotA.Save( ssA.str(), LODEPNG );
+	}
+	ImGui::Unindent( 16.0f );
+	ImGui::Separator();
+
+	ImGui::Text( " " );
+	ImGui::Text( " " );
+	ImGui::Separator();
+	ImGui::TextWrapped( "This sets a flag to grab a screenshot out of the display texture after the postprocessing takes place next frame. Because of when this input takes place, the trident and timing text have already been applied, so the point of this is to get it with tonemapping and other postprocessing, but without the widget or timing text. This is sampled at the specified WIDTH and HEIGHT dimensions, without the SSFACTOR applied." );
+	ImGui::Indent( 16.0f );
+	if ( ImGui::Button( "Get Postprocessed Screenshot" ) ) {
+		wantCapturePostprocessScreenshot = true;
+	}
+	ImGui::Unindent( 16.0f );
+	ImGui::Separator();
+
+	ImGui::Text( " " );
+	ImGui::Text( " " );
+	ImGui::Separator();
+	ImGui::TextWrapped( "Backbuffer Screenshot gets the image after tonemapping, postprocessing, and application of the trident and timing text. This also includes any linear filtering that is applied when the display texture is sampled into the framebuffer, but does not include any of the ImGui menus, because they will not have been drawn yet." );
+	ImGui::Indent( 16.0f );
+	if ( ImGui::Button( "Backbuffer Screenshot" ) ) {
+		std::vector<uint8_t> imageBytesToSaveB;
+		const int width = int( ImGui::GetIO().DisplaySize.x );
+		const int height = int( ImGui::GetIO().DisplaySize.y );
+		imageBytesToSaveB.resize( width * height * 4 );
+		glReadPixels( 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, &imageBytesToSaveB[ 0 ] );
+		Image screenshotB( width, height, &imageBytesToSaveB.data()[ 0 ] );
+		screenshotB.FlipVertical();
+		auto nowB = std::chrono::system_clock::now();
+		auto inTime_tB = std::chrono::system_clock::to_time_t( nowB );
+		std::stringstream ssB;
+		ssB << std::put_time( std::localtime( &inTime_tB ), "screenshots/Voraldo13ssB-%Y-%m-%d %X.png" );
+		screenshotB.Save( ssB.str(), LODEPNG );
+	}
+	ImGui::Unindent( 16.0f );
+	ImGui::Separator();
 	ImGui::Unindent( 16.0f );
 }
 
