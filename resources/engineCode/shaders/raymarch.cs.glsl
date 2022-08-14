@@ -18,6 +18,7 @@ uniform mat3 invBasis;
 // offsets, in texels
 uniform ivec2 tileOffset;
 uniform vec2 renderOffset;
+uniform ivec2 noiseOffset;
 // =============================================================================
 
 float tMin, tMax; // global state tracking
@@ -53,16 +54,18 @@ bool Intersect ( const vec3 rO, vec3 rD ) {
 }
 
 void main () {
-	const ivec2 invocation  = ivec2( gl_GlobalInvocationID.xy ) + tileOffset;
-	const ivec2 location    = invocation + ivec2( renderOffset );
-	const ivec2 iDimensions = imageSize( accumulatorTexture );
-	const vec2 dimensions   = vec2( iDimensions );
-	const float aspectRatio = dimensions.y / dimensions.x;
-	const vec2 uv           = location / dimensions;
-	const vec2 mappedPos    = scale * ( ( uv - vec2( 0.5 ) ) * vec2( 1.0, aspectRatio ) );
-	const vec3 rayOrigin    = invBasis * vec3( mappedPos, 2.0 );
-	const vec3 rayDirection = invBasis * vec3( perspectiveFactor * mappedPos, -2.0 );
-	const vec4 prevColor    = imageLoad( accumulatorTexture, invocation );
+	const ivec2 invocation   = ivec2( gl_GlobalInvocationID.xy ) + tileOffset;
+	const ivec2 location     = invocation + ivec2( renderOffset );
+	const ivec2 iDimensions  = imageSize( accumulatorTexture );
+	const vec2 dimensions    = vec2( iDimensions );
+	const float aspectRatio  = dimensions.y / dimensions.x;
+	const ivec2 noiseLoc     = ( noiseOffset + location ) % imageSize( blueNoiseTexture );
+	const vec2 blueNoiseRead = imageLoad( blueNoiseTexture, noiseLoc ).xy / 255.0;
+	const vec2 uv            = ( location + blueNoiseRead ) / dimensions;
+	const vec2 mappedPos     = scale * ( ( uv - vec2( 0.5 ) ) * vec2( 1.0, aspectRatio ) );
+	const vec3 rayOrigin     = invBasis * vec3( mappedPos, 2.0 );
+	const vec3 rayDirection  = invBasis * vec3( perspectiveFactor * mappedPos, -2.0 );
+	const vec4 prevColor     = imageLoad( accumulatorTexture, invocation );
 
 	vec4 color = clearColor;
 	if ( invocation.x < iDimensions.x && invocation.y < iDimensions.y ) {

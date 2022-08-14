@@ -462,6 +462,7 @@ void engine::DrawTextEditor () {
 }
 
 void engine::ImguiFrameStart () {
+	ZoneScoped;
 	// Start the Dear ImGui frame
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame( windowHandler.window );
@@ -469,12 +470,11 @@ void engine::ImguiFrameStart () {
 }
 
 void engine::ImguiFrameEnd () {
+	ZoneScoped;
 	// get it ready to put on the screen
 	ImGui::Render();
-
 	// put imgui data into the framebuffer
 	ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
-
 	// platform windows ( pop out windows )
 	ImGuiIO &io = ImGui::GetIO();
 	if ( io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable ) {

@@ -22,13 +22,8 @@ void engine::ComputePasses () {
 	TridentAndTiming();
 }
 
-void engine::Raymarch () {
+void engine::SendRaymarchParamters () {
 	ZoneScoped;
-	// set up environment ( 0:blue noise, 1: accumulator ... )
-	glBindImageTexture( 0, textures[ "Blue Noise" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
-	glBindImageTexture( 1, textures[ "Accumulator" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F );
-
-	glUseProgram( shaders[ "Raymarch" ] );
 	const glm::mat3 inverseBasisMat = inverse( glm::mat3( -trident.basisX, -trident.basisY, -trident.basisZ ) );
 	glUniformMatrix3fv( glGetUniformLocation( shaders[ "Raymarch" ], "invBasis" ), 1, false, glm::value_ptr( inverseBasisMat ) );
 	glUniform1f( glGetUniformLocation( shaders[ "Raymarch" ], "scale" ), -render.scaleFactor );
@@ -36,8 +31,20 @@ void engine::Raymarch () {
 	glUniform1f( glGetUniformLocation( shaders[ "Raymarch" ], "perspectiveFactor" ), render.perspective );
 	glUniform4fv( glGetUniformLocation( shaders[ "Raymarch" ], "clearColor" ), 1, glm::value_ptr( render.clearColor ) );
 	glUniform2f( glGetUniformLocation( shaders[ "Raymarch" ], "renderOffset" ), render.renderOffset.x, render.renderOffset.y );
+}
+void engine::Raymarch () {
+	ZoneScoped;
+	// set up environment ( 0:blue noise, 1: accumulator ... )
+	glBindImageTexture( 0, textures[ "Blue Noise" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
+	glBindImageTexture( 1, textures[ "Accumulator" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F );
 
-	cout << "Offset is " << render.renderOffset.x << " " << render.renderOffset.y << endl;
+	glUseProgram( shaders[ "Raymarch" ] );
+	SendRaymarchParamters();
+
+	static std::random_device r;
+	static std::seed_seq s{ r(), r(), r(), r(), r(), r(), r(), r(), r() };
+	static auto gen = std::mt19937_64( s );
+	static std::uniform_int_distribution< int > dist( 0, 512 );
 
 	// tiled update of the accumulator texture
 	constexpr int w = SSFACTOR * WIDTH;
@@ -45,18 +52,28 @@ void engine::Raymarch () {
 	constexpr int t = TILESIZE;
 	for ( int x = 0; x < w; x += t ) {
 		for ( int y = 0; y < h; y += t ) {
+			glUniform2i( glGetUniformLocation( shaders[ "Raymarch" ], "noiseOffset"), dist( gen ), dist( gen ) );
 			glUniform2i( glGetUniformLocation( shaders[ "Raymarch" ], "tileOffset"), x, y );
 			glDispatchCompute( t / 16, t / 16, 1 );
 		}
 	}
 }
 
+void engine::SendTonemappingParameters () {
+	ZoneScoped;
+	glUniform3fv( glGetUniformLocation( shaders[ "Tonemap" ], "colorTempAdjust" ), 1, glm::value_ptr( GetColorForTemperature( tonemap.colorTemp ) ) );
+	glUniform1i( glGetUniformLocation( shaders[ "Tonemap" ], "tonemapMode" ), tonemap.tonemapMode );
+	glUniform1f( glGetUniformLocation( shaders[ "Tonemap" ], "gamma" ), tonemap.gamma );
+}
+
 void engine::Tonemap () {
 	// shader for color grading ( color temp, contrast, gamma ... ) + tonemapping
 	ZoneScoped;
-	// set up environment ( 0:accumulator, 1:display )
+	// set up environment ( 0:accumulator, 1:display, 2: blueNoise )
 	glBindImageTexture( 0, textures[ "Accumulator" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F );
 	glBindImageTexture( 1, textures[ "Display Texture" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
+	glBindImageTexture( 2, textures[ "Blue Noise" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
+
 	glUseProgram( shaders[ "Tonemap" ] );
 	SendTonemappingParameters();
 	glDispatchCompute( ( WIDTH + 15 ) / 16, ( HEIGHT + 15 ) / 16, 1 );
@@ -91,14 +108,6 @@ void engine::ClearColorAndDepth () {
 	const int height = ( int ) io.DisplaySize.y;
 	// prevent -1, -1 being passed on first frame, since ImGui hasn't rendered yet
 	glViewport(0, 0, width > 0 ? width : WIDTH, height > 0 ? height : HEIGHT );
-}
-
-void engine::SendTonemappingParameters () {
-	ZoneScoped;
-
-	glUniform3fv( glGetUniformLocation( shaders[ "Tonemap" ], "colorTempAdjust" ), 1, glm::value_ptr( GetColorForTemperature( tonemap.colorTemp ) ) );
-	glUniform1i( glGetUniformLocation( shaders[ "Tonemap" ], "tonemapMode" ), tonemap.tonemapMode );
-	glUniform1f( glGetUniformLocation( shaders[ "Tonemap" ], "gamma" ), tonemap.gamma );
 }
 
 void engine::BlitToScreen () {
@@ -152,6 +161,9 @@ void engine::HandleEvents () {
 					render.scaleFactor += 0.1f;
 				}
 			}
+		}
+		if ( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_SHIFT && SDL_GetModState() & KMOD_CTRL && SDL_GetModState() & KMOD_ALT ) {
+			windowHandler.ToggleVSync(); // control + alt + shift + v to toggle vsync
 		}
 	}
 

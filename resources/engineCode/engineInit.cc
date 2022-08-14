@@ -1,12 +1,14 @@
 #include "engine.h"
 
 void engine::StartMessage () {
+	ZoneScoped;
 	cout << endl << T_YELLOW << BOLD << "NQADE - Not Quite A Demo Engine" << endl;
 	cout << " By Jon Baker ( 2020 - 2022 ) " << RESET << endl;
 	cout << "  https://jbaker.graphics/ " << endl << endl;
 }
 
 void engine::CreateWindowAndContext () {
+	ZoneScoped;
 	Tick();
 	cout << T_BLUE << "    Initializing SDL2" << RESET << " ................................ ";
 	windowHandler.PreInit();
@@ -24,39 +26,34 @@ void engine::CreateWindowAndContext () {
 }
 
 void engine::MenuPopulate () {
-	// eventually this will come from a json structure containing records of each menu entry
+	ZoneScoped;
 	Tick();
 	cout << T_BLUE << "    Populating Menu" << RESET << " .................................. ";
-
 	std::ifstream i( "resources/engineCode/config/menuConfig.json" );
-	json j;
-	i >> j;
-
+	json j; i >> j;
 	for ( auto& element : j[ "Entries" ] ) {
 		// construct each menu entry and add
 		string entryLabel = element[ "Label" ];
-
 		category_t entryCategory = category_t::none;
-		if ( element[ "Category" ] == string( "Shapes" ) ) {
+		if ( element[ "Category" ] == string( "Shapes" ) )
 			entryCategory = category_t::shapes;
-		} else if ( element[ "Category" ] == string( "Utilities" ) ) {
+		else if ( element[ "Category" ] == string( "Utilities" ) )
 			entryCategory = category_t::utilities;
-		} else if ( element[ "Category" ] == string( "Lighting" ) ) {
+		else if ( element[ "Category" ] == string( "Lighting" ) )
 			entryCategory = category_t::lighting;
-		} else if ( element[ "Category" ] == string( "Settings" ) ) {
+		else if ( element[ "Category" ] == string( "Settings" ) )
 			entryCategory = category_t::settings;
-		}
-
 		menu.entries.push_back( menuEntry( entryLabel, entryCategory ) );
 	}
 	cout << T_GREEN << "done." << T_RED << " ( " << menu.entries.size() << " entries - " << Tock() << " us )" << RESET << endl;
 }
 
 void engine::DisplaySetup () {
+	ZoneScoped;
 	Tick();
 	cout << endl << T_BLUE << "    Setting up Display" << RESET << " ............................... ";
 
-	// have to have dummy call to this - OpenGL core spec requires a VAO bound when calling glDrawArrays, otherwise it complains
+	// have to have this - OpenGL core spec requires a VAO bound when calling glDrawArrays
 	glGenVertexArrays( 1, &displayVAO );
 
 	// some info on your current platform
@@ -64,9 +61,7 @@ void engine::DisplaySetup () {
 	const GLubyte *version = glGetString( GL_VERSION );	// version as a string
 	const GLubyte *glslVersion = glGetString( GL_SHADING_LANGUAGE_VERSION );	// glsl version as a string
 	const GLubyte *vendor = glGetString( GL_VENDOR );		// vendor as a string
-
 	cout << T_GREEN << "done." << T_RED << " ( " << Tock() << " us )" << RESET << endl;
-
 
 	cout << T_BLUE << "    Platform Info :" << RESET << endl;
 	cout << T_RED << "      Vendor : " << T_CYAN << vendor << RESET << endl;
@@ -76,6 +71,7 @@ void engine::DisplaySetup () {
 }
 
 std::vector<uint8_t> engine::BayerData ( int dimension ) {
+	ZoneScoped;
 	if ( dimension == 4 ) {
 		std::vector<uint8_t> pattern4 = {
 			0,  8,  2,  10,	/* values begin scaled to the range 0..15 */
@@ -107,7 +103,8 @@ std::vector<uint8_t> engine::BayerData ( int dimension ) {
 	}
 }
 
-void engine::CreateTextures () {
+void engine::SetupTextures () {
+	ZoneScoped;
 	Tick();
 	cout << T_BLUE << "    Creating Textures" << RESET << " ................................ ";
 
@@ -245,6 +242,7 @@ void engine::CreateTextures () {
 	textures[ "Mask Block Back" ] = maskTextures[ 1 ];
 
 	// lighting data ( can probably get away with just the one buffer, tbd )
+	// also, do I need 16-bit floats or can I get away with less ( GL_R11F_G11F_B10F or GL_RGB9_E5? )
 	glGenTextures( 1, &lightTexture );
 	glActiveTexture( GL_TEXTURE12 );
 	glBindTexture( GL_TEXTURE_3D, lightTexture );
@@ -278,6 +276,7 @@ void engine::CreateTextures () {
 }
 
 void engine::ShaderCompile () {
+	ZoneScoped;
 	Tick();
 	cout << T_BLUE << "    Compiling Shaders" << RESET << " ................................ ";
 
@@ -313,6 +312,7 @@ void engine::ShaderCompile () {
 }
 
 void engine::ImguiSetup () {
+	ZoneScoped;
 	Tick();
 	cout << T_BLUE << "    Configuring dearImGUI" << RESET << " ............................ ";
 
@@ -395,6 +395,7 @@ void engine::ImguiSetup () {
 }
 
 void engine::ReportStartupStats () {
+	ZoneScoped;
 	cout << endl << T_CYAN << "  " << shaders.size() << " shaders." << endl;
 	cout << "  " << textures.size() << " textures." << endl;
 	cout << T_YELLOW << "  Startup is complete ( total " << TotalTime() << " us )" << RESET << endl << endl;

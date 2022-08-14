@@ -54,13 +54,10 @@ public:
 		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 3 );
 		GLcontext = SDL_GL_CreateContext( window );
 		SDL_GL_MakeCurrent( window, GLcontext );
-
-		// load OpenGL functions
-		if ( gl3wInit() != 0 ) {
+		if ( gl3wInit() != 0 ) { // load OpenGL functions
 			cout << "Failed to initialize OpenGL loader!" << endl;
 			abort();
 		}
-
 		// basic OpenGL Config
 		// glEnable( GL_DEPTH_TEST );
 		// glEnable( GL_LINE_SMOOTH );

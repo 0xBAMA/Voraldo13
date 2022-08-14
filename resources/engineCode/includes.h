@@ -58,12 +58,15 @@ constexpr int MSAACount = 1;
 #include "../ImGUI/imgui_impl_sdl.h"
 #include "../ImGUI/imgui_impl_opengl3.h"
 
-// structs for menus / operations
-#include "coreUtils/dataStructs.h"
-
 // SDL includes - windowing, gl context, system info
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
+
+// structs for menus / operations
+#include "coreUtils/dataStructs.h"
+
+// managing bindings of textures to binding points
+#include "coreUtils/bindset.h"
 
 // image load/save/resize/access/manipulation wrapper
 #include "../ImageHandling/image.h"

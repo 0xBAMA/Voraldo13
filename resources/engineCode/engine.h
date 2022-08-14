@@ -29,7 +29,6 @@ private:
 	renderState render;
 	// tonemapping parameters + adjustment
 	colorGradeParameters tonemap;
-	void SendTonemappingParameters ();
 
 //==============================================================================
 	// initialization
@@ -40,7 +39,7 @@ private:
 	void ShaderCompile ();
 	void ImguiSetup ();
 	void MenuPopulate ();
-	void CreateTextures ();
+	void SetupTextures ();
 	void ReportStartupStats ();
 
 //==============================================================================
@@ -49,7 +48,9 @@ private:
 	void HandleEvents ();
 	void ClearColorAndDepth ();
 	void ComputePasses ();
+	void SendRaymarchParamters ();
 	void Raymarch ();
+	void SendTonemappingParameters ();
 	void Tonemap ();
 	void TridentAndTiming ();
 	void ImguiPass ();

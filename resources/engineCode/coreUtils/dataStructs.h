@@ -41,7 +41,7 @@ struct renderState {
 	int renderMode = 3;
 
 	// accumulation stuff
-	float blendFactor = 0.45f;
+	float blendFactor = 0.618f;
 	uint32_t framesSinceStartup = 0;
 	uint32_t framesSinceLastInput = 0;
 	int numFramesHistory = 8; // how long to run after the last input - configurable via menu

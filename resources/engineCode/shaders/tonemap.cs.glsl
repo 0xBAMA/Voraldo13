@@ -2,6 +2,7 @@
 layout( local_size_x = 16, local_size_y = 16, local_size_z = 1 ) in;
 layout( binding = 0, rgba16f ) uniform image2D accumulatorTexture;
 layout( binding = 1, rgba8ui ) uniform uimage2D displayTexture;
+layout( binding = 2, rgba8ui ) uniform uimage2D blueNoise;
 #include "tonemap.glsl" // tonemapping curves
 
 uniform int tonemapMode;
@@ -21,11 +22,6 @@ vec4 linearInterpolatedSample ( vec2 location ) {
 	return mix( xBlend0, xBlend1, fractionalPart.y );
 }
 
-// also want to try these
-	// https://www.shadertoy.com/view/4sGcRW
-	// https://www.shadertoy.com/view/sl3cz8
-	// https://www.shadertoy.com/view/3t3Szr
-
 void main () {
 	ivec2 loc = ivec2( gl_GlobalInvocationID.xy );
 
@@ -34,7 +30,18 @@ void main () {
 	vec2 samplePosition = scalar * vec2( loc );
 
 	// TODO: take a couple samples, jittered with blue noise
-	vec4 originalValue = linearInterpolatedSample( samplePosition );
+	vec4 jitter[ 2 ];
+	ivec2 position = ivec2( gl_GlobalInvocationID.xy ) % ivec2( imageSize( blueNoise ) );
+	jitter[ 0 ] = imageLoad( blueNoise, position ) / 255.0;
+	position = ivec2( gl_GlobalInvocationID.xy + ivec2( 256 ) ) % ivec2( imageSize( blueNoise ) );
+	jitter[ 1 ] = imageLoad( blueNoise, position ) / 255.0;
+
+	vec4 originalValue = vec4( 0.0 );
+	originalValue += linearInterpolatedSample( samplePosition + jitter[ 0 ].xy );
+	originalValue += linearInterpolatedSample( samplePosition + jitter[ 0 ].zw );
+	originalValue += linearInterpolatedSample( samplePosition + jitter[ 1 ].xy );
+	originalValue += linearInterpolatedSample( samplePosition + jitter[ 1 ].zw );
+	originalValue /= 8.0;
 
 	// vec3 color = tonemap( tonemapMode, colorTempAdjust * originalValue.xyz * 255.0 );
 	vec3 color = tonemap( tonemapMode, colorTempAdjust * originalValue.xyz );

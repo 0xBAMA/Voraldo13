@@ -3,12 +3,13 @@
 
 // initialization of OpenGL, etc
 void engine::Init () {
+	ZoneScoped;
 	StartMessage();
 	CreateWindowAndContext();
 	GlDebugEnable();
 	DisplaySetup();
-	CreateTextures();
 	ShaderCompile();
+	SetupTextures();
 	ImguiSetup();
 	MenuPopulate();
 	ReportStartupStats();
