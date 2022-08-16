@@ -20,7 +20,6 @@ struct renderState {
 	// application-wide
 	bool showTrident = true;
 	bool showTiming = true;
-	// ImVec4 clearColor;
 	glm::vec4 clearColor = glm::vec4( 0.0f, 0.0f, 0.0f, 1.0f );
 
 	// mipmaps need to be regenerated initially
@@ -33,7 +32,7 @@ struct renderState {
 	float alphaCorrectionPower = 2.0f;
 	float jitterAmount = 1.0f;
 	float perspective = 0.2f;
-	int volumeSteps = 400;
+	int volumeSteps = 500;
 
 	// TODO: stuff for the spherical camera - use perspective factor to multiply uv, I think
 		// maybe roll this into the rendermode? tbd

@@ -116,10 +116,12 @@ void engine::SetupTextures () {
 	ones.resize( numBytesBlock, 1.0f );
 	std::vector<uint8_t> initialXOR;
 	initialXOR.reserve( numBytesBlock );
-	for ( unsigned int x = 0; x < BLOCKDIM; x++ ) {
-		for ( unsigned int y = 0; y < BLOCKDIM; y++ ) {
-			for ( unsigned int z = 0; z < BLOCKDIM; z++ ) {
-				initialXOR.push_back( x ^ y ^ z );
+	for ( uint32_t x = 0; x < BLOCKDIM; x++ ) {
+		for ( uint32_t y = 0; y < BLOCKDIM; y++ ) {
+			for ( uint32_t z = 0; z < BLOCKDIM; z++ ) {
+				for ( int c = 0; c < 4; c++ ) {
+					initialXOR.push_back( x ^ y ^ z );
+				}
 			}
 		}
 	}

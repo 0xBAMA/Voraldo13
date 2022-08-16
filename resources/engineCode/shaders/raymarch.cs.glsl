@@ -2,7 +2,8 @@
 layout( local_size_x = 16, local_size_y = 16, local_size_z = 1 ) in;
 layout( binding = 0, rgba8ui ) uniform uimage2D blueNoiseTexture;
 layout( binding = 1, rgba16f ) uniform image2D accumulatorTexture;
-// lighting texture, tbd
+layout( binding = 2, rgba8ui ) uniform uimage3D colorBlockFront;
+layout( binding = 3, rgba16f ) uniform image3D lightingBlock;
 
 // =============================================================================
 // rendering settings - consider packing these
@@ -11,6 +12,7 @@ uniform float scale;
 uniform float perspectiveFactor;
 uniform float alphaPower;
 uniform float blendFactor;
+uniform int numSteps;
 
 // basis vectors used to construct view ray
 uniform mat3 invBasis;
@@ -53,6 +55,30 @@ bool Intersect ( const vec3 rO, vec3 rD ) {
 	return ( ( tMin < maxDistance ) && ( tMax > minDistance ) );
 }
 
+void getColorForPixel ( vec3 rO, vec3 rD, inout vec4 color ) {
+	float tCurrent = tMax;
+	const float stepSize = max( float( ( tMax - tMin ) / numSteps ), 0.001f );
+	const vec3 blockSize = vec3( imageSize( colorBlockFront ) );
+	ivec3 samplePosition = ivec3( ( blockSize / 2.0f ) * ( rO + tCurrent * rD + vec3( 1.0f ) ) );
+	vec4 newRead = imageLoad( colorBlockFront, samplePosition ) / 255.0;
+	vec4 newLightRead = imageLoad( lightingBlock, samplePosition );
+	for ( int i = 0; i < numSteps; i++ ) {
+		if( tCurrent >= tMin ) {
+			newRead.rgb *= newLightRead.xyz;
+			float alphaSquared = pow( newRead.a, alphaPower ); // gives more usable range on the alpha channel
+			// alpha blending, new sample over running color
+			color.rgb = newRead.rgb * alphaSquared + color.rgb * color.a * ( 1.0 - alphaSquared );
+			color.a = alphaSquared + color.a * ( 1.0 - alphaSquared );
+			tCurrent -= stepSize;
+			samplePosition = ivec3( ( blockSize / 2.0f ) * ( rO + tCurrent * rD + vec3( 1.0f ) ) );
+			newRead = imageLoad( colorBlockFront, samplePosition ) / 255.0;
+			newLightRead = imageLoad( lightingBlock, samplePosition );
+		} else {
+			break;
+		}
+	}
+}
+
 void main () {
 	const ivec2 invocation   = ivec2( gl_GlobalInvocationID.xy ) + tileOffset;
 	const ivec2 location     = invocation + ivec2( renderOffset );
@@ -70,10 +96,7 @@ void main () {
 	vec4 color = clearColor;
 	if ( invocation.x < iDimensions.x && invocation.y < iDimensions.y ) {
 		if ( Intersect( rayOrigin, rayDirection ) ) {
- 			color.xyz = tMin * rayDirection + rayOrigin;
-			color.a = 1.0;
-		} else {
-			color = clearColor;
+			getColorForPixel( rayOrigin, rayDirection, color );
 		}
 		imageStore( accumulatorTexture, invocation, color * ( 1.0 - blendFactor ) + prevColor * blendFactor );
 	}

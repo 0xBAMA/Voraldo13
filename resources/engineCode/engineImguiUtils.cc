@@ -441,7 +441,7 @@ void engine::MenuRenderingSettings () {
 	OrangeText( " Rendering Settings" );
 	ImGui::Separator();
 	ImGui::Indent( 16.0f );
-	ImGui::ColorEdit3( "Clear Color", (float *) &render.clearColor );
+	ImGui::ColorEdit4( "Clear Color", (float *) &render.clearColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf );
 	ImGui::SliderFloat( "Alpha Correction Power", &render.alphaCorrectionPower, 0.0f, 4.0f );
 	ImGui::SliderFloat( "Jitter Amount", &render.jitterAmount, 0.0f, 2.0f );
 	ImGui::SliderFloat( "Perspective", &render.perspective, -4.0f, 4.0f );
