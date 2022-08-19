@@ -47,9 +47,8 @@ void engine::MenuLayout( bool* p_open ) {
 	if ( ImGui::Begin( "Menu layout", p_open, flags ) ) {
 		if ( ImGui::BeginMenuBar() ) {
 			if ( ImGui::BeginMenu( "File" ) ) {
-				if ( ImGui::MenuItem( "Close" ) )
-					*p_open = false;
-
+				if ( ImGui::MenuItem( "Swap Blocks" ) )
+					SwapBlocks(); // one step of undo
 				ImGui::EndMenu();
 			} // else if ( ImGui::MenuItem( "Swap Blocks" ) ) {
 			// 	cout << "swapping blocks" << endl; // this is interesting, menu with no contents used as button
@@ -152,184 +151,515 @@ void engine::MenuSplash () {
 	OrangeText( " Welcome To Voraldo 13" );
 }
 
+void ColorPickerHelper ( bool& draw, int& mask, glm::vec4& color ) {
+	ImGui::Separator();
+	OrangeText("OPTIONS");
+	ImGui::Checkbox( "  Draw ", &draw );
+	ImGui::SameLine();
+	ImGui::InputInt( " Mask ", &mask );
+	// bounds check
+	mask = std::clamp( mask, 0, 255 );
+	ImGui::ColorEdit4( "  Color", ( float * ) &color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf );
+}
+
+void TitleText ( const char *string  ) {
+	// TODO: add titles in a different font
+}
+
 void engine::MenuAABB () {
 	OrangeText( "AABB" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
+	ImGui::BeginTabBar( "aabb" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
 
-	// xmin, xmax
-	// ymin, ymax
-	// zmin, zmax
-	// bool draw
-	// 0-255 mask level
-	// RGBA color
-
-
-	if ( ImGui::Button( "Switcheroo" ) ) {
-		json j;
-
-		// swap the front/back buffers
-		SwapBlocks();
-
-		// apply the bindset
-		bindSets[ "Basic Operation" ].apply();
-
-		// send the uniforms
-		// .....
-
-		// dispatch the compute shader
-		// .....
-
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
 	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
 
-	ImGui::Unindent( 16.0f );
+		static glm::ivec3 mins, maxs;
+		static bool draw;
+		static int mask;
+		static glm::vec4 color;
+
+		OrangeText( "EXTENTS" );
+		ImGui::SliderInt( " x max", &maxs.x, 0, BLOCKDIM );
+		ImGui::SliderInt( " x min", &mins.x, 0, BLOCKDIM );
+		ImGui::Separator();
+		ImGui::SliderInt( " y max", &maxs.y, 0, BLOCKDIM );
+		ImGui::SliderInt( " y min", &mins.y, 0, BLOCKDIM );
+		ImGui::Separator();
+		ImGui::SliderInt( " z max", &maxs.z, 0, BLOCKDIM );
+		ImGui::SliderInt( " z min", &mins.z, 0, BLOCKDIM );
+		ColorPickerHelper( draw, mask, color );
+
+		if ( ImGui::Button( "Invoke" ) ) {
+			json j;
+
+			// swap the front/back buffers
+			SwapBlocks();
+
+			// apply the bindset
+			bindSets[ "Basic Operation" ].apply();
+
+			// send the uniforms
+			// .....
+
+			// dispatch the compute shader
+			// .....
+
+			// append this json object to the log + description
+
+		}
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuCylinderTube () {
 	OrangeText( "Cylinder/Tube" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "cylinder/tube" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuEllipsoid () {
 	OrangeText( "Ellipsoid" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "ellipsoid" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuGrid () {
 	OrangeText( "Regular Grid" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "regular grid" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuHeightmap () {
 	OrangeText( "Heightmap" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "heightmap" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuIcosahedron () {
 	OrangeText( "Icosahedron" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "icosahedron" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuNoise () {
 	OrangeText( "Noise" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "noise" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuSphere () {
 	OrangeText( "Sphere" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "sphere" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuTriangle () {
 	OrangeText( "Triangle" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "triangle" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuUserShader () {
 	OrangeText( "User Shader" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "user shader" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuVAT () {
 	OrangeText( "Voxel Automata Terrain" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "VAT" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuSpaceship () {
 	OrangeText( "Spaceship Generator" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "spaceship generator" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuLetters () {
 	OrangeText( "Letters" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "letters" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuXOR () {
 	OrangeText( "XOR" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "xor" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuClearBlock () {
 	OrangeText( "Clear Block" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "clear block" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuMasking () {
 	OrangeText( "Masking Operations" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "masking" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuBlur () {
 	OrangeText( "Blur" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "blur" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuShiftTrim () {
 	OrangeText( "Shift/Trim" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "shift/trim" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuLoadSave () {
 	OrangeText( "Load/Save" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "load/save" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuLimiterCompressor () {
 	OrangeText( "Limiter/Compressor" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "limiter/compressor" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuCopyPaste () {
 	OrangeText( "Copy/Paste" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "copy/paste" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuLogging () {
 	OrangeText( "Logging" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "logging" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuScreenshot () {
@@ -395,51 +725,149 @@ void engine::MenuScreenshot () {
 
 void engine::MenuClearLightLevels () {
 	OrangeText( "Clear Light Levels" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "light clear" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuPointLight () {
 	OrangeText( "Point Light" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "point light" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuConeLight () {
 	OrangeText( "Cone Light" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "cone light" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuDirectionalLight () {
 	OrangeText( "Directional Light" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "directional light" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuFakeGI () {
 	OrangeText( "Fake Global Illumination" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "fake gi" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuAmbientOcclusion () {
 	OrangeText( "Ambient Occlusion" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "ao" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuLightMash () {
 	OrangeText( "Light Mash" );
-	ImGui::Separator();
-	ImGui::Indent( 16.0f );
-	ImGui::Unindent( 16.0f );
+	ImGui::BeginTabBar( "light mash" );
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+
+	}
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
 }
 
 void engine::MenuApplicationSettings() {

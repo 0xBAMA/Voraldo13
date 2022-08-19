@@ -221,9 +221,14 @@ void engine::HandleEvents () {
 }
 
 void engine::SwapBlocks () {
-	std::swap( bindSets[ "Rendering" ], bindSets[ "Rendering 2" ] );
-	std::swap( bindSets[ "Basic Operation" ], bindSets[ "Basic Operation 2" ] );
-	std::swap( bindSets[ "Lighting Operation" ], bindSets[ "Lighting Operation 2" ] );
+	// this makes it so that you can just use e.g. the Rendering bindset for the
+	// renderer, abstracts away the need for logic around a buffer toggle - just
+	// call SwapBlocks() after operations which change which blocks play the
+	// role of front/back to make sure the state is correct
+	std::swap( bindSets[ "Rendering" ], bindSets[ "Rendering Back Set" ] );
+	std::swap( bindSets[ "Basic Operation" ], bindSets[ "Basic Operation Back Set" ] );
+	std::swap( bindSets[ "Lighting Operation" ], bindSets[ "Lighting Operation Back Set" ] );
+	std::swap( textures[ "Color Block Front" ], textures[ "Color Block Back" ] ); // for mipmap gen
 	// ...
 }
 

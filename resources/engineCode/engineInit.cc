@@ -276,8 +276,8 @@ other textures, tbd
 ==============================================================================*/
 
 // configure bindsets
-	// two variants will be required for any that need to switch front and back buffers, since
-	// we can't get at the texture handle after it's in the bindset - use std::swap to switch them when required
+	// two variants will be required for any that need to switch front and back buffers, since we can't get at
+	// the texture handle after it's in the bindset - use std::swap to switch them when required in SwapBlocks()
 	bindSets[ "Rendering" ] = bindSet( {
 		binding( 0, textures[ "Blue Noise" ], GL_RGBA8UI ),
 		binding( 1, textures[ "Accumulator" ], GL_RGBA16F ),
@@ -285,13 +285,14 @@ other textures, tbd
 		binding( 3, textures[ "Lighting Block" ], GL_RGBA16F )
 	} );
 
-	bindSets[ "Rendering 2" ] = bindSet( {
+	bindSets[ "Rendering Back Set" ] = bindSet( {
 		binding( 0, textures[ "Blue Noise" ], GL_RGBA8UI ),
 		binding( 1, textures[ "Accumulator" ], GL_RGBA16F ),
 		binding( 2, textures[ "Color Block Back" ], GL_RGBA8UI ),
 		binding( 3, textures[ "Lighting Block" ], GL_RGBA16F )
 	} );
 
+	// only one set required for postprocessing
 	bindSets[ "Postprocessing" ] = bindSet( {
 		binding( 0, textures[ "Blue Noise" ], GL_RGBA8UI ),
 		binding( 1, textures[ "Accumulator" ], GL_RGBA16F ),
@@ -304,9 +305,9 @@ other textures, tbd
 		// anything else?
 	// } );
 
-	// bindSets[ "Basic Operation 2" ] = bindSet( {
-		// front block, back block ( color )
-		// front block, back block ( mask )
+	// bindSets[ "Basic Operation Back Set" ] = bindSet( {
+		// back block, front block ( color )
+		// back block, front block ( mask )
 		// anything else?
 	// } );
 
@@ -317,7 +318,7 @@ other textures, tbd
 		// ...
 	// } );
 
-	// bindSets[ "Lighting Operation 2" ] = bindSet( {
+	// bindSets[ "Lighting Operation Back Set" ] = bindSet( {
 		// front block ( color )
 		// light block
 		// blue noise? is this used/would it help?
