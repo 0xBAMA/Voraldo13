@@ -271,8 +271,21 @@ void engine::SetupTextures () {
 	// heightmap - diamond square initially
 
 	// noise buffer - some placeholder noise, maybe for now
+		// or maybe just use loadBuffer? tbd
 
-	// copy/paste buffer ( how is this going to happen? )
+	// copy/paste buffer ( how is this going to happen, what does the interface look like? )
+
+
+	// configure bindsets
+		// for rendering
+
+	bindSets[ "Rendering" ] = bindSet( std::vector< binding > {
+		binding( 0, textures[ "Blue Noise" ], GL_RGBA8UI ),
+		binding( 1, textures[ "Accumulator" ], GL_RGBA16F ),
+		binding( 2, textures[ "Color Block Front" ], GL_RGBA8UI ),
+		binding( 3, textures[ "Lighting Block" ], GL_RGBA16F ),
+	} );
+
 
 	cout << T_GREEN << "done." << T_RED << " ( " << Tock() << " us )" << RESET << endl;
 }

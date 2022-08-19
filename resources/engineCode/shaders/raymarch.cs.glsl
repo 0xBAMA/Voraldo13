@@ -12,6 +12,7 @@ uniform float scale;
 uniform float perspectiveFactor;
 uniform float alphaPower;
 uniform float blendFactor;
+uniform float jitterFactor;
 uniform int numSteps;
 
 // basis vectors used to construct view ray
@@ -57,9 +58,9 @@ bool Intersect ( const vec3 rO, vec3 rD ) {
 
 void getColorForPixel ( vec3 rO, vec3 rD, inout vec4 color ) {
 	float tCurrent = tMax;
-	const float stepSize = max( float( ( tMax - tMin ) / numSteps ), 0.001f );
+	const float stepSize = max( float( ( tMax - tMin ) / numSteps ), 0.001 );
 	const vec3 blockSize = vec3( imageSize( colorBlockFront ) );
-	ivec3 samplePosition = ivec3( ( blockSize / 2.0f ) * ( rO + tCurrent * rD + vec3( 1.0f ) ) );
+	ivec3 samplePosition = ivec3( ( blockSize / 2.0 ) * ( rO + tCurrent * rD + vec3( 1.0 ) ) );
 	vec4 newRead = imageLoad( colorBlockFront, samplePosition ) / 255.0;
 	vec4 newLightRead = imageLoad( lightingBlock, samplePosition );
 	for ( int i = 0; i < numSteps; i++ ) {
@@ -67,14 +68,13 @@ void getColorForPixel ( vec3 rO, vec3 rD, inout vec4 color ) {
 			newRead.rgb *= newLightRead.xyz;
 			float alphaSquared = pow( newRead.a, alphaPower ); // gives more usable range on the alpha channel
 			// alpha blending, new sample over running color
+			color.a = max( alphaSquared + color.a * ( 1.0 - alphaSquared ), 0.001 );
 			color.rgb = newRead.rgb * alphaSquared + color.rgb * color.a * ( 1.0 - alphaSquared );
-			color.a = alphaSquared + color.a * ( 1.0 - alphaSquared );
+			color.rgb /= color.a; // missing piece of a over b alpha blending - can't really see a lot of difference
 			tCurrent -= stepSize;
-			samplePosition = ivec3( ( blockSize / 2.0f ) * ( rO + tCurrent * rD + vec3( 1.0f ) ) );
+			samplePosition = ivec3( ( blockSize / 2.0 ) * ( rO + tCurrent * rD + vec3( 1.0 ) ) );
 			newRead = imageLoad( colorBlockFront, samplePosition ) / 255.0;
 			newLightRead = imageLoad( lightingBlock, samplePosition );
-		} else {
-			break;
 		}
 	}
 }
@@ -86,7 +86,7 @@ void main () {
 	const vec2 dimensions    = vec2( iDimensions );
 	const float aspectRatio  = dimensions.y / dimensions.x;
 	const ivec2 noiseLoc     = ( noiseOffset + invocation ) % imageSize( blueNoiseTexture );
-	const vec2 blueNoiseRead = imageLoad( blueNoiseTexture, noiseLoc ).xy / 255.0;
+	const vec2 blueNoiseRead = jitterFactor * ( imageLoad( blueNoiseTexture, noiseLoc ).xy / 255.0 );
 	const vec2 uv            = ( location + blueNoiseRead ) / dimensions;
 	const vec2 mappedPos     = scale * ( ( uv - vec2( 0.5 ) ) * vec2( 1.0, aspectRatio ) );
 	const vec3 rayOrigin     = invBasis * vec3( mappedPos, 2.0 );

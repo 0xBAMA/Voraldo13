@@ -40,15 +40,18 @@ void engine::SendRaymarchParameters () {
 	glUniform2f( glGetUniformLocation( shader, "renderOffset" ), render.renderOffset.x, render.renderOffset.y );
 	glUniform1f( glGetUniformLocation( shader, "alphaPower" ), render.alphaCorrectionPower );
 	glUniform1i( glGetUniformLocation( shader, "numSteps" ), render.volumeSteps );
+	glUniform1f( glGetUniformLocation( shader, "jitterFactor" ), render.jitterAmount );
 }
 
 void engine::Raymarch () {
 	ZoneScoped;
 	// set up environment ( 0:blue noise, 1: accumulator ... )
-	glBindImageTexture( 0, textures[ "Blue Noise" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
-	glBindImageTexture( 1, textures[ "Accumulator" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F );
-	glBindImageTexture( 2, textures[ "Color Block Front" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
-	glBindImageTexture( 3, textures[ "Lighting Block" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F );
+	// glBindImageTexture( 0, textures[ "Blue Noise" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
+	// glBindImageTexture( 1, textures[ "Accumulator" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F );
+	// glBindImageTexture( 2, textures[ "Color Block Front" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
+	// glBindImageTexture( 3, textures[ "Lighting Block" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F );
+
+	bindSets[ "Rendering" ].apply();
 
 	glUseProgram( shaders[ "Raymarch" ] );
 	SendRaymarchParameters();
