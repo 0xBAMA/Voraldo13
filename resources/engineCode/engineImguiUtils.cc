@@ -156,6 +156,32 @@ void engine::MenuAABB () {
 	OrangeText( "AABB" );
 	ImGui::Separator();
 	ImGui::Indent( 16.0f );
+
+	// xmin, xmax
+	// ymin, ymax
+	// zmin, zmax
+	// bool draw
+	// 0-255 mask level
+	// RGBA color
+
+
+	if ( ImGui::Button( "Switcheroo" ) ) {
+		json j;
+
+		// swap the front/back buffers
+		SwapBlocks();
+
+		// apply the bindset
+		bindSets[ "Basic Operation" ].apply();
+
+		// send the uniforms
+		// .....
+
+		// dispatch the compute shader
+		// .....
+
+	}
+
 	ImGui::Unindent( 16.0f );
 }
 

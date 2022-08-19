@@ -45,14 +45,8 @@ void engine::SendRaymarchParameters () {
 
 void engine::Raymarch () {
 	ZoneScoped;
-	// set up environment ( 0:blue noise, 1: accumulator ... )
-	// glBindImageTexture( 0, textures[ "Blue Noise" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
-	// glBindImageTexture( 1, textures[ "Accumulator" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F );
-	// glBindImageTexture( 2, textures[ "Color Block Front" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
-	// glBindImageTexture( 3, textures[ "Lighting Block" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F );
 
 	bindSets[ "Rendering" ].apply();
-
 	glUseProgram( shaders[ "Raymarch" ] );
 	SendRaymarchParameters();
 
@@ -85,11 +79,7 @@ void engine::SendTonemappingParameters () {
 void engine::Tonemap () {
 	// shader for color grading ( color temp, contrast, gamma ... ) + tonemapping
 	ZoneScoped;
-	// set up environment ( 0:accumulator, 1:display, 2: blueNoise )
-	glBindImageTexture( 0, textures[ "Accumulator" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F );
-	glBindImageTexture( 1, textures[ "Display Texture" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
-	glBindImageTexture( 2, textures[ "Blue Noise" ], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI );
-
+	bindSets[ "Postprocessing" ].apply();
 	glUseProgram( shaders[ "Tonemap" ] );
 	SendTonemappingParameters();
 	glDispatchCompute( ( WIDTH + 15 ) / 16, ( HEIGHT + 15 ) / 16, 1 );
@@ -228,6 +218,13 @@ void engine::HandleEvents () {
 			render.renderOffset.y -= ( SDL_GetModState() & KMOD_SHIFT ) ?  10.0f :  1.0f;
 
 	}
+}
+
+void engine::SwapBlocks () {
+	std::swap( bindSets[ "Rendering" ], bindSets[ "Rendering 2" ] );
+	std::swap( bindSets[ "Basic Operation" ], bindSets[ "Basic Operation 2" ] );
+	std::swap( bindSets[ "Lighting Operation" ], bindSets[ "Lighting Operation 2" ] );
+	// ...
 }
 
 // Function to get color temperature from shadertoy user BeRo

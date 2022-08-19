@@ -16,6 +16,7 @@ private:
 	unordered_map< string, GLuint > textures;
 	unordered_map< string, GLuint > shaders;
 	unordered_map< string, bindSet > bindSets;
+	void SwapBlocks();
 
 //==============================================================================
 	// application handles + basic data

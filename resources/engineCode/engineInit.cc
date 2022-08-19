@@ -106,7 +106,7 @@ std::vector<uint8_t> engine::BayerData ( int dimension ) {
 void engine::SetupTextures () {
 	ZoneScoped;
 	Tick();
-	cout << T_BLUE << "    Creating Textures" << RESET << " ................................ ";
+	cout << T_BLUE << "    Creating Textures and Bindsets" << RESET << " ................... ";
 
 	// color blocks ( front and back )
 	size_t numBytesBlock = BLOCKDIM * BLOCKDIM * BLOCKDIM * 4;
@@ -218,7 +218,7 @@ void engine::SetupTextures () {
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT );
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT );
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT );
-	glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &initialXOR.data()[ 0 ] );
+	glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &zeroes.data()[ 0 ] );
 	textures[ "Color Block Back" ] = colorTextures[ 1 ];
 
 	// mask blocks ( front and back - can this be consolidated? not sure if two are needed )
@@ -268,24 +268,63 @@ void engine::SetupTextures () {
 	glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &zeroes.data()[ 0 ] );
 	textures[ "Loadbuffer" ] = loadBuffer;
 
-	// heightmap - diamond square initially
+/*==============================================================================
+other textures, tbd
+	> heightmap - diamond square initially
+	> noise buffer - some placeholder noise, maybe for now - or maybe just use loadBuffer? tbd
+	> copy/paste buffer ( how is this going to happen, what does the interface look like? )
+==============================================================================*/
 
-	// noise buffer - some placeholder noise, maybe for now
-		// or maybe just use loadBuffer? tbd
-
-	// copy/paste buffer ( how is this going to happen, what does the interface look like? )
-
-
-	// configure bindsets
-		// for rendering
-
-	bindSets[ "Rendering" ] = bindSet( std::vector< binding > {
+// configure bindsets
+	// two variants will be required for any that need to switch front and back buffers, since
+	// we can't get at the texture handle after it's in the bindset - use std::swap to switch them when required
+	bindSets[ "Rendering" ] = bindSet( {
 		binding( 0, textures[ "Blue Noise" ], GL_RGBA8UI ),
 		binding( 1, textures[ "Accumulator" ], GL_RGBA16F ),
 		binding( 2, textures[ "Color Block Front" ], GL_RGBA8UI ),
-		binding( 3, textures[ "Lighting Block" ], GL_RGBA16F ),
+		binding( 3, textures[ "Lighting Block" ], GL_RGBA16F )
 	} );
 
+	bindSets[ "Rendering 2" ] = bindSet( {
+		binding( 0, textures[ "Blue Noise" ], GL_RGBA8UI ),
+		binding( 1, textures[ "Accumulator" ], GL_RGBA16F ),
+		binding( 2, textures[ "Color Block Back" ], GL_RGBA8UI ),
+		binding( 3, textures[ "Lighting Block" ], GL_RGBA16F )
+	} );
+
+	bindSets[ "Postprocessing" ] = bindSet( {
+		binding( 0, textures[ "Blue Noise" ], GL_RGBA8UI ),
+		binding( 1, textures[ "Accumulator" ], GL_RGBA16F ),
+		binding( 2, textures[ "Display Texture" ], GL_RGBA8UI )
+	} );
+
+	// bindSets[ "Basic Operation" ] = bindSet( {
+		// front block, back block ( color )
+		// front block, back block ( mask )
+		// anything else?
+	// } );
+
+	// bindSets[ "Basic Operation 2" ] = bindSet( {
+		// front block, back block ( color )
+		// front block, back block ( mask )
+		// anything else?
+	// } );
+
+	// bindSets[ "Lighting Operation" ] = bindSet( {
+		// front block ( color )
+		// light block
+		// blue noise? is this used/would it help?
+		// ...
+	// } );
+
+	// bindSets[ "Lighting Operation 2" ] = bindSet( {
+		// front block ( color )
+		// light block
+		// blue noise? is this used/would it help?
+		// ...
+	// } );
+
+	// other sets - some operations will reqiure a different configuration
 
 	cout << T_GREEN << "done." << T_RED << " ( " << Tock() << " us )" << RESET << endl;
 }
