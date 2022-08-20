@@ -199,8 +199,6 @@ void engine::MenuAABB () {
 		ColorPickerHelper( draw, mask, color );
 
 		if ( ImGui::Button( "Invoke" ) ) {
-			json j;
-
 			// swap the front/back buffers
 			SwapBlocks();
 
@@ -208,12 +206,30 @@ void engine::MenuAABB () {
 			bindSets[ "Basic Operation" ].apply();
 
 			// send the uniforms
-			// .....
+			json j;
+			j["shader"] = "AABB";
+			j["min"]["type"] = "ivec3";
+			j["min"]["x"] = mins.x;
+			j["min"]["y"] = mins.y;
+			j["min"]["z"] = mins.z;
+			j["max"]["type"] = "ivec3";
+			j["max"]["x"] = maxs.x;
+			j["max"]["y"] = maxs.y;
+			j["max"]["z"] = maxs.z;
+			j["draw"]["type"] = "bool";
+			j["draw"]["val"] = draw;
+			j["mask"]["type"] = "int";
+			j["mask"]["val"] = mask;
+			j["color"]["type"] = "color";
+			j["color"]["r"] = color.r;
+			j["color"]["g"] = color.g;
+			j["color"]["b"] = color.b;
+			j["color"]["a"] = color.a;
+			// SendUniforms( j );
+			// AddToLog( j );
 
 			// dispatch the compute shader
 			// .....
-
-			// append this json object to the log + description
 
 		}
 
