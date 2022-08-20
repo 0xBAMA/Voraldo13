@@ -376,6 +376,10 @@ void engine::ImguiSetup () {
 	ImGui::CreateContext();
 	ImGuiIO &io = ImGui::GetIO();
 
+	// font config
+	defaultFont = io.Fonts->AddFontDefault();
+	titleFont = io.Fonts->AddFontFromFileTTF( "resources/fonts/ttf/Cinzel-VariableFont_wght.ttf", 26 );
+
 	// enable docking
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;

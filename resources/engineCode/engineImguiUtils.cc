@@ -34,10 +34,12 @@ static void HelpMarker ( const char *desc ) {
 	}
 }
 
-static void OrangeText ( const char *string ) {
+void engine::OrangeText ( const char *string ) {
 	ImGui::Separator();
 	ImGui::PushStyleColor( ImGuiCol_Text, ImVec4( 0.75, 0.35, 0.1, 1.0 ) );
+	ImGui::PushFont( titleFont );
 	ImGui::TextUnformatted( string );
+	ImGui::PopFont();
 	ImGui::PopStyleColor();
 }
 
@@ -151,7 +153,7 @@ void engine::MenuSplash () {
 	OrangeText( " Welcome To Voraldo 13" );
 }
 
-void ColorPickerHelper ( bool& draw, int& mask, glm::vec4& color ) {
+void engine::ColorPickerHelper ( bool& draw, int& mask, glm::vec4& color ) {
 	ImGui::Separator();
 	OrangeText("OPTIONS");
 	ImGui::Checkbox( "  Draw ", &draw );

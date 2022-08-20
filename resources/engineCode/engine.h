@@ -67,6 +67,10 @@ private:
 	int currentlySelectedMenuItem = -1;
 	void MenuSplash ();
 	bool wantCapturePostprocessScreenshot = false;
+	void OrangeText ( const char *string );
+	void ColorPickerHelper ( bool& draw, int& mask, glm::vec4& color );
+	ImFont * defaultFont;
+	ImFont * titleFont;
 
 //==============================================================================
 	// arguments to operation functions tbd
