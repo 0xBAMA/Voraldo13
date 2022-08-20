@@ -182,20 +182,21 @@ void engine::MenuAABB () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
-		static glm::ivec3 mins, maxs;
-		static bool draw;
-		static int mask;
-		static glm::vec4 color;
+		static glm::ivec3 minCoords( 0, 0, 0 );
+		static glm::ivec3 maxCoords( 0, 0, 0 );
+		static bool draw = true;
+		static int mask = 0;
+		static glm::vec4 color( 0.0f );
 
 		OrangeText( "EXTENTS" );
-		ImGui::SliderInt( " x max", &maxs.x, 0, BLOCKDIM );
-		ImGui::SliderInt( " x min", &mins.x, 0, BLOCKDIM );
+		ImGui::SliderInt( " x max", &maxCoords.x, 0, BLOCKDIM );
+		ImGui::SliderInt( " x min", &minCoords.x, 0, BLOCKDIM );
 		ImGui::Separator();
-		ImGui::SliderInt( " y max", &maxs.y, 0, BLOCKDIM );
-		ImGui::SliderInt( " y min", &mins.y, 0, BLOCKDIM );
+		ImGui::SliderInt( " y max", &maxCoords.y, 0, BLOCKDIM );
+		ImGui::SliderInt( " y min", &minCoords.y, 0, BLOCKDIM );
 		ImGui::Separator();
-		ImGui::SliderInt( " z max", &maxs.z, 0, BLOCKDIM );
-		ImGui::SliderInt( " z min", &mins.z, 0, BLOCKDIM );
+		ImGui::SliderInt( " z max", &maxCoords.z, 0, BLOCKDIM );
+		ImGui::SliderInt( " z min", &minCoords.z, 0, BLOCKDIM );
 		ColorPickerHelper( draw, mask, color );
 
 		if ( ImGui::Button( "Invoke" ) ) {
@@ -207,30 +208,30 @@ void engine::MenuAABB () {
 
 			// send the uniforms
 			json j;
-			j["shader"] = "AABB";
-			j["min"]["type"] = "ivec3";
-			j["min"]["x"] = mins.x;
-			j["min"]["y"] = mins.y;
-			j["min"]["z"] = mins.z;
-			j["max"]["type"] = "ivec3";
-			j["max"]["x"] = maxs.x;
-			j["max"]["y"] = maxs.y;
-			j["max"]["z"] = maxs.z;
-			j["draw"]["type"] = "bool";
-			j["draw"]["val"] = draw;
-			j["mask"]["type"] = "int";
-			j["mask"]["val"] = mask;
-			j["color"]["type"] = "color";
-			j["color"]["r"] = color.r;
-			j["color"]["g"] = color.g;
-			j["color"]["b"] = color.b;
-			j["color"]["a"] = color.a;
-			// SendUniforms( j );
+			j[ "shader" ] = "AABB";
+			j[ "bindset" ] = "Basic Operation"; // redundant for now, but relevant for reuse?
+			j[ "mins" ][ "type" ] = "ivec3";
+			j[ "minCoords" ][ "x" ] = minCoords.x;
+			j[ "minCoords" ][ "y" ] = minCoords.y;
+			j[ "minCoords" ][ "z" ] = minCoords.z;
+			j[ "maxCoords" ][ "type" ] = "ivec3";
+			j[ "maxCoords" ][ "x" ] = maxCoords.x;
+			j[ "maxCoords" ][ "y" ] = maxCoords.y;
+			j[ "maxCoords" ][ "z" ] = maxCoords.z;
+			j[ "draw" ][ "type" ] = "bool";
+			j[ "draw" ][ "x" ] = draw;
+			j[ "mask" ][ "type" ] = "int";
+			j[ "mask" ][ "x" ] = mask;
+			j[ "color" ][ "type" ] = "vec4";
+			j[ "color" ][ "x" ] = color.r;
+			j[ "color" ][ "y" ] = color.g;
+			j[ "color" ][ "z" ] = color.b;
+			j[ "color" ][ "w" ] = color.a;
+			SendUniforms( j );
 			// AddToLog( j );
 
 			// dispatch the compute shader
-			// .....
-
+			glDispatchCompute( BLOCKDIM / 8, BLOCKDIM / 8, BLOCKDIM / 8 );
 		}
 
 		ImGui::Unindent( 16.0f );

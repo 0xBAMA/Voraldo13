@@ -299,17 +299,19 @@ other textures, tbd
 		binding( 2, textures[ "Display Texture" ], GL_RGBA8UI )
 	} );
 
-	// bindSets[ "Basic Operation" ] = bindSet( {
-		// front block, back block ( color )
-		// front block, back block ( mask )
-		// anything else?
-	// } );
+	bindSets[ "Basic Operation" ] = bindSet( {
+		binding( 0, textures[ "Color Block Front" ], GL_RGBA8UI ),
+		binding( 1, textures[ "Color Block Back" ], GL_RGBA8UI ),
+		binding( 2, textures[ "Mask Block Front" ], GL_R8UI ),
+		binding( 3, textures[ "Mask Block Back" ], GL_R8UI )
+	} );
 
-	// bindSets[ "Basic Operation Back Set" ] = bindSet( {
-		// back block, front block ( color )
-		// back block, front block ( mask )
-		// anything else?
-	// } );
+	bindSets[ "Basic Operation Back Set" ] = bindSet( {
+		binding( 0, textures[ "Color Block Back" ], GL_RGBA8UI ),
+		binding( 1, textures[ "Color Block Front" ], GL_RGBA8UI ),
+		binding( 2, textures[ "Mask Block Back" ], GL_R8UI ),
+		binding( 3, textures[ "Mask Block Front" ], GL_R8UI )
+	} );
 
 	// bindSets[ "Lighting Operation" ] = bindSet( {
 		// front block ( color )
@@ -343,6 +345,9 @@ void engine::ShaderCompile () {
 	// something to put data in the accumulator texture
 	shaders[ "Dummy Draw" ] = computeShader( base + "dummyDraw.cs.glsl" ).shaderHandle;
 
+	// operations
+	shaders[ "AABB" ] = computeShader( base + "operations/AABB.cs.glsl" ).shaderHandle;
+
 	// color adjustments
 	shaders[ "Tonemap" ] = computeShader( base + "tonemap.cs.glsl" ).shaderHandle;
 
@@ -359,8 +364,6 @@ void engine::ShaderCompile () {
 	shaders[ "Trident Raymarch" ] = computeShader( base + "tridentGenerate.cs.glsl" ).shaderHandle;
 	shaders[ "Trident Blit" ] = computeShader( base + "tridentCopy.cs.glsl" ).shaderHandle;
 	trident.PassInShaders( shaders[ "Trident Raymarch" ], shaders[ "Trident Blit" ] );
-
-		// ...
 
 	cout << T_GREEN << "done." << T_RED << " ( " << Tock() << " us )" << RESET << endl;
 

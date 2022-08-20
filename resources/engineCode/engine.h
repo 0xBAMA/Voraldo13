@@ -114,6 +114,7 @@ private:
 	glm::vec3 GetColorForTemperature( float temperature ); // 6500.0 is white
 	std::vector<uint8_t> BayerData ( int dimension );
 	void CapturePostprocessScreenshot ();
+	void SendUniforms( json j );
 
 //==============================================================================
 	// shutdown procedures

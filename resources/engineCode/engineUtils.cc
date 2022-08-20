@@ -232,6 +232,41 @@ void engine::SwapBlocks () {
 	// ...
 }
 
+void engine::SendUniforms ( json j ) {
+	// prepare to send
+	GLuint shader = shaders[ j[ "shader" ] ];
+	glUseProgram( shader );
+
+	// iterate through the entries
+	for ( auto& element : j.items() ) {
+
+		// name of the operation, or name of the shader
+		string label( element.key() );
+
+		// the type of the uniform - "null" is a special value for the shader label + bindset
+		string type( label == "shader" || label == "bindset" ? "null" : element.value()[ "type" ] );
+
+		// shortens references
+		json val = element.value();
+
+		if ( type == "null" ) {
+			continue;
+		} else if ( type == "bool" ) {
+			glUniform1i( glGetUniformLocation( shader, label.c_str() ), val[ "x" ].get<bool>() );
+		} else if ( type == "int" ) {
+			glUniform1i( glGetUniformLocation( shader, label.c_str() ), val[ "x" ] );
+		} else if ( type == "float" ) {
+			glUniform1f( glGetUniformLocation( shader, label.c_str() ), val[ "x" ] );
+		} else if ( type == "ivec3" ) {
+			glUniform3i( glGetUniformLocation( shader, label.c_str() ), val[ "x" ], val[ "y" ], val[ "z" ] );
+		} else if ( type == "vec3" ) {
+			glUniform3f( glGetUniformLocation( shader, label.c_str() ), val[ "x" ], val[ "y" ], val[ "z" ] );
+		} else if ( type == "vec4" ) {
+			glUniform4f( glGetUniformLocation( shader, label.c_str() ), val[ "x" ], val[ "y" ], val[ "z" ], val[ "w" ] );
+		}
+	}
+}
+
 // Function to get color temperature from shadertoy user BeRo
 // from the author:
 //   Color temperature (sRGB) stuff
