@@ -43,7 +43,6 @@ void engine::OrangeText ( const char *string ) {
 	ImGui::PopStyleColor();
 }
 
-// this needs a formatting pass
 void engine::MenuLayout( bool* p_open ) {
 	const auto flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar;
 	if ( ImGui::Begin( "Menu layout", p_open, flags ) ) {
@@ -831,6 +830,50 @@ void engine::MenuClearBlock () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
+
+		static bool respectMask = true;
+		static bool draw = false;
+		ImGui::Checkbox( "Respect Mask", &respectMask );
+		ImGui::Checkbox( "Draw Color", &draw );
+
+		static glm::vec4 color ( 0.0f );
+		static int mask = 0;
+
+		if ( draw ) {
+			ImGui::InputInt( " Mask ", &mask );
+			mask = std::clamp( mask, 0, 255 );
+			ImGui::ColorEdit4( "  Color", ( float * ) &color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf );
+		}
+
+		SetPosBottomRightCorner();
+		if ( ImGui::Button( "Invoke Operation" ) ) {
+			// swap the front/back buffers
+			SwapBlocks();
+
+			// apply the bindset
+			bindSets[ "Basic Operation" ].apply();
+
+			// send the uniforms
+			json j;
+			j[ "shader" ] = "Clear";
+			j[ "bindset" ] = "Basic Operation";
+			j[ "respectMask" ][ "type" ] = "bool";
+			j[ "respectMask" ][ "x" ] = respectMask;
+			j[ "draw" ][ "type" ] = "bool";
+			j[ "draw" ][ "x" ] = draw;
+			j[ "mask" ][ "type" ] = "int";
+			j[ "mask" ][ "x" ] = mask;
+			j[ "color" ][ "type" ] = "vec4";
+			j[ "color" ][ "x" ] = color.r;
+			j[ "color" ][ "y" ] = color.g;
+			j[ "color" ][ "z" ] = color.b;
+			j[ "color" ][ "w" ] = color.a;
+			SendUniforms( j );
+			AddToLog( j );
+
+			// dispatch the compute shader
+			BlockDispatch();
+		}
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
