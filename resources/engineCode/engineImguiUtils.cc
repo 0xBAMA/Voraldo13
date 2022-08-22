@@ -342,13 +342,78 @@ void engine::MenuEllipsoid () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
+		static glm::vec3 center ( 0.0f );
+		static glm::vec3 rotations ( 0.0f );
+		static glm::vec3 radii ( 0.0f );
+		static bool draw = true;
+		static int mask = 0;
+		static glm::vec4 color( 0.0f );
+
+		OrangeText( "Center Point" );
+		ImGui::SliderFloat( "Center X", &center.x, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Center Y", &center.y, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Center Z", &center.z, 0.0f, float( BLOCKDIM ), "%.3f" );
+
+		OrangeText( "Rotation" );
+		ImGui::SliderFloat( "Rotation About X", &rotations.x, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Rotation About Y", &rotations.y, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Rotation About Z", &rotations.z, 0.0f, float( BLOCKDIM ), "%.3f" );
+
+		OrangeText( "Radii" );
+		ImGui::SliderFloat( "X Radius", &radii.x, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Y Radius", &radii.y, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Z Radius", &radii.z, 0.0f, float( BLOCKDIM ), "%.3f" );
+
+		ColorPickerHelper( draw, mask, color );
+
+		SetPosBottomRightCorner();
+		if ( ImGui::Button( "Invoke Operation" ) ) {
+			// swap the front/back buffers
+			SwapBlocks();
+
+			// apply the bindset
+			bindSets[ "Basic Operation" ].apply();
+
+			// send the uniforms
+			json j;
+			j[ "shader" ] = "Ellipsoid";
+			j[ "bindset" ] = "Basic Operation";
+			j[ "center" ][ "type" ] = "vec3";
+			j[ "center" ][ "x" ] = center.x;
+			j[ "center" ][ "y" ] = center.y;
+			j[ "center" ][ "z" ] = center.z;
+			j[ "rotations" ][ "type" ] = "vec3";
+			j[ "rotations" ][ "x" ] = rotations.x;
+			j[ "rotations" ][ "y" ] = rotations.y;
+			j[ "rotations" ][ "z" ] = rotations.z;
+			j[ "radii" ][ "type" ] = "vec3";
+			j[ "radii" ][ "x" ] = radii.x;
+			j[ "radii" ][ "y" ] = radii.y;
+			j[ "radii" ][ "z" ] = radii.z;
+			j[ "draw" ][ "type" ] = "bool";
+			j[ "draw" ][ "x" ] = draw;
+			j[ "mask" ][ "type" ] = "int";
+			j[ "mask" ][ "x" ] = mask;
+			j[ "color" ][ "type" ] = "vec4";
+			j[ "color" ][ "x" ] = color.r;
+			j[ "color" ][ "y" ] = color.g;
+			j[ "color" ][ "z" ] = color.b;
+			j[ "color" ][ "w" ] = color.a;
+			SendUniforms( j );
+			AddToLog( j );
+
+			// dispatch the compute shader
+			BlockDispatch();
+		}
+
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
+
+		// TODO: Ellipsoid description
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
@@ -365,7 +430,6 @@ void engine::MenuGrid () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -386,7 +450,6 @@ void engine::MenuHeightmap () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -407,7 +470,6 @@ void engine::MenuIcosahedron () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -428,7 +490,6 @@ void engine::MenuNoise () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -449,7 +510,6 @@ void engine::MenuSphere () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -470,7 +530,6 @@ void engine::MenuTriangle () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -491,7 +550,6 @@ void engine::MenuUserShader () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -512,7 +570,6 @@ void engine::MenuVAT () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -533,7 +590,6 @@ void engine::MenuSpaceship () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -554,7 +610,6 @@ void engine::MenuLetters () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -575,7 +630,6 @@ void engine::MenuXOR () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -596,7 +650,6 @@ void engine::MenuClearBlock () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -617,7 +670,6 @@ void engine::MenuMasking () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -638,7 +690,6 @@ void engine::MenuBlur () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -659,7 +710,6 @@ void engine::MenuShiftTrim () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -680,7 +730,6 @@ void engine::MenuLoadSave () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -701,7 +750,6 @@ void engine::MenuLimiterCompressor () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -722,7 +770,6 @@ void engine::MenuCopyPaste () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -743,7 +790,6 @@ void engine::MenuLogging () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -825,7 +871,6 @@ void engine::MenuClearLightLevels () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -846,7 +891,6 @@ void engine::MenuPointLight () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -867,7 +911,6 @@ void engine::MenuConeLight () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -888,7 +931,6 @@ void engine::MenuDirectionalLight () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -909,7 +951,6 @@ void engine::MenuFakeGI () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -930,7 +971,6 @@ void engine::MenuAmbientOcclusion () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
@@ -951,7 +991,6 @@ void engine::MenuLightMash () {
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
-
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
