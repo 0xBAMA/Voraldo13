@@ -575,6 +575,54 @@ void engine::MenuSphere () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
+		static glm::vec3 center ( 0.0f );
+		static float radius ( 0.0f );
+		static bool draw = true;
+		static int mask = 0;
+		static glm::vec4 color( 0.0f );
+
+		OrangeText( "Center Point" );
+		ImGui::SliderFloat( "Center X", &center.x, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Center Y", &center.y, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Center Z", &center.z, 0.0f, float( BLOCKDIM ), "%.3f" );
+		OrangeText( "Radius" );
+		ImGui::SliderFloat( "Radius", &radius, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ColorPickerHelper( draw, mask, color );
+
+		SetPosBottomRightCorner();
+		if ( ImGui::Button( "Invoke Operation" ) ) {
+			// swap the front/back buffers
+			SwapBlocks();
+
+			// apply the bindset
+			bindSets[ "Basic Operation" ].apply();
+
+			// send the uniforms
+			json j;
+			j[ "shader" ] = "Sphere";
+			j[ "bindset" ] = "Basic Operation";
+			j[ "center" ][ "type" ] = "vec3";
+			j[ "center" ][ "x" ] = center.x;
+			j[ "center" ][ "y" ] = center.y;
+			j[ "center" ][ "z" ] = center.z;
+			j[ "radius" ][ "type" ] = "float";
+			j[ "radius" ][ "x" ] = radius;
+			j[ "draw" ][ "type" ] = "bool";
+			j[ "draw" ][ "x" ] = draw;
+			j[ "mask" ][ "type" ] = "int";
+			j[ "mask" ][ "x" ] = mask;
+			j[ "color" ][ "type" ] = "vec4";
+			j[ "color" ][ "x" ] = color.r;
+			j[ "color" ][ "y" ] = color.g;
+			j[ "color" ][ "z" ] = color.b;
+			j[ "color" ][ "w" ] = color.a;
+			SendUniforms( j );
+			AddToLog( j );
+
+			// dispatch the compute shader
+			BlockDispatch();
+		}
+
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}

@@ -350,6 +350,7 @@ void engine::ShaderCompile () {
 	shaders[ "Cylinder" ] = computeShader( base + "operations/cylinder.cs.glsl" ).shaderHandle;
 	shaders[ "Ellipsoid" ] = computeShader( base + "operations/ellipsoid.cs.glsl" ).shaderHandle;
 	shaders[ "Grid" ] = computeShader( base + "operations/grid.cs.glsl" ).shaderHandle;
+	shaders[ "Sphere" ] = computeShader( base + "operations/sphere.cs.glsl" ).shaderHandle;
 
 	// color adjustments
 	shaders[ "Tonemap" ] = computeShader( base + "tonemap.cs.glsl" ).shaderHandle;
