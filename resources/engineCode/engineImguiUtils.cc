@@ -1045,6 +1045,55 @@ void engine::MenuBlur () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
+		static bool touchAlpha = true;
+		static bool respectMask = false;
+		static int radius = 0;
+
+		ImGui::Text( " " );
+		ImGui::SliderInt( "Radius", &radius, 0, 5 );
+		ImGui::Checkbox( "Touch Alpha", &touchAlpha );
+		ImGui::Checkbox( "Respect Mask", &respectMask );
+		ImGui::Text( " " );
+
+		// type - box / gaussian
+		OrangeText( "Box Kernel" );
+		ImGui::Indent( 16.0f );
+		if ( ImGui::Button( "Box Blur" ) ) {
+			SwapBlocks();
+			bindSets[ "Basic Operation" ].apply();
+			json j;
+			j[ "shader" ] = "Box Blur";
+			j[ "bindset" ] = "Basic Operation";
+			j[ "touchAlpha" ][ "type" ] = "bool";
+			j[ "touchAlpha" ][ "x" ] = touchAlpha;
+			j[ "respectMask" ][ "type" ] = "bool";
+			j[ "respectMask" ][ "x" ] = respectMask;
+			j[ "radius" ][ "type" ] = "int";
+			j[ "radius" ][ "x" ] = radius;
+			SendUniforms( j );
+			AddToLog( j );
+			BlockDispatch();
+		}
+		ImGui::Unindent( 16.0f );
+		OrangeText( "Gaussian Kernel" );
+		ImGui::Indent( 16.0f );
+		if ( ImGui::Button( "Gaussian Blur" ) ) {
+			SwapBlocks();
+			bindSets[ "Basic Operation" ].apply();
+			json j;
+			j[ "shader" ] = "Gaussian Blur";
+			j[ "bindset" ] = "Basic Operation";
+			j[ "touchAlpha" ][ "type" ] = "bool";
+			j[ "touchAlpha" ][ "x" ] = touchAlpha;
+			j[ "respectMask" ][ "type" ] = "bool";
+			j[ "respectMask" ][ "x" ] = respectMask;
+			j[ "radius" ][ "type" ] = "int";
+			j[ "radius" ][ "x" ] = radius;
+			SendUniforms( j );
+			AddToLog( j );
+			BlockDispatch();
+		}
+		ImGui::Unindent( 16.0f );
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}

@@ -20,14 +20,15 @@ void main () {
 	for( int x = -radius; x <= radius; x++ ) {
 		for( int y = -radius; y <= radius; y++ ) {
 			for( int z = -radius; z <= radius; z++ ) {
-				sum += vec4( imageLoad( colorBlockBack, blockLocation + ivec3( x, y, z ) ) );
-				num += 1.0;
+				const float weight = 1.0 - ( distance( vec3( 0.0 ), vec3( x, y, z ) ) );
+				sum += weight * vec4( imageLoad( colorBlockBack, blockLocation + ivec3( x, y, z ) ) );
+				num += weight;
 			}
 		}
 	}
 
 	sum /= num;
-	sum = respectMask ? sum : mix( sum, vec4( previousColor ), float( previousMask ) / 255.0 );
+	sum = respectMask ? mix( sum, vec4( previousColor ), float( previousMask ) / 255.0 ) : sum;
 	sum.a = touchAlpha ? sum.a : float( previousColor.a );
 
 	imageStore( colorBlockFront, blockLocation, uvec4( sum ) );
