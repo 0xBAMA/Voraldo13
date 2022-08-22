@@ -1,5 +1,5 @@
 #version 430
-layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
+layout( local_size_x = 8, local_size_y = 8, local_size_z = 8 ) in;
 layout( binding = 0, rgba8ui ) uniform uimage3D colorBlockFront;
 layout( binding = 1, rgba8ui ) uniform uimage3D colorBlockBack;
 layout( binding = 2, r8ui ) uniform uimage3D maskBlockFront;
@@ -11,11 +11,15 @@ uniform vec4 color;
 uniform bool draw;
 uniform int mask;
 
+bool inBounds ( int x, int lo, int hi ) {
+	return x == clamp( x, lo, hi );
+}
+
 bool inShape () {
 	const ivec3 location = ivec3( gl_GlobalInvocationID.xyz );
-	if ( location.x <= maxCoords.x && location.x >= minCoords.x &&
-		location.y <= maxCoords.y && location.y >= minCoords.y &&
-		location.z <= maxCoords.z && location.z >= minCoords.z ) {
+	if ( inBounds( location.x, minCoords.x, maxCoords.x ) &&
+		inBounds( location.y, minCoords.y, maxCoords.y ) &&
+		inBounds( location.z, minCoords.z, maxCoords.z ) ) {
 		return true;
 	} else {
 		return false;

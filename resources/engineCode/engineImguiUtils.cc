@@ -168,16 +168,14 @@ void TitleText ( const char *string  ) {
 	// TODO: add titles in a different font
 }
 
+void SetPosBottomRightCorner () {
+	ImVec2 windowSize = ImGui::GetWindowSize();
+	ImGui::SetCursorPos( ImVec2( windowSize.x - 150, windowSize.y - 18 ) );
+}
+
 void engine::MenuAABB () {
 	OrangeText( "AABB" );
 	ImGui::BeginTabBar( "aabb" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
-		ImGui::Separator();
-		ImGui::Indent( 16.0f );
-
-		ImGui::Unindent( 16.0f );
-		ImGui::EndTabItem();
-	}
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
@@ -189,17 +187,17 @@ void engine::MenuAABB () {
 		static glm::vec4 color( 0.0f );
 
 		OrangeText( "EXTENTS" );
-		ImGui::SliderInt( " x max", &maxCoords.x, 0, BLOCKDIM );
-		ImGui::SliderInt( " x min", &minCoords.x, 0, BLOCKDIM );
+		ImGui::SliderInt( "Max X", &maxCoords.x, 0, BLOCKDIM );
+		ImGui::SliderInt( "Max Y", &maxCoords.y, 0, BLOCKDIM );
+		ImGui::SliderInt( "Max Z", &maxCoords.z, 0, BLOCKDIM );
 		ImGui::Separator();
-		ImGui::SliderInt( " y max", &maxCoords.y, 0, BLOCKDIM );
-		ImGui::SliderInt( " y min", &minCoords.y, 0, BLOCKDIM );
-		ImGui::Separator();
-		ImGui::SliderInt( " z max", &maxCoords.z, 0, BLOCKDIM );
-		ImGui::SliderInt( " z min", &minCoords.z, 0, BLOCKDIM );
+		ImGui::SliderInt( "Min X", &minCoords.x, 0, BLOCKDIM );
+		ImGui::SliderInt( "Min Y", &minCoords.y, 0, BLOCKDIM );
+		ImGui::SliderInt( "Min Z", &minCoords.z, 0, BLOCKDIM );
 		ColorPickerHelper( draw, mask, color );
 
-		if ( ImGui::Button( "Invoke" ) ) {
+		SetPosBottomRightCorner();
+		if ( ImGui::Button( "Invoke Operation" ) ) {
 			// swap the front/back buffers
 			SwapBlocks();
 
@@ -210,7 +208,7 @@ void engine::MenuAABB () {
 			json j;
 			j[ "shader" ] = "AABB";
 			j[ "bindset" ] = "Basic Operation"; // redundant for now, but relevant for reuse?
-			j[ "mins" ][ "type" ] = "ivec3";
+			j[ "minCoords" ][ "type" ] = "ivec3";
 			j[ "minCoords" ][ "x" ] = minCoords.x;
 			j[ "minCoords" ][ "y" ] = minCoords.y;
 			j[ "minCoords" ][ "z" ] = minCoords.z;
@@ -228,11 +226,20 @@ void engine::MenuAABB () {
 			j[ "color" ][ "z" ] = color.b;
 			j[ "color" ][ "w" ] = color.a;
 			SendUniforms( j );
-			// AddToLog( j );
+			AddToLog( j );
 
 			// dispatch the compute shader
-			glDispatchCompute( BLOCKDIM / 8, BLOCKDIM / 8, BLOCKDIM / 8 );
+			BlockDispatch();
 		}
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		// TODO: DESCRIPTION OF AABB PRIMITIVE
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
@@ -243,17 +250,84 @@ void engine::MenuAABB () {
 void engine::MenuCylinderTube () {
 	OrangeText( "Cylinder/Tube" );
 	ImGui::BeginTabBar( "cylinder/tube" );
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		static glm::vec3 bottomVector ( 0.0f );
+		static glm::vec3 topVector ( 0.0f );
+		static float innerRadius = 0.0f;
+		static float outerRadius = 0.0f;
+		static bool draw = true;
+		static int mask = 0;
+		static glm::vec4 color( 0.0f );
+
+		OrangeText( "Radii" );
+		ImGui::SliderFloat( "Inner", &innerRadius, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Outer", &outerRadius, 0.0f, float( BLOCKDIM ), "%.3f" );
+
+		OrangeText( "Top Point" );
+		ImGui::SliderFloat( "Top X", &topVector.x, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Top Y", &topVector.y, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Top Z", &topVector.z, 0.0f, float( BLOCKDIM ), "%.3f" );
+
+		OrangeText( "Bottom Point" );
+		ImGui::SliderFloat( "Bottom X", &bottomVector.x, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Bottom Y", &bottomVector.y, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Bottom Z", &bottomVector.z, 0.0f, float( BLOCKDIM ), "%.3f" );
+
+		ColorPickerHelper( draw, mask, color );
+
+		SetPosBottomRightCorner();
+		if ( ImGui::Button( "Invoke Operation" ) ) {
+			// swap the front/back buffers
+			SwapBlocks();
+
+			// apply the bindset
+			bindSets[ "Basic Operation" ].apply();
+
+			// send the uniforms
+			json j;
+			j[ "shader" ] = "Cylinder";
+			j[ "bindset" ] = "Basic Operation";
+			j[ "topVector" ][ "type" ] = "vec3";
+			j[ "topVector" ][ "x" ] = topVector.x;
+			j[ "topVector" ][ "y" ] = topVector.y;
+			j[ "topVector" ][ "z" ] = topVector.z;
+			j[ "bottomVector" ][ "type" ] = "vec3";
+			j[ "bottomVector" ][ "x" ] = bottomVector.x;
+			j[ "bottomVector" ][ "y" ] = bottomVector.y;
+			j[ "bottomVector" ][ "z" ] = bottomVector.z;
+			j[ "innerRadius" ][ "type" ] = "float";
+			j[ "innerRadius" ][ "x" ] = innerRadius;
+			j[ "outerRadius" ][ "type" ] = "float";
+			j[ "outerRadius" ][ "x" ] = outerRadius;
+			j[ "draw" ][ "type" ] = "bool";
+			j[ "draw" ][ "x" ] = draw;
+			j[ "mask" ][ "type" ] = "int";
+			j[ "mask" ][ "x" ] = mask;
+			j[ "color" ][ "type" ] = "vec4";
+			j[ "color" ][ "x" ] = color.r;
+			j[ "color" ][ "y" ] = color.g;
+			j[ "color" ][ "z" ] = color.b;
+			j[ "color" ][ "w" ] = color.a;
+			SendUniforms( j );
+			AddToLog( j );
+
+			// dispatch the compute shader
+			BlockDispatch();
+		}
+
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
-		ImGui::Unindent( 16.0f );
-		ImGui::EndTabItem();
-
-	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
-		ImGui::Separator();
-		ImGui::Indent( 16.0f );
+		// TODO: DESCRIPTION OF CYLINDER/TUBE PRIMITIVE
+			// CYLINDER IS A TUBE WITH A ZERO INNER RADIUS
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
@@ -264,7 +338,7 @@ void engine::MenuCylinderTube () {
 void engine::MenuEllipsoid () {
 	OrangeText( "Ellipsoid" );
 	ImGui::BeginTabBar( "ellipsoid" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -272,7 +346,7 @@ void engine::MenuEllipsoid () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -285,7 +359,7 @@ void engine::MenuEllipsoid () {
 void engine::MenuGrid () {
 	OrangeText( "Regular Grid" );
 	ImGui::BeginTabBar( "regular grid" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -293,7 +367,7 @@ void engine::MenuGrid () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -306,7 +380,7 @@ void engine::MenuGrid () {
 void engine::MenuHeightmap () {
 	OrangeText( "Heightmap" );
 	ImGui::BeginTabBar( "heightmap" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -314,7 +388,7 @@ void engine::MenuHeightmap () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -327,7 +401,7 @@ void engine::MenuHeightmap () {
 void engine::MenuIcosahedron () {
 	OrangeText( "Icosahedron" );
 	ImGui::BeginTabBar( "icosahedron" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -335,7 +409,7 @@ void engine::MenuIcosahedron () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -348,7 +422,7 @@ void engine::MenuIcosahedron () {
 void engine::MenuNoise () {
 	OrangeText( "Noise" );
 	ImGui::BeginTabBar( "noise" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -356,7 +430,7 @@ void engine::MenuNoise () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -369,7 +443,7 @@ void engine::MenuNoise () {
 void engine::MenuSphere () {
 	OrangeText( "Sphere" );
 	ImGui::BeginTabBar( "sphere" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -377,7 +451,7 @@ void engine::MenuSphere () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -390,7 +464,7 @@ void engine::MenuSphere () {
 void engine::MenuTriangle () {
 	OrangeText( "Triangle" );
 	ImGui::BeginTabBar( "triangle" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -398,7 +472,7 @@ void engine::MenuTriangle () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -411,7 +485,7 @@ void engine::MenuTriangle () {
 void engine::MenuUserShader () {
 	OrangeText( "User Shader" );
 	ImGui::BeginTabBar( "user shader" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -419,7 +493,7 @@ void engine::MenuUserShader () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -432,7 +506,7 @@ void engine::MenuUserShader () {
 void engine::MenuVAT () {
 	OrangeText( "Voxel Automata Terrain" );
 	ImGui::BeginTabBar( "VAT" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -440,7 +514,7 @@ void engine::MenuVAT () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -453,7 +527,7 @@ void engine::MenuVAT () {
 void engine::MenuSpaceship () {
 	OrangeText( "Spaceship Generator" );
 	ImGui::BeginTabBar( "spaceship generator" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -461,7 +535,7 @@ void engine::MenuSpaceship () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -474,7 +548,7 @@ void engine::MenuSpaceship () {
 void engine::MenuLetters () {
 	OrangeText( "Letters" );
 	ImGui::BeginTabBar( "letters" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -482,7 +556,7 @@ void engine::MenuLetters () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -495,7 +569,7 @@ void engine::MenuLetters () {
 void engine::MenuXOR () {
 	OrangeText( "XOR" );
 	ImGui::BeginTabBar( "xor" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -503,7 +577,7 @@ void engine::MenuXOR () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -516,7 +590,7 @@ void engine::MenuXOR () {
 void engine::MenuClearBlock () {
 	OrangeText( "Clear Block" );
 	ImGui::BeginTabBar( "clear block" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -524,7 +598,7 @@ void engine::MenuClearBlock () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -537,7 +611,7 @@ void engine::MenuClearBlock () {
 void engine::MenuMasking () {
 	OrangeText( "Masking Operations" );
 	ImGui::BeginTabBar( "masking" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -545,7 +619,7 @@ void engine::MenuMasking () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -558,7 +632,7 @@ void engine::MenuMasking () {
 void engine::MenuBlur () {
 	OrangeText( "Blur" );
 	ImGui::BeginTabBar( "blur" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -566,7 +640,7 @@ void engine::MenuBlur () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -579,7 +653,7 @@ void engine::MenuBlur () {
 void engine::MenuShiftTrim () {
 	OrangeText( "Shift/Trim" );
 	ImGui::BeginTabBar( "shift/trim" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -587,7 +661,7 @@ void engine::MenuShiftTrim () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -600,7 +674,7 @@ void engine::MenuShiftTrim () {
 void engine::MenuLoadSave () {
 	OrangeText( "Load/Save" );
 	ImGui::BeginTabBar( "load/save" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -608,7 +682,7 @@ void engine::MenuLoadSave () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -621,7 +695,7 @@ void engine::MenuLoadSave () {
 void engine::MenuLimiterCompressor () {
 	OrangeText( "Limiter/Compressor" );
 	ImGui::BeginTabBar( "limiter/compressor" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -629,7 +703,7 @@ void engine::MenuLimiterCompressor () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -642,7 +716,7 @@ void engine::MenuLimiterCompressor () {
 void engine::MenuCopyPaste () {
 	OrangeText( "Copy/Paste" );
 	ImGui::BeginTabBar( "copy/paste" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -650,7 +724,7 @@ void engine::MenuCopyPaste () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -663,7 +737,7 @@ void engine::MenuCopyPaste () {
 void engine::MenuLogging () {
 	OrangeText( "Logging" );
 	ImGui::BeginTabBar( "logging" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -671,7 +745,7 @@ void engine::MenuLogging () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -745,7 +819,7 @@ void engine::MenuScreenshot () {
 void engine::MenuClearLightLevels () {
 	OrangeText( "Clear Light Levels" );
 	ImGui::BeginTabBar( "light clear" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -753,7 +827,7 @@ void engine::MenuClearLightLevels () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -766,7 +840,7 @@ void engine::MenuClearLightLevels () {
 void engine::MenuPointLight () {
 	OrangeText( "Point Light" );
 	ImGui::BeginTabBar( "point light" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -774,7 +848,7 @@ void engine::MenuPointLight () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -787,7 +861,7 @@ void engine::MenuPointLight () {
 void engine::MenuConeLight () {
 	OrangeText( "Cone Light" );
 	ImGui::BeginTabBar( "cone light" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -795,7 +869,7 @@ void engine::MenuConeLight () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -808,7 +882,7 @@ void engine::MenuConeLight () {
 void engine::MenuDirectionalLight () {
 	OrangeText( "Directional Light" );
 	ImGui::BeginTabBar( "directional light" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -816,7 +890,7 @@ void engine::MenuDirectionalLight () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -829,7 +903,7 @@ void engine::MenuDirectionalLight () {
 void engine::MenuFakeGI () {
 	OrangeText( "Fake Global Illumination" );
 	ImGui::BeginTabBar( "fake gi" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -837,7 +911,7 @@ void engine::MenuFakeGI () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -850,7 +924,7 @@ void engine::MenuFakeGI () {
 void engine::MenuAmbientOcclusion () {
 	OrangeText( "Ambient Occlusion" );
 	ImGui::BeginTabBar( "ao" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -858,7 +932,7 @@ void engine::MenuAmbientOcclusion () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -871,7 +945,7 @@ void engine::MenuAmbientOcclusion () {
 void engine::MenuLightMash () {
 	OrangeText( "Light Mash" );
 	ImGui::BeginTabBar( "light mash" );
-	if ( ImGui::BeginTabItem( " Description " ) ) {
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
@@ -879,7 +953,7 @@ void engine::MenuLightMash () {
 		ImGui::EndTabItem();
 
 	}
-	if ( ImGui::BeginTabItem( " Controls " ) ) {
+	if ( ImGui::BeginTabItem( " Description " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 

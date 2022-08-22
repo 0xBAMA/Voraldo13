@@ -132,7 +132,7 @@ void engine::ImguiPass () {
 	ZoneScoped;
 	ImguiFrameStart();			// start the imgui frame
 
-	// if ( true ) ImGui::ShowDemoWindow();	// show the demo window
+	// ImGui::ShowDemoWindow();	// show the demo window
 
 	// menu container
 	static bool showMenu = true;
@@ -233,6 +233,8 @@ void engine::SwapBlocks () {
 }
 
 void engine::SendUniforms ( json j ) {
+	ZoneScoped;
+
 	// prepare to send
 	GLuint shader = shaders[ j[ "shader" ] ];
 	glUseProgram( shader );
@@ -265,6 +267,16 @@ void engine::SendUniforms ( json j ) {
 			glUniform4f( glGetUniformLocation( shader, label.c_str() ), val[ "x" ], val[ "y" ], val[ "z" ], val[ "w" ] );
 		}
 	}
+}
+
+void engine::AddToLog ( json j ) {
+	// add the operation record to the log
+}
+
+void engine::BlockDispatch () {
+	ZoneScoped;
+	glDispatchCompute( BLOCKDIM / 8, BLOCKDIM / 8, BLOCKDIM / 8 );
+	glMemoryBarrier( GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
 
 // Function to get color temperature from shadertoy user BeRo
