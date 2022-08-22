@@ -353,17 +353,14 @@ void engine::MenuEllipsoid () {
 		ImGui::SliderFloat( "Center X", &center.x, 0.0f, float( BLOCKDIM ), "%.3f" );
 		ImGui::SliderFloat( "Center Y", &center.y, 0.0f, float( BLOCKDIM ), "%.3f" );
 		ImGui::SliderFloat( "Center Z", &center.z, 0.0f, float( BLOCKDIM ), "%.3f" );
-
 		OrangeText( "Rotation" );
 		ImGui::SliderFloat( "Rotation About X", &rotations.x, 0.0f, float( BLOCKDIM ), "%.3f" );
 		ImGui::SliderFloat( "Rotation About Y", &rotations.y, 0.0f, float( BLOCKDIM ), "%.3f" );
 		ImGui::SliderFloat( "Rotation About Z", &rotations.z, 0.0f, float( BLOCKDIM ), "%.3f" );
-
 		OrangeText( "Radii" );
 		ImGui::SliderFloat( "X Radius", &radii.x, 0.0f, float( BLOCKDIM ), "%.3f" );
 		ImGui::SliderFloat( "Y Radius", &radii.y, 0.0f, float( BLOCKDIM ), "%.3f" );
 		ImGui::SliderFloat( "Z Radius", &radii.z, 0.0f, float( BLOCKDIM ), "%.3f" );
-
 		ColorPickerHelper( draw, mask, color );
 
 		SetPosBottomRightCorner();
@@ -427,6 +424,76 @@ void engine::MenuGrid () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
+
+		static glm::ivec3 spacing ( 0 );
+		static glm::ivec3 offsets ( 0 );
+		static glm::ivec3 width ( 0 );
+		static glm::vec3 rotation ( 0.0f );
+		static bool draw = true;
+		static int mask = 0;
+		static glm::vec4 color( 0.0f );
+
+		OrangeText( "Rotation" );
+		ImGui::SliderFloat( "Rotation About X", &rotation.x, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Rotation About Y", &rotation.y, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Rotation About Z", &rotation.z, 0.0f, float( BLOCKDIM ), "%.3f" );
+		OrangeText( "Grid Spacing" );
+		ImGui::SliderInt( "X", &spacing.x, 0, BLOCKDIM );
+		ImGui::SliderInt( "Y", &spacing.y, 0, BLOCKDIM );
+		ImGui::SliderInt( "Z", &spacing.z, 0, BLOCKDIM );
+		OrangeText( "Grid Offset" );
+		ImGui::SliderInt( "X ", &offsets.x, 0, BLOCKDIM );
+		ImGui::SliderInt( "Y ", &offsets.y, 0, BLOCKDIM );
+		ImGui::SliderInt( "Z ", &offsets.z, 0, BLOCKDIM );
+		OrangeText( "Grid Width" );
+		ImGui::SliderInt( "X  ", &width.x, 0, BLOCKDIM );
+		ImGui::SliderInt( "Y  ", &width.y, 0, BLOCKDIM );
+		ImGui::SliderInt( "Z  ", &width.z, 0, BLOCKDIM );
+		ColorPickerHelper( draw, mask, color );
+
+		SetPosBottomRightCorner();
+		if ( ImGui::Button( "Invoke Operation" ) ) {
+			// swap the front/back buffers
+			SwapBlocks();
+
+			// apply the bindset
+			bindSets[ "Basic Operation" ].apply();
+
+			// send the uniforms
+			json j;
+			j[ "shader" ] = "Grid";
+			j[ "bindset" ] = "Basic Operation";
+			j[ "spacing" ][ "type" ] = "ivec3";
+			j[ "spacing" ][ "x" ] = spacing.x;
+			j[ "spacing" ][ "y" ] = spacing.y;
+			j[ "spacing" ][ "z" ] = spacing.z;
+			j[ "offsets" ][ "type" ] = "ivec3";
+			j[ "offsets" ][ "x" ] = offsets.x;
+			j[ "offsets" ][ "y" ] = offsets.y;
+			j[ "offsets" ][ "z" ] = offsets.z;
+			j[ "width" ][ "type" ] = "ivec3";
+			j[ "width" ][ "x" ] = width.x;
+			j[ "width" ][ "y" ] = width.y;
+			j[ "width" ][ "z" ] = width.z;
+			j[ "rotation" ][ "type" ] = "vec3";
+			j[ "rotation" ][ "x" ] = rotation.x;
+			j[ "rotation" ][ "y" ] = rotation.y;
+			j[ "rotation" ][ "z" ] = rotation.z;
+			j[ "draw" ][ "type" ] = "bool";
+			j[ "draw" ][ "x" ] = draw;
+			j[ "mask" ][ "type" ] = "int";
+			j[ "mask" ][ "x" ] = mask;
+			j[ "color" ][ "type" ] = "vec4";
+			j[ "color" ][ "x" ] = color.r;
+			j[ "color" ][ "y" ] = color.g;
+			j[ "color" ][ "z" ] = color.b;
+			j[ "color" ][ "w" ] = color.a;
+			SendUniforms( j );
+			AddToLog( j );
+
+			// dispatch the compute shader
+			BlockDispatch();
+		}
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
