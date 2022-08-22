@@ -895,6 +895,136 @@ void engine::MenuMasking () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
+		static glm::vec4 color;
+		static glm::vec4 variances;
+		static glm::vec3 lightValue;
+		static glm::vec3 lightVariance;
+		static bool useR;
+		static bool useG;
+		static bool useB;
+		static bool useA;
+		static bool useLightR;
+		static bool useLightG;
+		static bool useLightB;
+		static int amount;
+
+		// unmask all
+		ImGui::Text( " " );
+		OrangeText( "Unmask All" );
+		if( ImGui::Button( "Unmask All" ) ) {
+			SwapBlocks();
+			bindSets[ "Basic Operation" ].apply();
+			json j;
+			j[ "shader" ] = "Mask Clear";
+			j[ "bindset" ] = "Basic Operation";
+			SendUniforms( j );
+			AddToLog( j );
+			BlockDispatch();
+		}
+
+		// invert mask
+		ImGui::Text( " " );
+		ImGui::Text( " " );
+		OrangeText( "Invert Mask" );
+		if( ImGui::Button( "Invert Mask" ) ) {
+			SwapBlocks();
+			bindSets[ "Basic Operation" ].apply();
+			json j;
+			j[ "shader" ] = "Mask Invert";
+			j[ "bindset" ] = "Basic Operation";
+			SendUniforms( j );
+			AddToLog( j );
+			BlockDispatch();
+		}
+
+		ImGui::Text( " " );
+		ImGui::Text( " " );
+		OrangeText( "Data Based Masking" );
+		ImGui::Indent( 16.0f );
+		OrangeText( "Color Levels" );
+		ImGui::Unindent( 16.0f );
+		ImGui::ColorEdit4( "Color", ( float * ) &color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
+		ImGui::Separator();
+		ImGui::Checkbox( "Use Red Channel  ", &useR );
+		ImGui::SameLine();
+		ImGui::SliderFloat( "Red Spread", &variances.r, 0, 255 );
+		ImGui::Checkbox( "Use Green Channel", &useG );
+		ImGui::SameLine();
+		ImGui::SliderFloat( "Green Spread", &variances.g, 0, 255 );
+		ImGui::Checkbox( "Use Blue Channel ", &useB );
+		ImGui::SameLine();
+		ImGui::SliderFloat( "Blue Spread", &variances.b, 0, 255 );
+		ImGui::Checkbox( "Use Alpha Channel", &useA );
+		ImGui::SameLine();
+		ImGui::SliderFloat( "Alpha Spread", &variances.a, 0, 255 );
+		ImGui::Indent( 16.0f );
+		OrangeText( "Light Levels" );
+		ImGui::Unindent( 16.0f );
+		ImGui::ColorEdit3( "Light Color", ( float * ) &lightValue );
+		ImGui::Checkbox( "Use Light ( Red )  ", &useLightR );
+		ImGui::SameLine();
+		ImGui::SliderFloat( "Light Spread ( Red )", &lightVariance.r, 0.0f, 1.0f, "%.3f" );
+		ImGui::Checkbox( "Use Light ( Green )", &useLightG );
+		ImGui::SameLine();
+		ImGui::SliderFloat( "Light Spread ( Green )", &lightVariance.g, 0.0f, 1.0f, "%.3f" );
+		ImGui::Checkbox( "Use Light ( Blue ) ", &useLightB );
+		ImGui::SameLine();
+		ImGui::SliderFloat( "Light Spread ( Blue )", &lightVariance.b, 0.0f, 1.0f, "%.3f" );
+		ImGui::Separator();
+		ImGui::SliderInt("Mask Amount", &amount, 0, 255);
+
+		if( ImGui::Button( "Mask By Data" ) ) {
+			// swap the front/back buffers
+			SwapBlocks();
+
+			// apply the bindset
+			bindSets[ "Basic Operation With Lighting" ].apply();
+
+			// send the uniforms
+			json j;
+			j[ "shader" ] = "Data Mask";
+			j[ "bindset" ] = "Basic Operation With Lighting";
+			j[ "useR" ][ "type" ] = "bool";
+			j[ "useR" ][ "x" ] = useR;
+			j[ "useG" ][ "type" ] = "bool";
+			j[ "useG" ][ "x" ] = useG;
+			j[ "useB" ][ "type" ] = "bool";
+			j[ "useB" ][ "x" ] = useB;
+			j[ "useA" ][ "type" ] = "bool";
+			j[ "useA" ][ "x" ] = useA;
+			j[ "useLightR" ][ "type" ] = "bool";
+			j[ "useLightR" ][ "x" ] = useLightR;
+			j[ "useLightG" ][ "type" ] = "bool";
+			j[ "useLightG" ][ "x" ] = useLightG;
+			j[ "useLightB" ][ "type" ] = "bool";
+			j[ "useLightB" ][ "x" ] = useLightB;
+			j[ "variances" ][ "type" ] = "vec4";
+			j[ "variances" ][ "x" ] = variances.r / 255.0;
+			j[ "variances" ][ "y" ] = variances.g / 255.0;
+			j[ "variances" ][ "z" ] = variances.b / 255.0;
+			j[ "variances" ][ "w" ] = variances.a / 255.0;
+			j[ "lightValue" ][ "type" ] = "vec3";
+			j[ "lightValue" ][ "x" ] = lightValue.x;
+			j[ "lightValue" ][ "y" ] = lightValue.y;
+			j[ "lightValue" ][ "z" ] = lightValue.z;
+			j[ "lightVariance" ][ "type" ] = "vec3";
+			j[ "lightVariance" ][ "x" ] = lightVariance.x;
+			j[ "lightVariance" ][ "y" ] = lightVariance.y;
+			j[ "lightVariance" ][ "z" ] = lightVariance.z;
+			j[ "mask" ][ "type" ] = "int";
+			j[ "mask" ][ "x" ] = amount;
+			j[ "color" ][ "type" ] = "vec4";
+			j[ "color" ][ "x" ] = color.r;
+			j[ "color" ][ "y" ] = color.g;
+			j[ "color" ][ "z" ] = color.b;
+			j[ "color" ][ "w" ] = color.a;
+			SendUniforms( j );
+			AddToLog( j );
+
+			// dispatch the compute shader
+			BlockDispatch();
+		}
+
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -1034,7 +1164,7 @@ void engine::MenuScreenshot () {
 	ImGui::Indent( 16.0f );
 
 	ImGui::Text( " " );
-	ImGui::Text( " " );
+	OrangeText( "Accumulator Screenshot" );
 	ImGui::Separator();
 	ImGui::TextWrapped( "Accumulator texture just has the averaged samples. This is before tonemapping, etc, and does not include any filtering. It will be the size of the image buffer times the SSFACTOR on each x and y." );
 	ImGui::Indent( 16.0f );
@@ -1056,6 +1186,7 @@ void engine::MenuScreenshot () {
 
 	ImGui::Text( " " );
 	ImGui::Text( " " );
+	OrangeText( "Postprocessed Screenshot" );
 	ImGui::Separator();
 	ImGui::TextWrapped( "This sets a flag to grab a screenshot out of the display texture after the postprocessing takes place next frame. Because of when this input takes place, the trident and timing text have already been applied, so the point of this is to get it with tonemapping and other postprocessing, but without the widget or timing text. This is sampled at the specified WIDTH and HEIGHT dimensions, without the SSFACTOR applied." );
 	ImGui::Indent( 16.0f );
@@ -1067,6 +1198,7 @@ void engine::MenuScreenshot () {
 
 	ImGui::Text( " " );
 	ImGui::Text( " " );
+	OrangeText( "Backbuffer Screenshot" );
 	ImGui::Separator();
 	ImGui::TextWrapped( "Backbuffer Screenshot gets the image after tonemapping, postprocessing, and application of the trident and timing text. This also includes any linear filtering that is applied when the display texture is sampled into the framebuffer, but does not include any of the ImGui menus, because they will not have been drawn yet." );
 	ImGui::Indent( 16.0f );

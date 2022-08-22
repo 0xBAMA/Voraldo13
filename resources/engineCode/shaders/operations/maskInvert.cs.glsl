@@ -11,5 +11,5 @@ void main () {
 	const uvec4 previousColor = imageLoad( colorBlockBack, blockLocation );
 
 	imageStore( colorBlockFront, blockLocation, previousColor );
-	imageStore( maskBlockFront, blockLocation, uvec4( 0 ) );
+	imageStore( maskBlockFront, blockLocation, uvec4( 255 - previousMask ) );
 }

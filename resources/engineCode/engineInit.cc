@@ -276,8 +276,8 @@ other textures, tbd
 ==============================================================================*/
 
 // configure bindsets
-	// two variants will be required for any that need to switch front and back buffers, since we can't get at
-	// the texture handle after it's in the bindset - use std::swap to switch them when required in SwapBlocks()
+// two variants will be required for any that need to switch front and back buffers, since we can't get at
+// the texture handle after it's in the bindset - use std::swap to switch them when required in SwapBlocks()
 	bindSets[ "Rendering" ] = bindSet( {
 		binding( 0, textures[ "Blue Noise" ], GL_RGBA8UI ),
 		binding( 1, textures[ "Accumulator" ], GL_RGBA16F ),
@@ -311,6 +311,22 @@ other textures, tbd
 		binding( 1, textures[ "Color Block Front" ], GL_RGBA8UI ),
 		binding( 2, textures[ "Mask Block Back" ], GL_R8UI ),
 		binding( 3, textures[ "Mask Block Front" ], GL_R8UI )
+	} );
+
+	bindSets[ "Basic Operation With Lighting" ] = bindSet( {
+		binding( 0, textures[ "Color Block Front" ], GL_RGBA8UI ),
+		binding( 1, textures[ "Color Block Back" ], GL_RGBA8UI ),
+		binding( 2, textures[ "Mask Block Front" ], GL_R8UI ),
+		binding( 3, textures[ "Mask Block Back" ], GL_R8UI ),
+		binding( 4, textures[ "Lighting Block" ], GL_RGBA16F )
+	} );
+
+	bindSets[ "Basic Operation With Lighting Back Set" ] = bindSet( {
+		binding( 0, textures[ "Color Block Back" ], GL_RGBA8UI ),
+		binding( 1, textures[ "Color Block Front" ], GL_RGBA8UI ),
+		binding( 2, textures[ "Mask Block Back" ], GL_R8UI ),
+		binding( 3, textures[ "Mask Block Front" ], GL_R8UI ),
+		binding( 4, textures[ "Lighting Block" ], GL_RGBA16F )
 	} );
 
 	// bindSets[ "Lighting Operation" ] = bindSet( {
@@ -349,8 +365,11 @@ void engine::ShaderCompile () {
 	shaders[ "AABB" ] = computeShader( base + "operations/AABB.cs.glsl" ).shaderHandle;
 	shaders[ "Clear" ] = computeShader( base + "operations/clear.cs.glsl" ).shaderHandle;
 	shaders[ "Cylinder" ] = computeShader( base + "operations/cylinder.cs.glsl" ).shaderHandle;
+	shaders[ "Data Mask" ] = computeShader( base + "operations/dataMask.cs.glsl" ).shaderHandle;
 	shaders[ "Ellipsoid" ] = computeShader( base + "operations/ellipsoid.cs.glsl" ).shaderHandle;
 	shaders[ "Grid" ] = computeShader( base + "operations/grid.cs.glsl" ).shaderHandle;
+	shaders[ "Mask Invert" ] = computeShader( base + "operations/maskInvert.cs.glsl" ).shaderHandle;
+	shaders[ "Mask Clear" ] = computeShader( base + "operations/maskClear.cs.glsl" ).shaderHandle;
 	shaders[ "Sphere" ] = computeShader( base + "operations/sphere.cs.glsl" ).shaderHandle;
 	shaders[ "Triangle" ] = computeShader( base + "operations/triangle.cs.glsl" ).shaderHandle;
 

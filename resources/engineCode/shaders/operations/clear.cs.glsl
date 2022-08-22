@@ -10,17 +10,13 @@ uniform vec4 color;
 uniform bool draw;
 uniform int mask;
 
-// todo: respect mask is obvious
-// draw determines if we fill with the input color, ( 0,0,0,0 ) otherwise - blending logic will be respected if both are true
-// mask input works the same as any other operation
-
 void main () {
 	const ivec3 blockLocation = ivec3( gl_GlobalInvocationID.xyz );
 	const uint previousMask = imageLoad( maskBlockBack, blockLocation ).x;
 	const uvec4 previousColor = imageLoad( colorBlockBack, blockLocation );
 
 	if ( previousMask > 0 && respectMask ) {
-		uvec4 blendedColor = uvec4( ( mix( color, draw ? ( vec4( previousColor ) / 255.0 ) : vec4( 0.0 ), float( previousMask ) / 255.0 ) ) * 255.0 );
+		uvec4 blendedColor = uvec4( ( mix( draw ? color : vec4( 0.0 ), ( vec4( previousColor ) / 255.0 ), float( previousMask ) / 255.0 ) ) * 255.0 );
 		imageStore( colorBlockFront, blockLocation, blendedColor );
 		imageStore( maskBlockFront, blockLocation, uvec4( max( uint( mask ), previousMask ) ) );
 	} else if ( draw ) {

@@ -227,6 +227,7 @@ void engine::SwapBlocks () {
 	// role of front/back to make sure the state is correct
 	std::swap( bindSets[ "Rendering" ], bindSets[ "Rendering Back Set" ] );
 	std::swap( bindSets[ "Basic Operation" ], bindSets[ "Basic Operation Back Set" ] );
+	std::swap( bindSets[ "Basic Operation With Lighting" ], bindSets[ "Basic Operation With Lighting Back Set" ] );
 	std::swap( bindSets[ "Lighting Operation" ], bindSets[ "Lighting Operation Back Set" ] );
 	std::swap( textures[ "Color Block Front" ], textures[ "Color Block Back" ] ); // for mipmap gen
 	// ...
