@@ -643,6 +643,75 @@ void engine::MenuTriangle () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
+		static glm::vec3 point1 ( 0.0f );
+		static glm::vec3 point2 ( 0.0f );
+		static glm::vec3 point3 ( 0.0f );
+		static float thickness ( 0.0f );
+		static bool draw = true;
+		static int mask = 0;
+		static glm::vec4 color( 0.0f );
+
+		OrangeText( "Point 1" );
+		ImGui::SliderFloat( "X1", &point1.x, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Y1", &point1.y, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Z1", &point1.z, 0.0f, float( BLOCKDIM ), "%.3f" );
+
+		OrangeText( "Point 2" );
+		ImGui::SliderFloat( "X2", &point2.x, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Y2", &point2.y, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Z2", &point2.z, 0.0f, float( BLOCKDIM ), "%.3f" );
+
+		OrangeText( "Point 3" );
+		ImGui::SliderFloat( "X3", &point3.x, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Y3", &point3.y, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Z3", &point3.z, 0.0f, float( BLOCKDIM ), "%.3f" );
+
+		OrangeText( "Thickness" );
+		ImGui::SliderFloat( "Thickness", &thickness, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ColorPickerHelper( draw, mask, color );
+
+		SetPosBottomRightCorner();
+		if ( ImGui::Button( "Invoke Operation" ) ) {
+			// swap the front/back buffers
+			SwapBlocks();
+
+			// apply the bindset
+			bindSets[ "Basic Operation" ].apply();
+
+			// send the uniforms
+			json j;
+			j[ "shader" ] = "Triangle";
+			j[ "bindset" ] = "Basic Operation";
+			j[ "point1" ][ "type" ] = "vec3";
+			j[ "point1" ][ "x" ] = point1.x;
+			j[ "point1" ][ "y" ] = point1.y;
+			j[ "point1" ][ "z" ] = point1.z;
+			j[ "point2" ][ "type" ] = "vec3";
+			j[ "point2" ][ "x" ] = point2.x;
+			j[ "point2" ][ "y" ] = point2.y;
+			j[ "point2" ][ "z" ] = point2.z;
+			j[ "point3" ][ "type" ] = "vec3";
+			j[ "point3" ][ "x" ] = point3.x;
+			j[ "point3" ][ "y" ] = point3.y;
+			j[ "point3" ][ "z" ] = point3.z;
+			j[ "thickness" ][ "type" ] = "float";
+			j[ "thickness" ][ "x" ] = thickness;
+			j[ "draw" ][ "type" ] = "bool";
+			j[ "draw" ][ "x" ] = draw;
+			j[ "mask" ][ "type" ] = "int";
+			j[ "mask" ][ "x" ] = mask;
+			j[ "color" ][ "type" ] = "vec4";
+			j[ "color" ][ "x" ] = color.r;
+			j[ "color" ][ "y" ] = color.g;
+			j[ "color" ][ "z" ] = color.b;
+			j[ "color" ][ "w" ] = color.a;
+			SendUniforms( j );
+			AddToLog( j );
+
+			// dispatch the compute shader
+			BlockDispatch();
+		}
+
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
