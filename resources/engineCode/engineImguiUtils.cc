@@ -1661,23 +1661,24 @@ void engine::MenuApplicationSettings() {
 }
 
 void engine::MenuRenderingSettings () {
-
+	bool reset = false; // tracking whether any of these have updated
 	OrangeText( " Rendering Settings" );
 	ImGui::Separator();
 	ImGui::Indent( 16.0f );
 	ImGui::ColorEdit4( "Clear Color", (float *) &render.clearColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf );
-	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
+	reset = reset || ImGui::IsItemEdited();
 	ImGui::Text( " " );
 
 	ImGui::SliderFloat( "Alpha Correction Power", &render.alphaCorrectionPower, 0.0f, 4.0f );
-	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
+	reset = reset || ImGui::IsItemEdited();
 	ImGui::SliderFloat( "Jitter Amount", &render.jitterAmount, 0.0f, 20.0f, "%.2f", ImGuiSliderFlags_Logarithmic );
-	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
+	reset = reset || ImGui::IsItemEdited();
 	ImGui::SliderFloat( "Perspective", &render.perspective, -2.0f, 4.0f );
-	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
+	reset = reset || ImGui::IsItemEdited();
 	ImGui::SliderFloat( "Scale", &render.scaleFactor, 0.0f, 40.0f );
-	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
+	reset = reset || ImGui::IsItemEdited();
 	ImGui::SliderInt( "Max Volume Steps", &render.volumeSteps, 0, 1400 );
+	reset = reset || ImGui::IsItemEdited();
 	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
 
 	ImGui::Text( " " );
@@ -1698,15 +1699,17 @@ void engine::MenuRenderingSettings () {
 	ImGui::Combo( "Render Mode", &currentlySelectedRenderMode, renderModeList, IM_ARRAYSIZE( renderModeList ) );
 	if ( ImGui::IsItemEdited() ) { // updated, need to do the appropriate setup
 		// ref the shaders[] map with the render mode label
+		// shaders[ "Renderer" ] = shaders[ std::string( renderModeList[ currentlySelectedRenderMode ] ) ];
 		// cout << renderModeList[ currentlySelectedRenderMode ] << endl;
 	}
 
 
 	// picker for render mode shader
 	ImGui::SliderFloat( "Blend Factor", &render.blendFactor, 0.0f, 1.0f );
-	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
+	reset = reset || ImGui::IsItemEdited();
 	ImGui::SliderInt( "History Frames", &render.numFramesHistory, 0, 14 );
-	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
+	reset = reset || ImGui::IsItemEdited();
+	if( reset ) render.framesSinceLastInput = 0;
 
 	ImGui::Unindent( 16.0f );
 }
