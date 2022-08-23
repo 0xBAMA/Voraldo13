@@ -330,21 +330,26 @@ other textures, tbd
 		binding( 4, textures[ "Lighting Block" ], GL_RGBA16F )
 	} );
 
-	// bindSets[ "Lighting Operation" ] = bindSet( {
-		// front block ( color )
-		// light block
-		// blue noise? is this used/would it help?
-		// ...
-	// } );
+	bindSets[ "Lighting Operation" ] = bindSet( {
+		binding( 0, textures[ "Color Block Back" ], GL_RGBA8UI ),
+		binding( 1, textures[ "Color Block Front" ], GL_RGBA8UI ),
+		binding( 2, textures[ "Mask Block Back" ], GL_R8UI ),
+		binding( 3, textures[ "Mask Block Front" ], GL_R8UI ),
+		binding( 4, textures[ "Lighting Block" ], GL_RGBA16F ),
+		binding( 5, textures[ "Blue Noise" ], GL_RGBA8UI )
+	} );
 
-	// bindSets[ "Lighting Operation Back Set" ] = bindSet( {
-		// front block ( color )
-		// light block
-		// blue noise? is this used/would it help?
-		// ...
-	// } );
+	bindSets[ "Lighting Operation Back Set" ] = bindSet( {
+		binding( 0, textures[ "Color Block Front" ], GL_RGBA8UI ),
+		binding( 1, textures[ "Color Block Back" ], GL_RGBA8UI ),
+		binding( 2, textures[ "Mask Block Front" ], GL_R8UI ),
+		binding( 3, textures[ "Mask Block Back" ], GL_R8UI ),
+		binding( 4, textures[ "Lighting Block" ], GL_RGBA16F ),
+		binding( 5, textures[ "Blue Noise" ], GL_RGBA8UI )
+	} );
 
 	// other sets - some operations will reqiure a different configuration
+		// heightmap needs heightmap
 
 	cout << T_GREEN << "done." << T_RED << " ( " << Tock() << " us )" << RESET << endl;
 }
@@ -371,6 +376,7 @@ void engine::ShaderCompile () {
 	shaders[ "Data Mask" ] = computeShader( base + "operations/dataMask.cs.glsl" ).shaderHandle;
 	shaders[ "Ellipsoid" ] = computeShader( base + "operations/ellipsoid.cs.glsl" ).shaderHandle;
 	shaders[ "Grid" ] = computeShader( base + "operations/grid.cs.glsl" ).shaderHandle;
+	shaders[ "Light Clear" ] = computeShader( base + "lighting/clear.cs.glsl" ).shaderHandle;
 	shaders[ "Mask Invert" ] = computeShader( base + "operations/maskInvert.cs.glsl" ).shaderHandle;
 	shaders[ "Mask Clear" ] = computeShader( base + "operations/maskClear.cs.glsl" ).shaderHandle;
 	shaders[ "Sphere" ] = computeShader( base + "operations/sphere.cs.glsl" ).shaderHandle;

@@ -1306,6 +1306,26 @@ void engine::MenuClearLightLevels () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
+		static glm::vec4 color;
+
+		ImGui::ColorEdit3( "Light Color", ( float * ) &color );
+		ImGui::SliderFloat( "Intensity Scalar", &color.a, 0.0f, 5.0f );
+
+		if ( ImGui::Button( "Clear Levels" ) ) {
+			render.framesSinceLastInput = 0; // no swap, but will require a renderer refresh
+			bindSets[ "Lighting Operation" ].apply();
+			json j;
+			j[ "shader" ] = "Light Clear";
+			j[ "bindset" ] = "Lighting Operation";
+			j[ "color" ][ "type" ] = "vec4";
+			j[ "color" ][ "x" ] = color.r;
+			j[ "color" ][ "y" ] = color.g;
+			j[ "color" ][ "z" ] = color.b;
+			j[ "color" ][ "w" ] = color.a;
+			SendUniforms( j );
+			AddToLog( j );
+			BlockDispatch();
+		}
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
