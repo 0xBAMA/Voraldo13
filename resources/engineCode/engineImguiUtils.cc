@@ -1252,12 +1252,29 @@ void engine::MenuLoadSave () {
 		}
 
 		OrangeText( "Files In Saves Folder" );
-		static int listboxSelected = 1;
+		static int listboxSelected = 0;
 		ImGui::ListBox( " ", &listboxSelected, listboxItems, i, 24 );
 
 		static bool respectMask = false;
 		if ( ImGui::Button( " Load " ) ) {
-			// load it
+			Image loadedImage( savesList[ listboxSelected ] );
+
+			// buffer to the loadbuffer
+			glBindTexture( GL_TEXTURE_3D, textures[ "LoadBuffer" ] );
+			glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &loadedImage.data.data()[ 0 ] );
+
+			// call the copyLoadbuffer shader
+			SwapBlocks();
+			bindSets[ "LoadBuffer" ].apply();
+			json j;
+			j[ "shader" ] = "Load";
+			j[ "bindset" ] = "LoadBuffer";
+			j[ "respectMask" ][ "type" ] = "bool";
+			j[ "respectMask" ][ "x" ] = respectMask;
+			SendUniforms( j );
+			AddToLog( j );
+			cout << j << endl;
+			BlockDispatch();
 		}
 		ImGui::SameLine();
 		ImGui::Checkbox( " Respect Mask on Load", &respectMask );

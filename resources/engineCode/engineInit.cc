@@ -266,7 +266,7 @@ void engine::SetupTextures () {
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT );
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT );
 	glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &zeroes.data()[ 0 ] );
-	textures[ "Loadbuffer" ] = loadBuffer;
+	textures[ "LoadBuffer" ] = loadBuffer;
 
 /*==============================================================================
 other textures, tbd
@@ -278,6 +278,7 @@ other textures, tbd
 // configure bindsets
 // two variants will be required for any that need to switch front and back buffers, since we can't get at
 // the texture handle after it's in the bindset - use std::swap to switch them when required in SwapBlocks()
+	// it's a little bit of a mess here, but easy to use
 	bindSets[ "Rendering" ] = bindSet( {
 		binding( 0, textures[ "Blue Noise" ], GL_RGBA8UI ),
 		binding( 1, textures[ "Accumulator" ], GL_RGBA16F ),
@@ -311,6 +312,22 @@ other textures, tbd
 		binding( 1, textures[ "Color Block Front" ], GL_RGBA8UI ),
 		binding( 2, textures[ "Mask Block Back" ], GL_R8UI ),
 		binding( 3, textures[ "Mask Block Front" ], GL_R8UI )
+	} );
+
+	bindSets[ "LoadBuffer" ] = bindSet( {
+		binding( 0, textures[ "Color Block Front" ], GL_RGBA8UI ),
+		binding( 1, textures[ "Color Block Back" ], GL_RGBA8UI ),
+		binding( 2, textures[ "Mask Block Front" ], GL_R8UI ),
+		binding( 3, textures[ "Mask Block Back" ], GL_R8UI ),
+		binding( 4, textures[ "LoadBuffer" ], GL_RGBA8UI )
+	} );
+
+	bindSets[ "LoadBuffer Back Set" ] = bindSet( {
+		binding( 0, textures[ "Color Block Back" ], GL_RGBA8UI ),
+		binding( 1, textures[ "Color Block Front" ], GL_RGBA8UI ),
+		binding( 2, textures[ "Mask Block Back" ], GL_R8UI ),
+		binding( 3, textures[ "Mask Block Front" ], GL_R8UI ),
+		binding( 4, textures[ "LoadBuffer" ], GL_RGBA8UI )
 	} );
 
 // this pair is for the data masking
@@ -348,6 +365,8 @@ other textures, tbd
 		binding( 5, textures[ "Blue Noise" ], GL_RGBA8UI )
 	} );
 
+
+
 	// other sets - some operations will reqiure a different configuration
 		// heightmap needs heightmap
 
@@ -383,6 +402,7 @@ void engine::ShaderCompile () {
 	shaders[ "Grid" ] = computeShader( base + "operations/grid.cs.glsl" ).shaderHandle;
 	shaders[ "Light Clear" ] = computeShader( base + "lighting/clear.cs.glsl" ).shaderHandle;
 	shaders[ "Light Mash" ] = computeShader( base + "lighting/mash.cs.glsl" ).shaderHandle;
+	shaders[ "Load" ] = computeShader( base + "operations/load.cs.glsl" ).shaderHandle;
 	shaders[ "Mask Invert" ] = computeShader( base + "operations/maskInvert.cs.glsl" ).shaderHandle;
 	shaders[ "Mask Clear" ] = computeShader( base + "operations/maskClear.cs.glsl" ).shaderHandle;
 	shaders[ "Shift" ] = computeShader( base + "operations/shift.cs.glsl" ).shaderHandle;

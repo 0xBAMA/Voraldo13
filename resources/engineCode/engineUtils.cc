@@ -244,6 +244,7 @@ void engine::SwapBlocks () {
 
 	std::swap( bindSets[ "Rendering" ], bindSets[ "Rendering Back Set" ] );
 	std::swap( bindSets[ "Basic Operation" ], bindSets[ "Basic Operation Back Set" ] );
+	std::swap( bindSets[ "LoadBuffer" ], bindSets[ "LoadBuffer Back Set" ] );
 	std::swap( bindSets[ "Basic Operation With Lighting" ], bindSets[ "Basic Operation With Lighting Back Set" ] );
 	std::swap( bindSets[ "Lighting Operation" ], bindSets[ "Lighting Operation Back Set" ] );
 
