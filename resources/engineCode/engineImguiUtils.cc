@@ -1257,7 +1257,7 @@ void engine::MenuLoadSave () {
 
 		static bool respectMask = false;
 		if ( ImGui::Button( " Load " ) ) {
-			Image loadedImage( savesList[ listboxSelected ] );
+			Image loadedImage( savesList[ listboxSelected ], LODEPNG );
 
 			// buffer to the loadbuffer
 			glBindTexture( GL_TEXTURE_3D, textures[ "LoadBuffer" ] );
@@ -1292,6 +1292,13 @@ void engine::MenuLoadSave () {
 			}
 
 			// blahblah save it
+			std::vector<uint8_t> bytesToSave;
+			bytesToSave.resize( BLOCKDIM * BLOCKDIM * BLOCKDIM * 4 );
+			glBindTexture( GL_TEXTURE_3D, textures[ "Color Block Front" ] );
+			glGetTexImage( GL_TEXTURE_3D, 0, GL_RGBA, GL_UNSIGNED_BYTE, &bytesToSave[ 0 ] );
+
+			Image saveImage( BLOCKDIM, BLOCKDIM * BLOCKDIM, &bytesToSave.data()[ 0 ] );
+			saveImage.Save( "saves/" + saveString, LODEPNG );
 
 			// get the list with this included
 			updateSavesList();
