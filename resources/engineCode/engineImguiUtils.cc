@@ -1667,6 +1667,8 @@ void engine::MenuRenderingSettings () {
 	ImGui::Indent( 16.0f );
 	ImGui::ColorEdit4( "Clear Color", (float *) &render.clearColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf );
 	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
+	ImGui::Text( " " );
+
 	ImGui::SliderFloat( "Alpha Correction Power", &render.alphaCorrectionPower, 0.0f, 4.0f );
 	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
 	ImGui::SliderFloat( "Jitter Amount", &render.jitterAmount, 0.0f, 20.0f, "%.2f", ImGuiSliderFlags_Logarithmic );
@@ -1675,15 +1677,34 @@ void engine::MenuRenderingSettings () {
 	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
 	ImGui::SliderFloat( "Scale", &render.scaleFactor, 0.0f, 40.0f );
 	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
-	ImGui::SliderFloat( "Blend Factor", &render.blendFactor, 0.0f, 1.0f );
-	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
-	ImGui::SliderInt( "Volume Steps", &render.volumeSteps, 0, 1400 );
+	ImGui::SliderInt( "Max Volume Steps", &render.volumeSteps, 0, 1400 );
 	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
 
-	// render mode - then set what shaders[ "Raymarch" ] points to
-		// this will take a little more infrastructure work
+	ImGui::Text( " " );
+
+	// render mode - then set what shaders[ "Renderer" ] points to
+	// need to switch - store the result to the map
+	static int currentlySelectedRenderMode = 0;
+	const char* renderModeList[] = {
+		"Image3D Raymarch",
+		"TODO: Texture Raymarch ( Nearest )",
+		"TODO: Texture Raymarch ( Mipmapped )",
+		"TODO: Depth Visualization",
+		"TODO: Position Visualization",
+		"TODO: 3D DDA"
+		// spherical camera here? or as an input toggle - want to try it one way or the other
+	};
+
+	ImGui::Combo( "Render Mode", &currentlySelectedRenderMode, renderModeList, IM_ARRAYSIZE( renderModeList ) );
+	if ( ImGui::IsItemEdited() ) { // updated, need to do the appropriate setup
+		// ref the shaders[] map with the render mode label
+		// cout << renderModeList[ currentlySelectedRenderMode ] << endl;
+	}
+
 
 	// picker for render mode shader
+	ImGui::SliderFloat( "Blend Factor", &render.blendFactor, 0.0f, 1.0f );
+	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
 	ImGui::SliderInt( "History Frames", &render.numFramesHistory, 0, 14 );
 	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
 

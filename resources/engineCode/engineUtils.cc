@@ -31,7 +31,7 @@ void engine::ComputePasses () {
 
 void engine::SendRaymarchParameters () {
 	ZoneScoped;
-	const GLuint shader = shaders[ "Raymarch" ];
+	const GLuint shader = shaders[ "Renderer" ];
 	const glm::mat3 inverseBasisMat = inverse( glm::mat3( -trident.basisX, -trident.basisY, -trident.basisZ ) );
 	glUniformMatrix3fv( glGetUniformLocation( shader, "invBasis" ), 1, false, glm::value_ptr( inverseBasisMat ) );
 	glUniform1f( glGetUniformLocation( shader, "scale" ), -render.scaleFactor );
@@ -51,7 +51,7 @@ void engine::Raymarch () {
 	if ( render.framesSinceLastInput <= ( uint32_t ) render.numFramesHistory ) {
 
 		bindSets[ "Rendering" ].apply();
-		glUseProgram( shaders[ "Raymarch" ] );
+		glUseProgram( shaders[ "Renderer" ] );
 		SendRaymarchParameters();
 
 		static std::random_device r;
@@ -65,8 +65,8 @@ void engine::Raymarch () {
 		constexpr int t = TILESIZE;
 		for ( int x = 0; x < w; x += t ) {
 			for ( int y = 0; y < h; y += t ) {
-				glUniform2i( glGetUniformLocation( shaders[ "Raymarch" ], "noiseOffset"), dist( gen ), dist( gen ) );
-				glUniform2i( glGetUniformLocation( shaders[ "Raymarch" ], "tileOffset"), x, y );
+				glUniform2i( glGetUniformLocation( shaders[ "Renderer" ], "noiseOffset" ), dist( gen ), dist( gen ) );
+				glUniform2i( glGetUniformLocation( shaders[ "Renderer" ], "tileOffset" ), x, y );
 				glDispatchCompute( t / 16, t / 16, 1 );
 			}
 		}

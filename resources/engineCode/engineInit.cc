@@ -385,10 +385,10 @@ void engine::ShaderCompile () {
 	const string base( "resources/engineCode/shaders/" );
 
 	// main display blit
-	shaders[ "Display" ] = regularShader( base + "blit.vs.glsl", base + "blit.fs.glsl" ).shaderHandle;
+	shaders[ "Display" ] = regularShader( base + "renderers/blit.vs.glsl", base + "renderers/blit.fs.glsl" ).shaderHandle;
 
 	// something to put data in the accumulator texture
-	shaders[ "Dummy Draw" ] = computeShader( base + "dummyDraw.cs.glsl" ).shaderHandle;
+	shaders[ "Dummy Draw" ] = computeShader( base + "renderers/dummyDraw.cs.glsl" ).shaderHandle;
 
 	// operations
 	shaders[ "AABB" ] = computeShader( base + "operations/AABB.cs.glsl" ).shaderHandle;
@@ -413,8 +413,9 @@ void engine::ShaderCompile () {
 	// color adjustments
 	shaders[ "Tonemap" ] = computeShader( base + "tonemap.cs.glsl" ).shaderHandle;
 
-	// basic image based raymarch
-	shaders[ "Raymarch" ] = computeShader( base + "raymarch.cs.glsl" ).shaderHandle;
+	// renderers
+	shaders[ "Image3D Raymarch" ] = computeShader( base + "renderers/raymarch.cs.glsl" ).shaderHandle;
+	shaders[ "Renderer" ] = shaders[ "Image3D Raymarch" ]; // default
 
 	// initialize the text renderer
 	shaders[ "Font Renderer" ] = computeShader( "resources/fonts/fontRenderer/font.cs.glsl" ).shaderHandle;
