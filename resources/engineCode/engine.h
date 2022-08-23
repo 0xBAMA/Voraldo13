@@ -124,7 +124,13 @@ private:
 	bool hasEnding ( std::string fullString, std::string ending );
 	bool hasPNG ( std::string filename );
 
-
+	// json adder helper functions
+	void AddBool ( json& j, string label, bool value );
+	void AddInt ( json& j, string label, int value );
+	void AddFloat ( json& j, string label, float value );
+	void AddIvec3 ( json& j, string label, glm::ivec3 value );
+	void AddVec3 ( json& j, string label, glm::vec3 value );
+	void AddVec4 ( json& j, string label, glm::vec4 value );
 
 //==============================================================================
 	// shutdown procedures

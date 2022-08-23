@@ -251,43 +251,6 @@ void engine::SwapBlocks () {
 	std::swap( textures[ "Color Block Front" ], textures[ "Color Block Back" ] ); // for mipmap gen
 }
 
-void engine::SendUniforms ( json j ) {
-	ZoneScoped;
-
-	// prepare to send
-	GLuint shader = shaders[ j[ "shader" ] ];
-	glUseProgram( shader );
-
-	// iterate through the entries
-	for ( auto& element : j.items() ) {
-
-		// name of the operation, or name of the shader
-		string label( element.key() );
-
-		// the type of the uniform - "null" is a special value for the shader label + bindset
-		string type( label == "shader" || label == "bindset" ? "null" : element.value()[ "type" ] );
-
-		// shortens references
-		json val = element.value();
-
-		if ( type == "null" ) {
-			continue;
-		} else if ( type == "bool" ) {
-			glUniform1i( glGetUniformLocation( shader, label.c_str() ), val[ "x" ].get<bool>() );
-		} else if ( type == "int" ) {
-			glUniform1i( glGetUniformLocation( shader, label.c_str() ), val[ "x" ] );
-		} else if ( type == "float" ) {
-			glUniform1f( glGetUniformLocation( shader, label.c_str() ), val[ "x" ] );
-		} else if ( type == "ivec3" ) {
-			glUniform3i( glGetUniformLocation( shader, label.c_str() ), val[ "x" ], val[ "y" ], val[ "z" ] );
-		} else if ( type == "vec3" ) {
-			glUniform3f( glGetUniformLocation( shader, label.c_str() ), val[ "x" ], val[ "y" ], val[ "z" ] );
-		} else if ( type == "vec4" ) {
-			glUniform4f( glGetUniformLocation( shader, label.c_str() ), val[ "x" ], val[ "y" ], val[ "z" ], val[ "w" ] );
-		}
-	}
-}
-
 void engine::AddToLog ( json j ) {
 	// add the operation record to the log
 }
@@ -299,15 +262,15 @@ void engine::BlockDispatch () {
 	render.framesSinceLastInput = 0;
 }
 
-// Function to get color temperature from shadertoy user BeRo
-// from the author:
-//   Color temperature (sRGB) stuff
-//   Copyright (C) 2014 by Benjamin 'BeRo' Rosseaux
-//   Because the german law knows no public domain in the usual sense,
-//   this code is licensed under the CC0 license
-//   http://creativecommons.org/publicdomain/zero/1.0/
-// Valid from 1000 to 40000 K (and additionally 0 for pure full white)
 glm::vec3 engine::GetColorForTemperature ( float temperature ) {
+	// Function to get color temperature from shadertoy user BeRo
+	// from the author:
+	//   Color temperature (sRGB) stuff
+	//   Copyright (C) 2014 by Benjamin 'BeRo' Rosseaux
+	//   Because the german law knows no public domain in the usual sense,
+	//   this code is licensed under the CC0 license
+	//   http://creativecommons.org/publicdomain/zero/1.0/
+	// Valid from 1000 to 40000 K (and additionally 0 for pure full white)
 	// Values from:
 	// http://blenderartists.org/forum/showthread.php?270332-OSL-Goodness&p=2268693&viewfull=1#post2268693
 	glm::mat3 m = ( temperature <= 6500.0f )
@@ -362,4 +325,78 @@ void engine::updateSavesList () {
 	std::filesystem::directory_iterator end;
 	std::transform( start, end, std::back_inserter( savesList ), pathLeafString() );
 	std::sort( savesList.begin(), savesList.end() ); // sort these alphabetically
+}
+
+void engine::AddBool ( json& j, string label, bool value ) {
+	j[ label.c_str() ][ "type" ] = "bool";
+	j[ label.c_str() ][ "x" ] = value;
+}
+
+void engine::AddInt ( json& j, string label, int value ) {
+	j[ label.c_str() ][ "type" ] = "int";
+	j[ label.c_str() ][ "x" ] = value;
+}
+
+void engine::AddFloat ( json& j, string label, float value ) {
+	j[ label.c_str() ][ "type" ] = "float";
+	j[ label.c_str() ][ "x" ] = value;
+}
+
+void engine::AddIvec3 ( json& j, string label, glm::ivec3 value ) {
+	j[ label.c_str() ][ "type" ] = "ivec3";
+	j[ label.c_str() ][ "x" ] = value.x;
+	j[ label.c_str() ][ "y" ] = value.y;
+	j[ label.c_str() ][ "z" ] = value.z;
+}
+
+void engine::AddVec3 ( json& j, string label, glm::vec3 value ) {
+	j[ label.c_str() ][ "type" ] = "vec3";
+	j[ label.c_str() ][ "x" ] = value.x;
+	j[ label.c_str() ][ "y" ] = value.y;
+	j[ label.c_str() ][ "z" ] = value.z;
+}
+
+void engine::AddVec4 ( json& j, string label, glm::vec4 value ) {
+	j[ label.c_str() ][ "type" ] = "vec4";
+	j[ label.c_str() ][ "x" ] = value.x;
+	j[ label.c_str() ][ "y" ] = value.y;
+	j[ label.c_str() ][ "z" ] = value.z;
+	j[ label.c_str() ][ "w" ] = value.w;
+}
+
+void engine::SendUniforms ( json j ) {
+	ZoneScoped;
+
+	// prepare to send
+	GLuint shader = shaders[ j[ "shader" ] ];
+	glUseProgram( shader );
+
+	// iterate through the entries
+	for ( auto& element : j.items() ) {
+
+		// name of the operation, or name of the shader
+		string label( element.key() );
+
+		// the type of the uniform - "null" is a special value for the shader label + bindset
+		string type( label == "shader" || label == "bindset" ? "null" : element.value()[ "type" ] );
+
+		// shortens references
+		json val = element.value();
+
+		if ( type == "null" ) {
+			continue;
+		} else if ( type == "bool" ) {
+			glUniform1i( glGetUniformLocation( shader, label.c_str() ), val[ "x" ].get<bool>() );
+		} else if ( type == "int" ) {
+			glUniform1i( glGetUniformLocation( shader, label.c_str() ), val[ "x" ] );
+		} else if ( type == "float" ) {
+			glUniform1f( glGetUniformLocation( shader, label.c_str() ), val[ "x" ] );
+		} else if ( type == "ivec3" ) {
+			glUniform3i( glGetUniformLocation( shader, label.c_str() ), val[ "x" ], val[ "y" ], val[ "z" ] );
+		} else if ( type == "vec3" ) {
+			glUniform3f( glGetUniformLocation( shader, label.c_str() ), val[ "x" ], val[ "y" ], val[ "z" ] );
+		} else if ( type == "vec4" ) {
+			glUniform4f( glGetUniformLocation( shader, label.c_str() ), val[ "x" ], val[ "y" ], val[ "z" ], val[ "w" ] );
+		}
+	}
 }
