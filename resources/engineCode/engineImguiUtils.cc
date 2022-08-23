@@ -146,6 +146,7 @@ void engine::MenuLayout( bool* p_open ) {
 	}
 	ImGui::End();
 }
+
 void engine::MenuSplash () {
 	// splash - add any more information to present upon opening
 	// maybe learn how to use the imgui draw lists? tbd, something with an eye could be cool
@@ -1547,6 +1548,12 @@ void engine::MenuFakeGI () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 		OrangeText( "Currently Unimplemented" );
+
+		// key thing is that now, I want to be able to invoke this in any direction
+		// e.g. instead of dispatching up the y axis only, hard coded, I want to be
+		// able to use any of the directions, +/-x, +/-y, +/-z to iterate through the
+		// slices of the block
+
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
