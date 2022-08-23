@@ -384,6 +384,7 @@ void engine::ShaderCompile () {
 	shaders[ "Shift" ] = computeShader( base + "operations/shift.cs.glsl" ).shaderHandle;
 	shaders[ "Sphere" ] = computeShader( base + "operations/sphere.cs.glsl" ).shaderHandle;
 	shaders[ "Triangle" ] = computeShader( base + "operations/triangle.cs.glsl" ).shaderHandle;
+	shaders[ "XOR" ] = computeShader( base + "operations/xor.cs.glsl" ).shaderHandle;
 
 	// color adjustments
 	shaders[ "Tonemap" ] = computeShader( base + "tonemap.cs.glsl" ).shaderHandle;

@@ -810,7 +810,24 @@ void engine::MenuXOR () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-		OrangeText( "Currently Unimplemented" );
+
+		// maybe implement thresholding or something? tbd
+		static bool respectMask = true;
+		ImGui::Checkbox( "Respect Mask", &respectMask );
+		if ( ImGui::Button( "XOR" ) ) {
+			SwapBlocks();
+			bindSets[ "Basic Operation" ].apply();
+			json j;
+			j[ "shader" ] = "XOR";
+			j[ "bindset" ] = "Basic Operation";
+			j[ "respectMask" ][ "type" ] = "bool";
+			j[ "respectMask" ][ "x" ] = respectMask;
+			SendUniforms( j );
+			AddToLog( j );
+			BlockDispatch();
+		}
+
+
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
