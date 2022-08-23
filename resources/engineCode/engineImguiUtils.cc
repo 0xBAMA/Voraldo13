@@ -513,7 +513,7 @@ void engine::MenuHeightmap () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-
+		OrangeText( "Currently Unimplemented" );
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -533,7 +533,7 @@ void engine::MenuIcosahedron () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-
+		OrangeText( "Currently Unimplemented" );
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -553,7 +553,7 @@ void engine::MenuNoise () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-
+		OrangeText( "Currently Unimplemented" );
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -730,7 +730,7 @@ void engine::MenuUserShader () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-
+		OrangeText( "Currently Unimplemented" );
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -750,7 +750,7 @@ void engine::MenuVAT () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-
+		OrangeText( "Currently Unimplemented" );
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -770,7 +770,7 @@ void engine::MenuSpaceship () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-
+		OrangeText( "Currently Unimplemented" );
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -790,7 +790,7 @@ void engine::MenuLetters () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-
+		OrangeText( "Currently Unimplemented" );
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -810,7 +810,7 @@ void engine::MenuXOR () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-
+		OrangeText( "Currently Unimplemented" );
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -1162,7 +1162,7 @@ void engine::MenuLoadSave () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-
+		OrangeText( "Currently Unimplemented" );
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -1182,7 +1182,7 @@ void engine::MenuLimiterCompressor () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-
+		OrangeText( "Currently Unimplemented" );
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -1202,7 +1202,7 @@ void engine::MenuCopyPaste () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-
+		OrangeText( "Currently Unimplemented" );
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -1222,7 +1222,7 @@ void engine::MenuLogging () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-
+		OrangeText( "Currently Unimplemented" );
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -1345,7 +1345,7 @@ void engine::MenuPointLight () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-
+		OrangeText( "Currently Unimplemented" );
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -1365,7 +1365,7 @@ void engine::MenuConeLight () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-
+		OrangeText( "Currently Unimplemented" );
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -1385,7 +1385,7 @@ void engine::MenuDirectionalLight () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-
+		OrangeText( "Currently Unimplemented" );
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -1405,7 +1405,7 @@ void engine::MenuFakeGI () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-
+		OrangeText( "Currently Unimplemented" );
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -1425,7 +1425,7 @@ void engine::MenuAmbientOcclusion () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-
+		OrangeText( "Currently Unimplemented" );
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -1445,6 +1445,17 @@ void engine::MenuLightMash () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
+
+		if ( ImGui::Button( "Mash" ) ) {
+			render.framesSinceLastInput = 0; // no swap, but will require a renderer refresh
+			bindSets[ "Lighting Operation" ].apply();
+			json j;
+			j[ "shader" ] = "Light Mash";
+			j[ "bindset" ] = "Lighting Operation";
+			SendUniforms( j );
+			AddToLog( j );
+			BlockDispatch();
+		}
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
