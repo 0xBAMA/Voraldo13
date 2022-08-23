@@ -381,6 +381,7 @@ void engine::ShaderCompile () {
 	shaders[ "Light Mash" ] = computeShader( base + "lighting/mash.cs.glsl" ).shaderHandle;
 	shaders[ "Mask Invert" ] = computeShader( base + "operations/maskInvert.cs.glsl" ).shaderHandle;
 	shaders[ "Mask Clear" ] = computeShader( base + "operations/maskClear.cs.glsl" ).shaderHandle;
+	shaders[ "Shift" ] = computeShader( base + "operations/shift.cs.glsl" ).shaderHandle;
 	shaders[ "Sphere" ] = computeShader( base + "operations/sphere.cs.glsl" ).shaderHandle;
 	shaders[ "Triangle" ] = computeShader( base + "operations/triangle.cs.glsl" ).shaderHandle;
 

@@ -829,15 +829,16 @@ void engine::MenuClearBlock () {
 	ImGui::BeginTabBar( "clear block" );
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
-		ImGui::Indent( 16.0f );
+		ImGui::Indent( 32.0f );
 
 		static bool respectMask = true;
 		static bool draw = false;
+		static int mask = 0;
+		static glm::vec4 color ( 0.0f );
+
+		ImGui::Text( " " );
 		ImGui::Checkbox( "Respect Mask", &respectMask );
 		ImGui::Checkbox( "Draw Color", &draw );
-
-		static glm::vec4 color ( 0.0f );
-		static int mask = 0;
 
 		if ( draw ) {
 			ImGui::InputInt( " Mask ", &mask );
@@ -845,7 +846,8 @@ void engine::MenuClearBlock () {
 			ImGui::ColorEdit4( "  Color", ( float * ) &color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf );
 		}
 
-		SetPosBottomRightCorner();
+		ImGui::Unindent( 16.0f );
+		ImGui::Text( " " );
 		if ( ImGui::Button( "Invoke Operation" ) ) {
 			// swap the front/back buffers
 			SwapBlocks();
@@ -1114,36 +1116,97 @@ void engine::MenuShiftTrim () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
-		static bool respectMask = false;
-		static bool carryMask = false;
+		// these options tbd - v12 did 3 set modes, that might be a cleaner way to do it
+		// static bool respectMask = false;
+		// static bool carryMask = false;
 		static bool loopFaces = true;
 		static glm::ivec3 shiftAmount ( 0 );
 		static int trimAmount = 0;
 
 		ImGui::Text( " " );
 		OrangeText( "Shift" );
+		ImGui::Text( " " );
 		ImGui::Indent( 16.0f );
 		ImGui::Text( "Amount" );
 		ImGui::SliderInt( "X", &shiftAmount.x, -BLOCKDIM, BLOCKDIM );
 		ImGui::SliderInt( "Y", &shiftAmount.y, -BLOCKDIM, BLOCKDIM );
 		ImGui::SliderInt( "Z", &shiftAmount.z, -BLOCKDIM, BLOCKDIM );
-		ImGui::Checkbox( "Respect Mask", &respectMask );
-		ImGui::Checkbox( "Carry Mask", &carryMask );
+		// ImGui::Checkbox( "Respect Mask", &respectMask );
+		// ImGui::Checkbox( "Carry Mask", &carryMask );
 		ImGui::Checkbox( "Wraparound", &loopFaces );
-		ImGui::Unindent( 16.0f );
 		ImGui::Text( " " );
 
-		OrangeText( "Trim" );
-		ImGui::Indent( 16.0f );
-		ImGui::SliderInt( "Amount", &trimAmount, -BLOCKDIM / 4, BLOCKDIM / 4 );
+		if ( ImGui::Button( "Shift" ) ) {
+			SwapBlocks();
+			// bindSets[ "Basic Operation With Lighting" ].apply();
+			bindSets[ "Basic Operation" ].apply();
+			json j;
+			j[ "shader" ] = "Shift";
+			// j[ "bindset" ] = "Basic Operation With Lighting";
+			j[ "bindset" ] = "Basic Operation";
+			j[ "shiftAmount" ][ "type" ] = "ivec3";
+			j[ "shiftAmount" ][ "x" ] = shiftAmount.x;
+			j[ "shiftAmount" ][ "y" ] = shiftAmount.y;
+			j[ "shiftAmount" ][ "z" ] = shiftAmount.z;
+			j[ "wraparound" ][ "type" ] = "bool";
+			j[ "wraparound" ][ "x" ] = loopFaces;
+			SendUniforms( j );
+			AddToLog( j );
+			BlockDispatch();
+		}
+
 		ImGui::Unindent( 16.0f );
+		OrangeText( "Trim" );
+		ImGui::Text( " " );
+		ImGui::Indent( 16.0f );
+		ImGui::SliderInt( "Amount", &trimAmount, 0, BLOCKDIM / 4 );
+		ImGui::Text( " " );
+
+		if ( ImGui::Button( "Trim" ) ) {
 			// shift by n pixels up
-			// shift by 2n pixels down
+			// shift by -2n pixels
 			// shift by n pixels up
 				// no wrapping, so data is lost on faces
 					// maybe optionally wrap on masked voxels, so that it remains? tbd
+			SwapBlocks();
+			// bindSets[ "Basic Operation With Lighting" ].apply();
+			bindSets[ "Basic Operation" ].apply();
+			json j;
+			j[ "shader" ] = "Shift";
+			// j[ "bindset" ] = "Basic Operation With Lighting";
+			j[ "bindset" ] = "Basic Operation";
+			j[ "shiftAmount" ][ "type" ] = "ivec3";
+			j[ "shiftAmount" ][ "x" ] = trimAmount;
+			j[ "shiftAmount" ][ "y" ] = trimAmount;
+			j[ "shiftAmount" ][ "z" ] = trimAmount;
+			j[ "wraparound" ][ "type" ] = "bool";
+			j[ "wraparound" ][ "x" ] = false;
+			SendUniforms( j );
+			AddToLog( j );
+			BlockDispatch();
 
-		ImGui::Unindent( 16.0f );
+			SwapBlocks();
+			// bindSets[ "Basic Operation With Lighting" ].apply();
+			bindSets[ "Basic Operation" ].apply();
+			j[ "shiftAmount" ][ "x" ] = -2 * trimAmount;
+			j[ "shiftAmount" ][ "y" ] = -2 * trimAmount;
+			j[ "shiftAmount" ][ "z" ] = -2 * trimAmount;
+			SendUniforms( j );
+			AddToLog( j );
+			BlockDispatch();
+
+			SwapBlocks();
+			// bindSets[ "Basic Operation With Lighting" ].apply();
+			bindSets[ "Basic Operation" ].apply();
+			j[ "shiftAmount" ][ "x" ] = trimAmount;
+			j[ "shiftAmount" ][ "y" ] = trimAmount;
+			j[ "shiftAmount" ][ "z" ] = trimAmount;
+			SendUniforms( j );
+			AddToLog( j );
+			BlockDispatch();
+		}
+
+		ImGui::Unindent( 32.0f );
 		ImGui::EndTabItem();
 	}
 	if ( ImGui::BeginTabItem( " Description " ) ) {

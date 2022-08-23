@@ -233,8 +233,6 @@ void engine::HandleEvents () {
 			render.renderOffset.y -= ( SDL_GetModState() & KMOD_SHIFT ) ?  10.0f :  1.0f;
 			render.framesSinceLastInput = 0;
 		}
-
-
 	}
 }
 
