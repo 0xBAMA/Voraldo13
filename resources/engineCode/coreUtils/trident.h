@@ -125,6 +125,9 @@ public:
 		RotateX( pi / 2.0 );
 	}
 
+	bool Dirty () {
+		return needsRedraw;
+	}
 private:
 	GLuint tridentImage;
 	GLuint generateShader;

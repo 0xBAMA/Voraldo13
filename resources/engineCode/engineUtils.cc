@@ -3,6 +3,7 @@
 bool engine::MainLoop () {
 	FrameMarkStart( "Main Loop" );
 	render.framesSinceStartup++;
+	render.framesSinceLastInput++;
 	HandleEvents();			// handle keyboard / mouse events
 	ClearColorAndDepth();	// if I just disable depth testing, this can disappear
 	ComputePasses();		// multistage update of displayTexture
@@ -46,24 +47,28 @@ void engine::SendRaymarchParameters () {
 void engine::Raymarch () {
 	ZoneScoped;
 
-	bindSets[ "Rendering" ].apply();
-	glUseProgram( shaders[ "Raymarch" ] );
-	SendRaymarchParameters();
+	// don't render redundantly - only run for numFramesHistory frames after any state changes
+	if ( render.framesSinceLastInput <= ( uint32_t ) render.numFramesHistory ) {
 
-	static std::random_device r;
-	static std::seed_seq s{ r(), r(), r(), r(), r(), r(), r(), r(), r() };
-	static auto gen = std::mt19937_64( s );
-	static std::uniform_int_distribution< int > dist( 0, 512 );
+		bindSets[ "Rendering" ].apply();
+		glUseProgram( shaders[ "Raymarch" ] );
+		SendRaymarchParameters();
 
-	// tiled update of the accumulator texture
-	constexpr int w = SSFACTOR * WIDTH;
-	constexpr int h = SSFACTOR * HEIGHT;
-	constexpr int t = TILESIZE;
-	for ( int x = 0; x < w; x += t ) {
-		for ( int y = 0; y < h; y += t ) {
-			glUniform2i( glGetUniformLocation( shaders[ "Raymarch" ], "noiseOffset"), dist( gen ), dist( gen ) );
-			glUniform2i( glGetUniformLocation( shaders[ "Raymarch" ], "tileOffset"), x, y );
-			glDispatchCompute( t / 16, t / 16, 1 );
+		static std::random_device r;
+		static std::seed_seq s{ r(), r(), r(), r(), r(), r(), r(), r(), r() };
+		static auto gen = std::mt19937_64( s );
+		static std::uniform_int_distribution< int > dist( 0, 512 );
+
+		// tiled update of the accumulator texture
+		constexpr int w = SSFACTOR * WIDTH;
+		constexpr int h = SSFACTOR * HEIGHT;
+		constexpr int t = TILESIZE;
+		for ( int x = 0; x < w; x += t ) {
+			for ( int y = 0; y < h; y += t ) {
+				glUniform2i( glGetUniformLocation( shaders[ "Raymarch" ], "noiseOffset"), dist( gen ), dist( gen ) );
+				glUniform2i( glGetUniformLocation( shaders[ "Raymarch" ], "tileOffset"), x, y );
+				glDispatchCompute( t / 16, t / 16, 1 );
+			}
 		}
 	}
 }
@@ -166,6 +171,7 @@ void engine::HandleEvents () {
 				} else if ( event.wheel.y < 0 ) {
 					render.scaleFactor += 0.1f;
 				}
+				render.framesSinceLastInput = 0;
 			}
 		}
 		if ( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_SHIFT && SDL_GetModState() & KMOD_CTRL && SDL_GetModState() & KMOD_ALT ) {
@@ -207,15 +213,27 @@ void engine::HandleEvents () {
 		if ( state[ SDL_SCANCODE_6 ] )
 			trident.SetViewDown();
 
+		if ( trident.Dirty() ) // rotation or movement has happened
+			render.framesSinceLastInput = 0;
+
 		// panning around, vim style
-		if ( state[ SDL_SCANCODE_H ] )
+		if ( state[ SDL_SCANCODE_H ] ) {
 			render.renderOffset.x += ( SDL_GetModState() & KMOD_SHIFT ) ?  10.0f :  1.0f;
-		if ( state[ SDL_SCANCODE_L ] )
+			render.framesSinceLastInput = 0;
+		}
+		if ( state[ SDL_SCANCODE_L ] ) {
 			render.renderOffset.x -= ( SDL_GetModState() & KMOD_SHIFT ) ?  10.0f :  1.0f;
-		if ( state[ SDL_SCANCODE_J ] )
+			render.framesSinceLastInput = 0;
+		}
+		if ( state[ SDL_SCANCODE_J ] ) {
 			render.renderOffset.y += ( SDL_GetModState() & KMOD_SHIFT ) ?  10.0f :  1.0f;
-		if ( state[ SDL_SCANCODE_K ] )
+			render.framesSinceLastInput = 0;
+		}
+		if ( state[ SDL_SCANCODE_K ] ) {
 			render.renderOffset.y -= ( SDL_GetModState() & KMOD_SHIFT ) ?  10.0f :  1.0f;
+			render.framesSinceLastInput = 0;
+		}
+
 
 	}
 }
@@ -225,12 +243,13 @@ void engine::SwapBlocks () {
 	// renderer, abstracts away the need for logic around a buffer toggle - just
 	// call SwapBlocks() after operations which change which blocks play the
 	// role of front/back to make sure the state is correct
+
 	std::swap( bindSets[ "Rendering" ], bindSets[ "Rendering Back Set" ] );
 	std::swap( bindSets[ "Basic Operation" ], bindSets[ "Basic Operation Back Set" ] );
 	std::swap( bindSets[ "Basic Operation With Lighting" ], bindSets[ "Basic Operation With Lighting Back Set" ] );
 	std::swap( bindSets[ "Lighting Operation" ], bindSets[ "Lighting Operation Back Set" ] );
+
 	std::swap( textures[ "Color Block Front" ], textures[ "Color Block Back" ] ); // for mipmap gen
-	// ...
 }
 
 void engine::SendUniforms ( json j ) {
@@ -278,6 +297,7 @@ void engine::BlockDispatch () {
 	ZoneScoped;
 	glDispatchCompute( BLOCKDIM / 8, BLOCKDIM / 8, BLOCKDIM / 8 );
 	glMemoryBarrier( GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
+	render.framesSinceLastInput = 0;
 }
 
 // Function to get color temperature from shadertoy user BeRo

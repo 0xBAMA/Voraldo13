@@ -313,6 +313,7 @@ other textures, tbd
 		binding( 3, textures[ "Mask Block Front" ], GL_R8UI )
 	} );
 
+// this pair is for the data masking
 	bindSets[ "Basic Operation With Lighting" ] = bindSet( {
 		binding( 0, textures[ "Color Block Front" ], GL_RGBA8UI ),
 		binding( 1, textures[ "Color Block Back" ], GL_RGBA8UI ),

@@ -138,7 +138,7 @@ void engine::MenuLayout( bool* p_open ) {
 			} else if ( isPicked( "Application Settings" ) ) {	MenuApplicationSettings();
 			} else if ( isPicked( "Rendering Settings" ) ) {	MenuRenderingSettings();
 			} else if ( isPicked( "Post Processing" ) ) {		MenuPostProcessingSettings();
-			}
+			} // add a stats tab, maybe? tbd
 			#undef isPicked
 			ImGui::EndChild();
 			ImGui::EndGroup();
@@ -1114,6 +1114,35 @@ void engine::MenuShiftTrim () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
+		static bool respectMask = false;
+		static bool carryMask = false;
+		static bool loopFaces = true;
+		static glm::ivec3 shiftAmount ( 0 );
+		static int trimAmount = 0;
+
+		ImGui::Text( " " );
+		OrangeText( "Shift" );
+		ImGui::Indent( 16.0f );
+		ImGui::Text( "Amount" );
+		ImGui::SliderInt( "X", &shiftAmount.x, -BLOCKDIM, BLOCKDIM );
+		ImGui::SliderInt( "Y", &shiftAmount.y, -BLOCKDIM, BLOCKDIM );
+		ImGui::SliderInt( "Z", &shiftAmount.z, -BLOCKDIM, BLOCKDIM );
+		ImGui::Checkbox( "Respect Mask", &respectMask );
+		ImGui::Checkbox( "Carry Mask", &carryMask );
+		ImGui::Checkbox( "Wraparound", &loopFaces );
+		ImGui::Unindent( 16.0f );
+		ImGui::Text( " " );
+
+		OrangeText( "Trim" );
+		ImGui::Indent( 16.0f );
+		ImGui::SliderInt( "Amount", &trimAmount, -BLOCKDIM / 4, BLOCKDIM / 4 );
+		ImGui::Unindent( 16.0f );
+			// shift by n pixels up
+			// shift by 2n pixels down
+			// shift by n pixels up
+				// no wrapping, so data is lost on faces
+					// maybe optionally wrap on masked voxels, so that it remains? tbd
+
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -1432,21 +1461,32 @@ void engine::MenuApplicationSettings() {
 }
 
 void engine::MenuRenderingSettings () {
+
 	OrangeText( " Rendering Settings" );
 	ImGui::Separator();
 	ImGui::Indent( 16.0f );
 	ImGui::ColorEdit4( "Clear Color", (float *) &render.clearColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf );
+	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
 	ImGui::SliderFloat( "Alpha Correction Power", &render.alphaCorrectionPower, 0.0f, 4.0f );
+	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
 	ImGui::SliderFloat( "Jitter Amount", &render.jitterAmount, 0.0f, 20.0f, "%.2f", ImGuiSliderFlags_Logarithmic );
+	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
 	ImGui::SliderFloat( "Perspective", &render.perspective, -2.0f, 4.0f );
+	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
 	ImGui::SliderFloat( "Scale", &render.scaleFactor, 0.0f, 40.0f );
+	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
 	ImGui::SliderFloat( "Blend Factor", &render.blendFactor, 0.0f, 1.0f );
+	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
 	ImGui::SliderInt( "Volume Steps", &render.volumeSteps, 0, 1400 );
+	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
 
 	// render mode - then set what shaders[ "Raymarch" ] points to
+		// this will take a little more infrastructure work
 
 	// picker for render mode shader
 	ImGui::SliderInt( "History Frames", &render.numFramesHistory, 0, 14 );
+	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
+
 	ImGui::Unindent( 16.0f );
 }
 
@@ -1473,7 +1513,6 @@ void engine::MenuPostProcessingSettings () {
 	ImGui::Unindent( 16.0f );
 }
 
-
 void engine::DrawTextEditor () {
 	ImGui::Begin( "Editor", NULL, 0 );
 	static TextEditor editor;
@@ -1482,9 +1521,7 @@ void engine::DrawTextEditor () {
 	editor.SetLanguageDefinition( lang );
 
 	auto cpos = editor.GetCursorPosition();
-	// editor.SetPalette( TextEditor::GetLightPalette() );
 	editor.SetPalette( TextEditor::GetDarkPalette() );
-	// editor.SetPalette( TextEditor::GetRetroBluePalette() );
 
 	static bool loaded = false;
 	static const char *fileToEdit = "resources/engineCode/shaders/blit.vs.glsl";
