@@ -1425,7 +1425,27 @@ void engine::MenuAmbientOcclusion () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-		OrangeText( "Currently Unimplemented" );
+
+		static int radius = 0;
+
+		ImGui::Text( " " );
+		ImGui::SliderInt( "Radius", &radius, 0, 5 );
+		ImGui::Text( " " );
+
+		ImGui::Indent( 16.0f );
+		if ( ImGui::Button( "Ambient Occlusion" ) ) {
+			render.framesSinceLastInput = 0; // no swap, but will require a renderer refresh
+			bindSets[ "Lighting Operation" ].apply();
+			json j;
+			j[ "shader" ] = "Ambient Occlusion";
+			j[ "bindset" ] = "Lighting Operation";
+			j[ "radius" ][ "type" ] = "int";
+			j[ "radius" ][ "x" ] = radius;
+			SendUniforms( j );
+			AddToLog( j );
+			BlockDispatch();
+		}
+
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -1446,7 +1466,8 @@ void engine::MenuLightMash () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
-		if ( ImGui::Button( "Mash" ) ) {
+		ImGui::Text( " " );
+		if ( ImGui::Button( " Mash " ) ) {
 			render.framesSinceLastInput = 0; // no swap, but will require a renderer refresh
 			bindSets[ "Lighting Operation" ].apply();
 			json j;
