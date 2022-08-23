@@ -335,3 +335,30 @@ void engine::CapturePostprocessScreenshot () {
 	ssP << std::put_time( std::localtime( &inTime_tP ), "screenshots/Voraldo13ssP-%Y-%m-%d %X.png" );
 	screenshotP.Save( ssP.str(), LODEPNG );
 }
+
+// used in load/save operation to check extension
+bool engine::hasEnding ( std::string fullString, std::string ending ) {
+	if ( fullString.length() >= ending.length() ) {
+		return ( 0 == fullString.compare( fullString.length() - ending.length(), ending.length(), ending ) );
+	} else {
+		return false;
+	}
+}
+
+bool engine::hasPNG ( std::string filename ) {
+	return hasEnding( filename, std::string( ".png" ) );
+}
+
+void engine::updateSavesList () {
+	struct pathLeafString {
+		std::string operator()( const std::filesystem::directory_entry &entry ) const {
+			return entry.path().string();
+		}
+	};
+	savesList.clear();
+	std::filesystem::path p( "saves" );
+	std::filesystem::directory_iterator start( p );
+	std::filesystem::directory_iterator end;
+	std::transform( start, end, std::back_inserter( savesList ), pathLeafString() );
+	std::sort( savesList.begin(), savesList.end() ); // sort these alphabetically
+}

@@ -1242,7 +1242,44 @@ void engine::MenuLoadSave () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-		OrangeText( "Currently Unimplemented" );
+
+		#define LISTBOX_SIZE_MAX 256
+		static char inputString[ 256 ] = "";
+		const char *listboxItems[ LISTBOX_SIZE_MAX ];
+		uint32_t i;
+		for ( i = 0; i < LISTBOX_SIZE_MAX && i < savesList.size(); ++i ) {
+			listboxItems[ i ] = savesList[ i ].c_str();
+		}
+
+		OrangeText( "Files In Saves Folder" );
+		static int listboxSelected = 1;
+		ImGui::ListBox( " ", &listboxSelected, listboxItems, i, 24 );
+
+		static bool respectMask = false;
+		if ( ImGui::Button( " Load " ) ) {
+			// load it
+		}
+		ImGui::SameLine();
+		ImGui::Checkbox( " Respect Mask on Load", &respectMask );
+
+		ImGui::Text( " " );
+		OrangeText( "Enter Filename to Save" );
+		ImGui::InputTextWithHint( ".png", "", inputString, IM_ARRAYSIZE( inputString ) );
+		ImGui::SameLine();
+		if ( ImGui::Button( " Save " ) ) {
+			std::string saveString;
+			if ( hasPNG( std::string( inputString ) ) ) {
+				saveString = std::string( inputString );
+			} else {
+				saveString = std::string( inputString ) + std::string( ".png" );
+			}
+
+			// blahblah save it
+
+			// get the list with this included
+			updateSavesList();
+		}
+
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}

@@ -113,10 +113,18 @@ private:
 	// probably refactor these into some other utilites header or something
 	glm::vec3 GetColorForTemperature( float temperature ); // 6500.0 is white
 	std::vector<uint8_t> BayerData ( int dimension );
+
 	void CapturePostprocessScreenshot ();
 	void SendUniforms ( json j );
 	void AddToLog ( json j );
 	void BlockDispatch ();
+
+	void updateSavesList();
+	std::vector<string> savesList;
+	bool hasEnding ( std::string fullString, std::string ending );
+	bool hasPNG ( std::string filename );
+
+
 
 //==============================================================================
 	// shutdown procedures

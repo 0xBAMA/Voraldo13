@@ -351,6 +351,10 @@ other textures, tbd
 	// other sets - some operations will reqiure a different configuration
 		// heightmap needs heightmap
 
+
+	// get the list of images in the saves folder
+	updateSavesList();
+
 	cout << T_GREEN << "done." << T_RED << " ( " << Tock() << " us )" << RESET << endl;
 }
 
