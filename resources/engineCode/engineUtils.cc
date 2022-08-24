@@ -250,6 +250,7 @@ void engine::SwapBlocks () {
 	std::swap( bindSets[ "Lighting Operation" ], bindSets[ "Lighting Operation Back Set" ] );
 
 	std::swap( textures[ "Color Block Front" ], textures[ "Color Block Back" ] ); // for mipmap gen
+	render.framesSinceLastInput = 0;
 }
 
 void engine::AddToLog ( json j ) {

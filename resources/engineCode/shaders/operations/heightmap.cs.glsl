@@ -32,7 +32,8 @@ bool inShape () {
 	const vec3 location = vec3( gl_GlobalInvocationID.xyz );
 	const vec2 blockDims = vec2( imageSize( heightmap ) );
 
-	const vec3 normalizedCoords = ( location + vec3( 0.5 ) ) / blockDims.xxx;
+	// const vec3 normalizedCoords = ( location + vec3( 0.5 ) ) / blockDims.xxx;
+	const vec3 normalizedCoords = location / blockDims.xxx;
 
 	vec2 xyCoord = vec2( 0.0 ); // texture uv
 	float zCoord = 0.0;			// for height testing

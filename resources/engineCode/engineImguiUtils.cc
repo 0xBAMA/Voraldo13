@@ -397,17 +397,17 @@ void engine::MenuGrid () {
 		ImGui::SliderFloat( "Rotation About Y", &rotation.y, 0.0f, float( BLOCKDIM ), "%.3f" );
 		ImGui::SliderFloat( "Rotation About Z", &rotation.z, 0.0f, float( BLOCKDIM ), "%.3f" );
 		OrangeText( "Grid Spacing" );
-		ImGui::SliderInt( "X", &spacing.x, 0, BLOCKDIM );
-		ImGui::SliderInt( "Y", &spacing.y, 0, BLOCKDIM );
-		ImGui::SliderInt( "Z", &spacing.z, 0, BLOCKDIM );
+		ImGui::SliderInt( "X", &spacing.x, 0, BLOCKDIM / 8 );
+		ImGui::SliderInt( "Y", &spacing.y, 0, BLOCKDIM / 8 );
+		ImGui::SliderInt( "Z", &spacing.z, 0, BLOCKDIM / 8 );
 		OrangeText( "Grid Offset" );
-		ImGui::SliderInt( "X ", &offsets.x, 0, BLOCKDIM );
-		ImGui::SliderInt( "Y ", &offsets.y, 0, BLOCKDIM );
-		ImGui::SliderInt( "Z ", &offsets.z, 0, BLOCKDIM );
+		ImGui::SliderInt( "X ", &offsets.x, 0, BLOCKDIM / 8 );
+		ImGui::SliderInt( "Y ", &offsets.y, 0, BLOCKDIM / 8 );
+		ImGui::SliderInt( "Z ", &offsets.z, 0, BLOCKDIM / 8 );
 		OrangeText( "Grid Width" );
-		ImGui::SliderInt( "X  ", &width.x, 0, BLOCKDIM );
-		ImGui::SliderInt( "Y  ", &width.y, 0, BLOCKDIM );
-		ImGui::SliderInt( "Z  ", &width.z, 0, BLOCKDIM );
+		ImGui::SliderInt( "X  ", &width.x, 0, BLOCKDIM / 8 );
+		ImGui::SliderInt( "Y  ", &width.y, 0, BLOCKDIM / 8 );
+		ImGui::SliderInt( "Z  ", &width.z, 0, BLOCKDIM / 8 );
 		ColorPickerHelper( draw, mask, color );
 
 		SetPosBottomRightCorner();
@@ -727,7 +727,81 @@ void engine::MenuVAT () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-		OrangeText( "Currently Unimplemented" );
+
+		static glm::vec4 color0 = glm::vec4( 200.0f / 255.0f, 49.0f / 255.0f, 11.0f / 255.0f, 10.0f / 255.0f );
+		static glm::vec4 color1 = glm::vec4( 207.0f / 255.0f, 179.0f / 255.0f, 7.0f / 255.0f, 125.0f / 255.0f );
+		static glm::vec4 color2 = glm::vec4( 190.0f / 255.0f, 95.0f / 255.0f, 0.0f / 255.0f, 155.0f / 255.0f );
+		static float lambda = 0.35f;
+		static float beta = 0.5f;
+		static float mag = 0.0f;
+		static bool respectMask = true;
+		static int initMode = 3;
+		static float flip;
+		static char inputString[ 256 ] = "";
+		static bool plusX = false, plusY = false, plusZ = false;
+		static bool minusX = false, minusY = true, minusZ = false;
+
+		OrangeText( "Seeding" );
+		switch ( initMode ) {
+		case 0:
+			ImGui::Text( " Seed with state '0' " );
+			break;
+		case 1:
+			ImGui::Text( " Seed with state '1' " );
+			break;
+		case 2:
+			ImGui::Text( " Seed with state '2' " );
+			break;
+		case 3:
+			ImGui::Text( " Random seeding " );
+			break;
+		default:
+			break;
+		}
+		ImGui::SliderInt( "Mode", &initMode, 0, 3 );
+		ImGui::Checkbox( "Fill +X", &plusX );
+		ImGui::SameLine();
+		ImGui::Checkbox( "Fill +Y", &plusY );
+		ImGui::SameLine();
+		ImGui::Checkbox( "Fill +Z", &plusZ );
+		ImGui::Checkbox( "Fill -X", &minusX );
+		ImGui::SameLine();
+		ImGui::Checkbox( "Fill -Y", &minusY );
+		ImGui::SameLine();
+		ImGui::Checkbox( "Fill -Z", &minusZ );
+		ImGui::Text( " " );
+
+		OrangeText( "Evaluation" );
+		ImGui::Checkbox( "Respect Mask on Copy", &respectMask );
+		ImGui::SliderFloat( "Flip Chance", &flip, 0.0f, 1.0f, "%.3f" );
+		const auto flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf;
+		ImGui::ColorEdit4( "State 0 Color", (float *) &color0, flags );
+		ImGui::ColorEdit4( "State 1 Color", (float *) &color1, flags );
+		ImGui::ColorEdit4( "State 2 Color", (float *) &color2, flags );
+		ImGui::Text( " " );
+
+		OrangeText( "Rule" );
+		// text entry field for the rule
+		ImGui::InputText("Base64 Encoded Rule", inputString, IM_ARRAYSIZE( inputString ) );
+		ImGui::SetItemDefaultFocus();
+		ImGui::SliderFloat( "Lambda", &lambda, 0.0f, 1.0f, "%.3f" );
+		ImGui::Separator();
+		ImGui::SliderFloat( "Beta", &beta, 0.0f, 1.0f, "%.3f" );
+		ImGui::SliderFloat( "Mag", &mag, 0.0f, 1.0f, "%.3f" );
+
+		if ( ImGui::Button( " Compute From String " ) ) {
+
+		}
+		ImGui::SameLine();
+		if ( ImGui::Button( " Compute Random " ) ) {
+
+		}
+		ImGui::SameLine();
+		if ( ImGui::Button( " Compute IRandom " ) ) {
+
+		}
+
+
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
