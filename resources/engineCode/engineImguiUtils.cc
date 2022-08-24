@@ -161,7 +161,7 @@ void engine::ColorPickerHelper ( bool& draw, int& mask, glm::vec4& color ) {
 	ImGui::InputInt( " Mask ", &mask );
 	// bounds check
 	mask = std::clamp( mask, 0, 255 );
-	ImGui::ColorEdit4( "  Color", ( float * ) &color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf );
+	ImGui::ColorEdit4( "  Color", ( float * ) &color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_PickerHueWheel );
 }
 
 void TitleText ( const char *string  ) {
@@ -728,9 +728,9 @@ void engine::MenuVAT () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
-		static glm::vec4 color0 = glm::vec4( 200.0f / 255.0f, 49.0f / 255.0f, 11.0f / 255.0f, 10.0f / 255.0f );
-		static glm::vec4 color1 = glm::vec4( 207.0f / 255.0f, 179.0f / 255.0f, 7.0f / 255.0f, 125.0f / 255.0f );
-		static glm::vec4 color2 = glm::vec4( 190.0f / 255.0f, 95.0f / 255.0f, 0.0f / 255.0f, 155.0f / 255.0f );
+		static glm::vec4 color0 = glm::vec4( 200.0f, 49.0f, 11.0f, 10.0f ) / 255.0f;
+		static glm::vec4 color1 = glm::vec4( 207.0f, 179.0f, 7.0f, 125.0f ) / 255.0f;
+		static glm::vec4 color2 = glm::vec4( 190.0f, 95.0f, 0.0f, 155.0f ) / 255.0f;
 		static float lambda = 0.35f;
 		static float beta = 0.5f;
 		static float mag = 0.0f;
@@ -774,7 +774,7 @@ void engine::MenuVAT () {
 		OrangeText( "Evaluation" );
 		ImGui::Checkbox( "Respect Mask on Copy", &respectMask );
 		ImGui::SliderFloat( "Flip Chance", &flip, 0.0f, 1.0f, "%.3f" );
-		const auto flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf;
+		const auto flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_PickerHueWheel;
 		ImGui::ColorEdit4( "State 0 Color", (float *) &color0, flags );
 		ImGui::ColorEdit4( "State 1 Color", (float *) &color1, flags );
 		ImGui::ColorEdit4( "State 2 Color", (float *) &color2, flags );
@@ -782,23 +782,117 @@ void engine::MenuVAT () {
 
 		OrangeText( "Rule" );
 		// text entry field for the rule
-		ImGui::InputText("Base64 Encoded Rule", inputString, IM_ARRAYSIZE( inputString ) );
+		ImGui::InputText("Base62 Encoded Rule", inputString, IM_ARRAYSIZE( inputString ) );
 		ImGui::SetItemDefaultFocus();
 		ImGui::SliderFloat( "Lambda", &lambda, 0.0f, 1.0f, "%.3f" );
 		ImGui::Separator();
 		ImGui::SliderFloat( "Beta", &beta, 0.0f, 1.0f, "%.3f" );
 		ImGui::SliderFloat( "Mag", &mag, 0.0f, 1.0f, "%.3f" );
 
+		constexpr int blockLevelsDeep = int( log2( float( BLOCKDIM ) ) );
 		if ( ImGui::Button( " Compute From String " ) ) {
-
+			voxelAutomataTerrain vS( blockLevelsDeep, flip, string( inputString ), initMode, lambda, beta, mag, glm::bvec3( minusX, minusY, minusZ ), glm::bvec3( plusX, plusY, plusZ ) );
+			strcpy( inputString, vS.getShortRule().c_str() );
+			std::vector<uint8_t> loaded;
+			loaded.reserve( BLOCKDIM * BLOCKDIM * BLOCKDIM * 4 );
+			for ( int x = 0; x < BLOCKDIM; x++ ) {
+				for ( int y = 0; y < BLOCKDIM; y++ ) {
+					for ( int z = 0; z < BLOCKDIM; z++ ) {
+						glm::vec4 color;
+						switch ( vS.state[ x ][ y ][ z ] ) {
+							case 0: color = color0; break;
+							case 1: color = color1; break;
+							case 2: color = color2; break;
+							default: color = color0; break;
+						}
+						loaded.push_back( static_cast<uint8_t>( color.x * 255.0 ) );
+						loaded.push_back( static_cast<uint8_t>( color.y * 255.0 ) );
+						loaded.push_back( static_cast<uint8_t>( color.z * 255.0 ) );
+						loaded.push_back( static_cast<uint8_t>( color.w * 255.0 ) );
+					}
+				}
+			}
+			glBindTexture( GL_TEXTURE_3D, textures[ "LoadBuffer" ] );
+			glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &loaded[ 0 ] );
+			SwapBlocks();
+			bindSets[ "LoadBuffer" ].apply();
+			json j;
+			j[ "shader" ] = "Load";
+			j[ "bindset" ] = "LoadBuffer";
+			AddBool( j, "respectMask", respectMask );
+			SendUniforms( j );
+			// AddToLog( j ); // need to revisit this
+			BlockDispatch();
 		}
 		ImGui::SameLine();
 		if ( ImGui::Button( " Compute Random " ) ) {
-
+			voxelAutomataTerrain vR( blockLevelsDeep, flip, string( "r" ), initMode, lambda, beta, mag, glm::bvec3( minusX, minusY, minusZ ), glm::bvec3( plusX, plusY, plusZ ) );
+			strcpy( inputString, vR.getShortRule().c_str() );
+			std::vector<uint8_t> loaded;
+			loaded.reserve( BLOCKDIM * BLOCKDIM * BLOCKDIM * 4 );
+			for ( int x = 0; x < BLOCKDIM; x++ ) {
+				for ( int y = 0; y < BLOCKDIM; y++ ) {
+					for ( int z = 0; z < BLOCKDIM; z++ ) {
+						glm::vec4 color;
+						switch ( vR.state[ x ][ y ][ z ] ) {
+							case 0: color = color0; break;
+							case 1: color = color1; break;
+							case 2: color = color2; break;
+							default: color = color0; break;
+						}
+						loaded.push_back( static_cast<uint8_t>( color.x * 255.0 ) );
+						loaded.push_back( static_cast<uint8_t>( color.y * 255.0 ) );
+						loaded.push_back( static_cast<uint8_t>( color.z * 255.0 ) );
+						loaded.push_back( static_cast<uint8_t>( color.w * 255.0 ) );
+					}
+				}
+			}
+			glBindTexture( GL_TEXTURE_3D, textures[ "LoadBuffer" ] );
+			glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &loaded[ 0 ] );
+			SwapBlocks();
+			bindSets[ "LoadBuffer" ].apply();
+			json j;
+			j[ "shader" ] = "Load";
+			j[ "bindset" ] = "LoadBuffer";
+			AddBool( j, "respectMask", respectMask );
+			SendUniforms( j );
+			// AddToLog( j ); // need to revisit this
+			BlockDispatch();
 		}
 		ImGui::SameLine();
 		if ( ImGui::Button( " Compute IRandom " ) ) {
-
+			voxelAutomataTerrain vI( blockLevelsDeep, flip, string( "i" ), initMode, lambda, beta, mag, glm::bvec3( minusX, minusY, minusZ ), glm::bvec3( plusX, plusY, plusZ ) );
+			strcpy( inputString, vI.getShortRule().c_str() );
+			std::vector<uint8_t> loaded;
+			loaded.reserve( BLOCKDIM * BLOCKDIM * BLOCKDIM * 4 );
+			for ( int x = 0; x < BLOCKDIM; x++ ) {
+				for ( int y = 0; y < BLOCKDIM; y++ ) {
+					for ( int z = 0; z < BLOCKDIM; z++ ) {
+						glm::vec4 color;
+						switch ( vI.state[ x ][ y ][ z ] ) {
+							case 0: color = color0; break;
+							case 1: color = color1; break;
+							case 2: color = color2; break;
+							default: color = color0; break;
+						}
+						loaded.push_back( static_cast<uint8_t>( color.x * 255.0 ) );
+						loaded.push_back( static_cast<uint8_t>( color.y * 255.0 ) );
+						loaded.push_back( static_cast<uint8_t>( color.z * 255.0 ) );
+						loaded.push_back( static_cast<uint8_t>( color.w * 255.0 ) );
+					}
+				}
+			}
+			glBindTexture( GL_TEXTURE_3D, textures[ "LoadBuffer" ] );
+			glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &loaded[ 0 ] );
+			SwapBlocks();
+			bindSets[ "LoadBuffer" ].apply();
+			json j;
+			j[ "shader" ] = "Load";
+			j[ "bindset" ] = "LoadBuffer";
+			AddBool( j, "respectMask", respectMask );
+			SendUniforms( j );
+			// AddToLog( j ); // need to revisit this
+			BlockDispatch();
 		}
 
 
@@ -910,7 +1004,7 @@ void engine::MenuClearBlock () {
 		if ( draw ) {
 			ImGui::InputInt( " Mask ", &mask );
 			mask = std::clamp( mask, 0, 255 );
-			ImGui::ColorEdit4( "  Color", ( float * ) &color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf );
+			ImGui::ColorEdit4( "  Color", ( float * ) &color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_PickerHueWheel );
 		}
 
 		ImGui::Unindent( 16.0f );
@@ -1005,7 +1099,7 @@ void engine::MenuMasking () {
 		ImGui::Indent( 16.0f );
 		OrangeText( "Color Levels" );
 		ImGui::Unindent( 16.0f );
-		ImGui::ColorEdit4( "Color", ( float * ) &color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
+		ImGui::ColorEdit4( "Color", ( float * ) &color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_PickerHueWheel);
 		ImGui::Separator();
 		ImGui::Checkbox( "Use Red Channel  ", &useR );
 		ImGui::SameLine();
@@ -1660,7 +1754,7 @@ void engine::MenuRenderingSettings () {
 	OrangeText( " Rendering Settings" );
 	ImGui::Separator();
 	ImGui::Indent( 16.0f );
-	ImGui::ColorEdit4( "Clear Color", (float *) &render.clearColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf );
+	ImGui::ColorEdit4( "Clear Color", (float *) &render.clearColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_PickerHueWheel );
 	reset = reset || ImGui::IsItemEdited();
 	ImGui::Text( " " );
 
