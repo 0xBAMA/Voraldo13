@@ -457,8 +457,8 @@ void engine::ShaderCompile () {
 	trident.basePt = textRenderer.basePt;
 
 	// orientation trident shaders
-	shaders[ "Trident Raymarch" ] = computeShader( base + "tridentGenerate.cs.glsl" ).shaderHandle;
-	shaders[ "Trident Blit" ] = computeShader( base + "tridentCopy.cs.glsl" ).shaderHandle;
+	shaders[ "Trident Raymarch" ] = computeShader( "resources/engineCode/coreUtils/tridentGenerate.cs.glsl" ).shaderHandle;
+	shaders[ "Trident Blit" ] = computeShader( "resources/engineCode/coreUtils/tridentCopy.cs.glsl" ).shaderHandle;
 	trident.PassInShaders( shaders[ "Trident Raymarch" ], shaders[ "Trident Blit" ] );
 
 	cout << T_GREEN << "done." << T_RED << " ( " << Tock() << " us )" << RESET << endl;

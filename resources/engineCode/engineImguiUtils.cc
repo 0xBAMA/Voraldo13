@@ -1644,6 +1644,10 @@ void engine::MenuFakeGI () {
 		// able to use any of the directions, +/-x, +/-y, +/-z to iterate through the
 		// slices of the block
 
+		static int upDirection = 0;
+		static const char* upDirectionList[] = { "+X", "-X", "+Y", "-Y", "+Z", "-Z" };
+		ImGui::Combo( "Up Direction", &upDirection, upDirectionList, IM_ARRAYSIZE( upDirectionList ) );
+
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}

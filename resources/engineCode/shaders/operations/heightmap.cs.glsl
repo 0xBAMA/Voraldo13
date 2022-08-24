@@ -38,7 +38,6 @@ bool inShape () {
 	vec2 xyCoord = vec2( 0.0 ); // texture uv
 	float zCoord = 0.0;			// for height testing
 
-	// make sure colorWrite is assigned to, here
 	switch ( upDirection ) {
 	case 0:	// +x is up
 		xyCoord = normalizedCoords.yz;
@@ -74,6 +73,7 @@ bool inShape () {
 	// test against the height
 	heightVal *= heightScalar;
 	return ( zCoord < heightVal );
+	// make sure colorWrite is assigned to, here
 }
 
 void main () {
