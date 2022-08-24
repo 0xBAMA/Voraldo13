@@ -244,6 +244,7 @@ void engine::SwapBlocks () {
 
 	std::swap( bindSets[ "Rendering" ], bindSets[ "Rendering Back Set" ] );
 	std::swap( bindSets[ "Basic Operation" ], bindSets[ "Basic Operation Back Set" ] );
+	std::swap( bindSets[ "Heightmap" ], bindSets[ "Heightmap Back Set" ] );
 	std::swap( bindSets[ "LoadBuffer" ], bindSets[ "LoadBuffer Back Set" ] );
 	std::swap( bindSets[ "Basic Operation With Lighting" ], bindSets[ "Basic Operation With Lighting Back Set" ] );
 	std::swap( bindSets[ "Lighting Operation" ], bindSets[ "Lighting Operation Back Set" ] );
@@ -260,6 +261,97 @@ void engine::BlockDispatch () {
 	glDispatchCompute( BLOCKDIM / 8, BLOCKDIM / 8, BLOCKDIM / 8 );
 	glMemoryBarrier( GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 	render.framesSinceLastInput = 0;
+}
+
+void engine::newHeightmapPerlin () {
+	// might add more parameters at some point
+	std::vector<unsigned char> data;
+	PerlinNoise p;
+	float xscale = 0.014f;
+	float yscale = 0.04f;
+	static float offset = 0;
+	for ( unsigned int x = 0; x < BLOCKDIM; x++ ) {
+		for ( unsigned int y = 0; y < BLOCKDIM; y++ ) {
+			data.push_back( ( unsigned char ) ( p.noise( x * xscale, y * yscale, offset ) * 255 ) );
+			data.push_back( ( unsigned char ) ( p.noise( x * xscale, y * yscale, offset ) * 255 ) );
+			data.push_back( ( unsigned char ) ( p.noise( x * xscale, y * yscale, offset ) * 255 ) );
+			data.push_back( 255 );
+		}
+	}
+	offset += 0.5; // so it varies between updates ... ehh
+	glBindTexture( GL_TEXTURE_2D, textures[ "Heightmap" ] );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[ 0 ] );
+}
+
+void engine::newHeightmapDiamondSquare () {
+	long unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::default_random_engine engine{ seed };
+	std::uniform_real_distribution<float> distribution{ 0, 1 };
+	constexpr auto size = BLOCKDIM + 1;
+	constexpr auto edge = size - 1;
+	uint8_t map[ size ][ size ] = { { 0 } };
+	map[ 0 ][ 0 ] = map[ edge ][ 0 ] = map[ 0 ][ edge ] = map[ edge ][ edge ] = 128;
+
+	heightfield::diamond_square_no_wrap( size,
+		[ &engine, &distribution ]( float range ) { // rng
+			return distribution( engine ) * range;
+		},
+		[]( int level ) -> float { // variance
+			return 64.0f * std::pow( 0.5f, level );
+		},
+		[ &map ]( int x, int y ) -> uint8_t & { // at
+			return map[ y ][ x ];
+		});
+
+	std::vector<unsigned char> data;
+	for ( int x = 0; x < BLOCKDIM; x++ ) {
+		for ( int y = 0; y < BLOCKDIM; y++ ) {
+			data.push_back( map[ x ][ y ] );
+			data.push_back( map[ x ][ y ] );
+			data.push_back( map[ x ][ y ] );
+			data.push_back( 255 );
+		}
+	}
+	glBindTexture( GL_TEXTURE_2D, textures[ "Heightmap" ] );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[ 0 ] );
+}
+
+void engine::newHeightmapXOR () {
+	static std::vector<unsigned char> data;
+	static bool firstTime = true;
+	if ( firstTime ) {
+		for ( unsigned int x = 0; x < BLOCKDIM; x++ ) {
+			for ( unsigned int y = 0; y < BLOCKDIM; y++ ) {
+				unsigned int val = x ^ y;
+				data.push_back( val );
+				data.push_back( val );
+				data.push_back( val );
+				data.push_back( 255 );
+			}
+		}
+		firstTime = false;
+	}
+	glBindTexture( GL_TEXTURE_2D, textures[ "Heightmap" ] );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[ 0 ] );
+}
+
+void engine::newHeightmapAND () {
+	static std::vector<unsigned char> data;
+	static bool firstTime = true;
+	if ( firstTime ) {
+		for ( unsigned int x = 0; x < BLOCKDIM; x++ ) {
+			for ( unsigned int y = 0; y < BLOCKDIM; y++ ) {
+				unsigned int val = x & y;
+				data.push_back( val );
+				data.push_back( val );
+				data.push_back( val );
+				data.push_back( 255 );
+			}
+		}
+		firstTime = false;
+	}
+	glBindTexture( GL_TEXTURE_2D, textures[ "Heightmap" ] );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[ 0 ] );
 }
 
 glm::vec3 engine::GetColorForTemperature ( float temperature ) {

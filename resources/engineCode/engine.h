@@ -114,6 +114,11 @@ private:
 	glm::vec3 GetColorForTemperature( float temperature ); // 6500.0 is white
 	std::vector<uint8_t> BayerData ( int dimension );
 
+	void newHeightmapPerlin();
+	void newHeightmapDiamondSquare();
+	void newHeightmapXOR();
+	void newHeightmapAND();
+
 	void CapturePostprocessScreenshot ();
 	void SendUniforms ( json j );
 	void AddToLog ( json j );

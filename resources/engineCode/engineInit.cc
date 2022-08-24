@@ -2,7 +2,12 @@
 
 void engine::StartMessage () {
 	ZoneScoped;
-	cout << endl << T_YELLOW << BOLD << "NQADE - Not Quite A Demo Engine" << endl;
+	cout << endl << endl << T_GREEN;
+	// from https://fsymbols.com/generators/carty/
+	cout << "░█──░█ █▀▀█ █▀▀█ █▀▀█ █── █▀▀▄ █▀▀█ 　 ▄█─ █▀▀█ " << endl;
+	cout << "─░█░█─ █──█ █▄▄▀ █▄▄█ █── █──█ █──█ 　 ─█─ ──▀▄ " << endl;
+	cout << "──▀▄▀─ ▀▀▀▀ ▀─▀▀ ▀──▀ ▀▀▀ ▀▀▀─ ▀▀▀▀ 　 ▄█▄ █▄▄█ " << endl;
+	cout << RESET << T_YELLOW << BOLD << "NQADE - Not Quite A Demo Engine" << endl;
 	cout << " By Jon Baker ( 2020 - 2022 ) " << RESET << endl;
 	cout << "  https://jbaker.graphics/ " << endl << endl;
 }
@@ -135,6 +140,7 @@ void engine::SetupTextures () {
 	GLuint maskTextures[ 2 ];
 	GLuint lightTexture;
 	GLuint loadBuffer;
+	GLuint heightmapTexture;
 
 	// create the image textures
 	Image initial( WIDTH * std::max( SSFACTOR, 1.0 ), HEIGHT * std::max( SSFACTOR, 1.0 ) );
@@ -268,6 +274,16 @@ void engine::SetupTextures () {
 	glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &zeroes.data()[ 0 ] );
 	textures[ "LoadBuffer" ] = loadBuffer;
 
+	glGenTextures( 1, &heightmapTexture );
+	glActiveTexture( GL_TEXTURE14 );
+	glBindTexture( GL_TEXTURE_2D, heightmapTexture );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT );
+	textures[ "Heightmap" ] = heightmapTexture;
+	newHeightmapDiamondSquare();
+
 /*==============================================================================
 other textures, tbd
 	> heightmap - diamond square initially
@@ -278,7 +294,7 @@ other textures, tbd
 // configure bindsets
 // two variants will be required for any that need to switch front and back buffers, since we can't get at
 // the texture handle after it's in the bindset - use std::swap to switch them when required in SwapBlocks()
-	// it's a little bit of a mess here, but easy to use
+	// it's a little bit of a mess here, but easy to use - set it and forget it
 	bindSets[ "Rendering" ] = bindSet( {
 		binding( 0, textures[ "Blue Noise" ], GL_RGBA8UI ),
 		binding( 1, textures[ "Accumulator" ], GL_RGBA16F ),
@@ -312,6 +328,22 @@ other textures, tbd
 		binding( 1, textures[ "Color Block Front" ], GL_RGBA8UI ),
 		binding( 2, textures[ "Mask Block Back" ], GL_R8UI ),
 		binding( 3, textures[ "Mask Block Front" ], GL_R8UI )
+	} );
+
+	bindSets[ "Heightmap" ] = bindSet( {
+		binding( 0, textures[ "Color Block Front" ], GL_RGBA8UI ),
+		binding( 1, textures[ "Color Block Back" ], GL_RGBA8UI ),
+		binding( 2, textures[ "Mask Block Front" ], GL_R8UI ),
+		binding( 3, textures[ "Mask Block Back" ], GL_R8UI ),
+		binding( 4, textures[ "Heightmap" ], GL_RGBA8 )
+	} );
+
+	bindSets[ "Heightmap Back Set" ] = bindSet( {
+		binding( 0, textures[ "Color Block Back" ], GL_RGBA8UI ),
+		binding( 1, textures[ "Color Block Front" ], GL_RGBA8UI ),
+		binding( 2, textures[ "Mask Block Back" ], GL_R8UI ),
+		binding( 3, textures[ "Mask Block Front" ], GL_R8UI ),
+		binding( 4, textures[ "Heightmap" ], GL_RGBA8 )
 	} );
 
 	bindSets[ "LoadBuffer" ] = bindSet( {
@@ -399,6 +431,7 @@ void engine::ShaderCompile () {
 	shaders[ "Cylinder" ] = computeShader( base + "operations/cylinder.cs.glsl" ).shaderHandle;
 	shaders[ "Data Mask" ] = computeShader( base + "operations/dataMask.cs.glsl" ).shaderHandle;
 	shaders[ "Ellipsoid" ] = computeShader( base + "operations/ellipsoid.cs.glsl" ).shaderHandle;
+	shaders[ "Heightmap" ] = computeShader( base + "operations/heightmap.cs.glsl" ).shaderHandle;
 	shaders[ "Grid" ] = computeShader( base + "operations/grid.cs.glsl" ).shaderHandle;
 	shaders[ "Light Clear" ] = computeShader( base + "lighting/clear.cs.glsl" ).shaderHandle;
 	shaders[ "Light Mash" ] = computeShader( base + "lighting/mash.cs.glsl" ).shaderHandle;

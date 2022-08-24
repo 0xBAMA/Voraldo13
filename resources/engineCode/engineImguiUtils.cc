@@ -455,7 +455,70 @@ void engine::MenuHeightmap () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-		OrangeText( "Currently Unimplemented" );
+
+		OrangeText( "Current Map" );
+
+		// show the heightmap - can we get away with just using a bindset here?
+		ImGui::Image( ( void * ) intptr_t( textures[ "Heightmap" ] ), ImVec2( 256, 256 ) );
+
+		ImGui::Text( " " );
+
+		// buttons to spawn new heightmaps
+		OrangeText( "Generators" );
+		if ( ImGui::Button( " Perlin " ) ) {
+			newHeightmapPerlin();
+		}
+		ImGui::SameLine();
+		if ( ImGui::Button( " Diamond-Square " ) ) {
+			newHeightmapDiamondSquare();
+		}
+		ImGui::SameLine();
+		if ( ImGui::Button( " XOR " ) ) {
+			newHeightmapXOR();
+		}
+		ImGui::SameLine();
+		if ( ImGui::Button( " AND " ) ) {
+			newHeightmapAND();
+		}
+
+		static bool draw = true;
+		static int mask = 0;
+		static glm::vec4 color( 0.0f );
+
+		static bool heightColor = true;
+		static float heightScalar = 1.0f;
+		static int upDirection = 0;
+
+		ImGui::Text( " " );
+		OrangeText( "Parameters" );
+
+		static const char* upDirectionList[] = { "+X", "-X", "+Y", "-Y", "+Z", "-Z" };
+		ImGui::Combo( "Up Direction", &upDirection, upDirectionList, IM_ARRAYSIZE( upDirectionList ) );
+		ImGui::SliderFloat( "Height Scalar", &heightScalar, 0.0f, 5.0f, "%.3f" );
+		ImGui::Checkbox( "Color By Height", &heightColor );
+
+		ImGui::Text( " " );
+		ColorPickerHelper( draw, mask, color );
+
+		if ( ImGui::Button( " Draw " ) ) {
+			SwapBlocks();
+			bindSets[ "Heightmap" ].apply();
+			json j;
+			j[ "shader" ] = "Heightmap";
+			j[ "bindset" ] = "Heightmap";
+			AddBool( j, "heightColor", heightColor );
+			AddFloat( j, "heightScalar", heightScalar );
+			AddInt( j, "upDirection", upDirection );
+			AddBool( j, "draw", draw );
+			AddInt( j, "mask", mask );
+			AddVec4( j, "color", color );
+			SendUniforms( j );
+			AddToLog( j );
+
+			// dispatch the compute shader
+			BlockDispatch();
+		}
+
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
