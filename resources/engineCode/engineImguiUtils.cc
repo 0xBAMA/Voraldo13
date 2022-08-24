@@ -1099,7 +1099,7 @@ void engine::MenuMasking () {
 		ImGui::Indent( 16.0f );
 		OrangeText( "Color Levels" );
 		ImGui::Unindent( 16.0f );
-		ImGui::ColorEdit4( "Color", ( float * ) &color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_PickerHueWheel);
+		ImGui::ColorEdit4( "Color", ( float * ) &color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_PickerHueWheel );
 		ImGui::Separator();
 		ImGui::Checkbox( "Use Red Channel  ", &useR );
 		ImGui::SameLine();
@@ -1116,7 +1116,7 @@ void engine::MenuMasking () {
 		ImGui::Indent( 16.0f );
 		OrangeText( "Light Levels" );
 		ImGui::Unindent( 16.0f );
-		ImGui::ColorEdit3( "Light Color", ( float * ) &lightValue );
+		ImGui::ColorEdit3( "Light Color", ( float * ) &lightValue, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_PickerHueWheel );
 		ImGui::Checkbox( "Use Light ( Red )  ", &useLightR );
 		ImGui::SameLine();
 		ImGui::SliderFloat( "Light Spread ( Red )", &lightVariance.r, 0.0f, 1.0f, "%.3f" );
@@ -1646,7 +1646,41 @@ void engine::MenuFakeGI () {
 
 		static int upDirection = 0;
 		static const char* upDirectionList[] = { "+X", "-X", "+Y", "-Y", "+Z", "-Z" };
+		static float sfactor = 0.028f;
+		static float alphaThreshold = 0.105f;
+		static glm::vec4 skyColor = glm::vec4( 0.0f, 0.0f, 0.0f, 1.0f ); // alpha holds intensity
+
+		OrangeText( "Parameters" );
 		ImGui::Combo( "Up Direction", &upDirection, upDirectionList, IM_ARRAYSIZE( upDirectionList ) );
+		ImGui::SliderFloat( "SFactor", &sfactor, 0.0f, 0.1f, "%.3f" );
+		ImGui::SliderFloat( "Alpha Threshold", &alphaThreshold, 0.0f, 1.0f, "%.3f" );
+		ImGui::ColorEdit3( "Sky Color", ( float* ) &skyColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_PickerHueWheel );
+		ImGui::SliderFloat( "Intensity Scale", &skyColor.a, 0.0f, 3.0f, "%.3f" );
+
+		ImGui::Text( " " );
+		if ( ImGui::Button( " Fake GI " ) ) {
+			
+			// send uniforms ( no buffer swap )
+				// shader will need to know the up direction, too, for ray generation
+			// log the values
+
+
+			// This has a sequential dependence - from the same guy who did the Voxel
+			// Automata Terrain, Brent Werness:
+			//   "Totally faked the GI!  It just casts out 9 rays in upwards facing the
+			//   lattice directions.
+			//    If it escapes it gets light from the sky, otherwise it gets some
+			//    fraction of the light from whatever cell it hits.  Run from top to
+			//    bottom and you are set!"
+
+			const GLint shaderIndexLoc = glGetUniformLocation( shaders[ "Fake GI" ], "index" );
+			for ( int i = 0; i < BLOCKDIM; i++ ) {
+				// i is used for the mapping inside the shader
+				glUniform1i( shaderIndexLoc, index );
+				glDispatchCompute( BLOCKDIM / 8, 1, BLOCKDIM / 8 );
+				glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
+			}
+		}
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
