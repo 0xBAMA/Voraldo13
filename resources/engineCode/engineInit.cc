@@ -335,7 +335,7 @@ other textures, tbd
 		binding( 1, textures[ "Color Block Back" ], GL_RGBA8UI ),
 		binding( 2, textures[ "Mask Block Front" ], GL_R8UI ),
 		binding( 3, textures[ "Mask Block Back" ], GL_R8UI ),
-		binding( 4, textures[ "Heightmap" ], GL_RGBA8 )
+		binding( 4, textures[ "Heightmap" ], GL_RGBA16F )
 	} );
 
 	bindSets[ "Heightmap Back Set" ] = bindSet( {
@@ -343,7 +343,7 @@ other textures, tbd
 		binding( 1, textures[ "Color Block Front" ], GL_RGBA8UI ),
 		binding( 2, textures[ "Mask Block Back" ], GL_R8UI ),
 		binding( 3, textures[ "Mask Block Front" ], GL_R8UI ),
-		binding( 4, textures[ "Heightmap" ], GL_RGBA8 )
+		binding( 4, textures[ "Heightmap" ], GL_RGBA16F )
 	} );
 
 	bindSets[ "LoadBuffer" ] = bindSet( {

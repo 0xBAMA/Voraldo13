@@ -514,8 +514,6 @@ void engine::MenuHeightmap () {
 			AddVec4( j, "color", color );
 			SendUniforms( j );
 			AddToLog( j );
-
-			// dispatch the compute shader
 			BlockDispatch();
 		}
 

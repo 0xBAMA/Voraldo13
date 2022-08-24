@@ -4,7 +4,7 @@ layout( binding = 0, rgba8ui ) uniform uimage3D colorBlockFront;
 layout( binding = 1, rgba8ui ) uniform uimage3D colorBlockBack;
 layout( binding = 2, r8ui ) uniform uimage3D maskBlockFront;
 layout( binding = 3, r8ui ) uniform uimage3D maskBlockBack;
-layout( binding = 4 ) uniform sampler2D heightmap;
+layout( binding = 4, rgba16f ) uniform image2D heightmap;
 
 uniform bool heightColor;
 uniform float heightScalar;
@@ -14,12 +14,25 @@ uniform vec4 color;
 uniform bool draw;
 uniform int mask;
 
+// maybe useful... tbd
+// vec4 linearInterpolatedSample ( vec2 location ) {
+// 	const vec2 fractionalPart = fract( location );
+// 	const vec2 wholePart = floor( location );
+// 	const vec4 sample0 = imageLoad( heightmap, ivec2( wholePart ) );
+// 	const vec4 sample1 = imageLoad( heightmap, ivec2( wholePart ) + ivec2( 1, 0 ) );
+// 	const vec4 sample2 = imageLoad( heightmap, ivec2( wholePart ) + ivec2( 0, 1 ) );
+// 	const vec4 sample3 = imageLoad( heightmap, ivec2( wholePart ) + ivec2( 1, 1 ) );
+// 	const vec4 xBlend0 = mix( sample0, sample1, fractionalPart.x );
+// 	const vec4 xBlend1 = mix( sample2, sample3, fractionalPart.x );
+// 	return mix( xBlend0, xBlend1, fractionalPart.y ) / 255.0;
+// }
+
 vec4 colorWrite = vec4( 0.0 );
 bool inShape () {
 	const vec3 location = vec3( gl_GlobalInvocationID.xyz );
-	const vec3 blockDims = vec3( imageSize( colorBlockFront ) );
+	const vec2 blockDims = vec2( imageSize( heightmap ) );
 
-	const vec3 normalizedCoords = ( location + vec3( 0.5 ) ) / blockDims;
+	const vec3 normalizedCoords = ( location + vec3( 0.5 ) ) / blockDims.xxx;
 
 	vec2 xyCoord = vec2( 0.0 ); // texture uv
 	float zCoord = 0.0;			// for height testing
@@ -53,7 +66,7 @@ bool inShape () {
 	}
 
 	// take a sample at the uv
-	float heightVal = texture( heightmap, xyCoord ).x;
+	float heightVal = imageLoad( heightmap, ivec2( xyCoord * blockDims.xy ) ).x;
 	colorWrite.xyz = heightColor ? ( heightVal * color.xyz ) : color.xyz;
 	colorWrite.a = color.a;
 

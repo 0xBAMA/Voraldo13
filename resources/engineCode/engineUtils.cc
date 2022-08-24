@@ -280,7 +280,7 @@ void engine::newHeightmapPerlin () {
 	}
 	offset += 0.5; // so it varies between updates ... ehh
 	glBindTexture( GL_TEXTURE_2D, textures[ "Heightmap" ] );
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[ 0 ] );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA16F, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[ 0 ] );
 }
 
 void engine::newHeightmapDiamondSquare () {
@@ -313,7 +313,7 @@ void engine::newHeightmapDiamondSquare () {
 		}
 	}
 	glBindTexture( GL_TEXTURE_2D, textures[ "Heightmap" ] );
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[ 0 ] );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA16F, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[ 0 ] );
 }
 
 void engine::newHeightmapXOR () {
@@ -332,7 +332,7 @@ void engine::newHeightmapXOR () {
 		firstTime = false;
 	}
 	glBindTexture( GL_TEXTURE_2D, textures[ "Heightmap" ] );
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[ 0 ] );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA16F, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[ 0 ] );
 }
 
 void engine::newHeightmapAND () {
@@ -351,7 +351,7 @@ void engine::newHeightmapAND () {
 		firstTime = false;
 	}
 	glBindTexture( GL_TEXTURE_2D, textures[ "Heightmap" ] );
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[ 0 ] );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA16F, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[ 0 ] );
 }
 
 glm::vec3 engine::GetColorForTemperature ( float temperature ) {
