@@ -1651,6 +1651,7 @@ void engine::MenuFakeGI () {
 		static glm::vec4 skyColor = glm::vec4( 0.0f, 0.0f, 0.0f, 1.0f ); // alpha holds intensity
 
 		OrangeText( "Parameters" );
+		// shader will need to know the up direction for ray generation
 		ImGui::Combo( "Up Direction", &upDirection, upDirectionList, IM_ARRAYSIZE( upDirectionList ) );
 		ImGui::SliderFloat( "SFactor", &sfactor, 0.0f, 0.1f, "%.3f" );
 		ImGui::SliderFloat( "Alpha Threshold", &alphaThreshold, 0.0f, 1.0f, "%.3f" );
@@ -1659,25 +1660,32 @@ void engine::MenuFakeGI () {
 
 		ImGui::Text( " " );
 		if ( ImGui::Button( " Fake GI " ) ) {
-			
-			// send uniforms ( no buffer swap )
-				// shader will need to know the up direction, too, for ray generation
-			// log the values
+			render.framesSinceLastInput = 0; // no swap, but will require a renderer refresh
+			bindSets[ "Lighting Operation" ].apply();
+			json j; // no buffer swap
+			j[ "shader" ] = "Fake GI";
+			j[ "bindset" ] = "Lighting Operation";
+			AddFloat( j, "sFactor", sfactor );
+			AddFloat( j, "alphaThreshold", alphaThreshold );
+			AddVec4( j, "skyIntensity", skyColor );
+			AddInt( j, "upDirection", upDirection );
+			SendUniforms( j );
 
-
-			// This has a sequential dependence - from the same guy who did the Voxel
-			// Automata Terrain, Brent Werness:
-			//   "Totally faked the GI!  It just casts out 9 rays in upwards facing the
-			//   lattice directions.
-			//    If it escapes it gets light from the sky, otherwise it gets some
-			//    fraction of the light from whatever cell it hits.  Run from top to
-			//    bottom and you are set!"
+	/*
+	This has a sequential dependence - from the same guy who did the Voxel
+	Automata Terrain, Brent Werness:
+			"Totally faked the GI!  It just casts out 9 rays in upwards facing the
+		lattice directions.
+			If it escapes it gets light from the sky, otherwise it gets some
+		fraction of the light from whatever cell it hits.  Run from top to
+		bottom and you are set!"
+	*/
 
 			const GLint shaderIndexLoc = glGetUniformLocation( shaders[ "Fake GI" ], "index" );
 			for ( int i = 0; i < BLOCKDIM; i++ ) {
 				// i is used for the mapping inside the shader
-				glUniform1i( shaderIndexLoc, index );
-				glDispatchCompute( BLOCKDIM / 8, 1, BLOCKDIM / 8 );
+				glUniform1i( shaderIndexLoc, i );
+				glDispatchCompute( BLOCKDIM / 8, BLOCKDIM / 8, 1 );
 				glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 			}
 		}
