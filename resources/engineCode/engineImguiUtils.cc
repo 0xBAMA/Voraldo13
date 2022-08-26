@@ -1577,7 +1577,26 @@ void engine::MenuPointLight () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-		OrangeText( "Currently Unimplemented" );
+
+		glm::vec3 position = glm::vec3( 0.0f );
+		float distancePower = 2.0f;
+		float decay = 0.0f;
+		glm::vec4 color = glm::vec4( 0.0f );
+
+		OrangeText( "Position" );
+		ImGui::SliderFloat( "X", &position.x, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Y", &position.y, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Z", &position.z, 0.0f, float( BLOCKDIM ), "%.3f" );
+		OrangeText( "Parameters" );
+		ImGui::SliderFloat( "Distance Power", &distancePower, 0.0f, 5.0f, "%.3f" );
+		ImGui::SliderFloat( "Decay", &decay, 0.0f, 20.0f, "%.3f", ImGuiSliderFlags_Logarithmic );
+		ImGui::ColorEdit3( "Color", ( float* ) &color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_PickerHueWheel );
+		ImGui::SliderFloat( "Intensity Scale", &color.a, 0.0f, 5.0f );
+
+		if ( ImGui::Button( " Point Light " ) ) {
+
+		}
+
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -1597,7 +1616,33 @@ void engine::MenuConeLight () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-		OrangeText( "Currently Unimplemented" );
+
+		glm::vec3 position = glm::vec3( 0.0f );
+		float coneAngle = 0.0f;
+		float distancePower = 2.0f;
+		float theta = 0.0f;
+		float phi = 0.0f;
+		float decay = 0.0f;
+		glm::vec4 color = glm::vec4( 0.0f );
+
+		OrangeText( "Position" );
+		ImGui::SliderFloat( "X", &position.x, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Y", &position.y, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Z", &position.z, 0.0f, float( BLOCKDIM ), "%.3f" );
+		OrangeText( "Direction" );
+		ImGui::SliderFloat( "Theta", &theta, -float( pi ), float( pi ), "%.3f" );
+		ImGui::SliderFloat( "Phi", &phi, -float( pi ), float( pi ), "%.3f" );
+		OrangeText( "Parameters" );
+		ImGui::SliderFloat( "Cone Angle", &coneAngle, 0.0f, float( 2.0f * pi ), "%.3f" );
+		ImGui::SliderFloat( "Distance Power", &distancePower, 0.0f, 5.0f, "%.3f" );
+		ImGui::SliderFloat( "Decay", &decay, 0.0f, 20.0f, "%.3f", ImGuiSliderFlags_Logarithmic );
+		ImGui::ColorEdit3( "Color", ( float* ) &color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_PickerHueWheel );
+		ImGui::SliderFloat( "Intensity Scale", &color.a, 0.0f, 5.0f );
+
+		if ( ImGui::Button( " Cone Light " ) ) {
+
+		}
+
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -1617,7 +1662,24 @@ void engine::MenuDirectionalLight () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-		OrangeText( "Currently Unimplemented" );
+
+		float theta = 0.0f;
+		float phi = 0.0f;
+		float decay = 0.0f;
+		glm::vec4 color = glm::vec4( 0.0f );
+
+		OrangeText( "Direction" );
+		ImGui::SliderFloat( "Theta", &theta, -float( pi ), float( pi ), "%.3f" );
+		ImGui::SliderFloat( "Phi", &phi, -float( pi ), float( pi ), "%.3f" );
+		OrangeText( "Parameters" );
+		ImGui::SliderFloat( "Decay", &decay, 0.0f, 20.0f, "%.3f", ImGuiSliderFlags_Logarithmic );
+		ImGui::ColorEdit3( "Color", ( float* ) &color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_PickerHueWheel );
+		ImGui::SliderFloat( "Intensity Scale", &color.a, 0.0f, 5.0f );
+
+		if ( ImGui::Button( " Directional Light " ) ) {
+
+		}
+
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -1637,12 +1699,6 @@ void engine::MenuFakeGI () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-		OrangeText( "Currently Unimplemented" );
-
-		// key thing is that now, I want to be able to invoke this in any direction
-		// e.g. instead of dispatching up the y axis only, hard coded, I want to be
-		// able to use any of the directions, +/-x, +/-y, +/-z to iterate through the
-		// slices of the block
 
 		static int upDirection = 0;
 		static const char* upDirectionList[] = { "+X", "-X", "+Y", "-Y", "+Z", "-Z" };
