@@ -298,14 +298,14 @@ other textures, tbd
 	bindSets[ "Rendering" ] = bindSet( {
 		binding( 0, textures[ "Blue Noise" ], GL_RGBA8UI ),
 		binding( 1, textures[ "Accumulator" ], GL_RGBA16F ),
-		binding( 2, textures[ "Color Block Front" ], GL_RGBA8UI ),
+		binding( 2, textures[ "Color Block Front" ], GL_RGBA8 ),
 		binding( 3, textures[ "Lighting Block" ], GL_RGBA16F )
 	} );
 
 	bindSets[ "Rendering Back Set" ] = bindSet( {
 		binding( 0, textures[ "Blue Noise" ], GL_RGBA8UI ),
 		binding( 1, textures[ "Accumulator" ], GL_RGBA16F ),
-		binding( 2, textures[ "Color Block Back" ], GL_RGBA8UI ),
+		binding( 2, textures[ "Color Block Back" ], GL_RGBA8 ),
 		binding( 3, textures[ "Lighting Block" ], GL_RGBA16F )
 	} );
 
@@ -317,71 +317,71 @@ other textures, tbd
 	} );
 
 	bindSets[ "Basic Operation" ] = bindSet( {
-		binding( 0, textures[ "Color Block Front" ], GL_RGBA8UI ),
-		binding( 1, textures[ "Color Block Back" ], GL_RGBA8UI ),
+		binding( 0, textures[ "Color Block Front" ], GL_RGBA8 ),
+		binding( 1, textures[ "Color Block Back" ], GL_RGBA8 ),
 		binding( 2, textures[ "Mask Block Front" ], GL_R8UI ),
 		binding( 3, textures[ "Mask Block Back" ], GL_R8UI )
 	} );
 
 	bindSets[ "Basic Operation Back Set" ] = bindSet( {
-		binding( 0, textures[ "Color Block Back" ], GL_RGBA8UI ),
-		binding( 1, textures[ "Color Block Front" ], GL_RGBA8UI ),
+		binding( 0, textures[ "Color Block Back" ], GL_RGBA8 ),
+		binding( 1, textures[ "Color Block Front" ], GL_RGBA8 ),
 		binding( 2, textures[ "Mask Block Back" ], GL_R8UI ),
 		binding( 3, textures[ "Mask Block Front" ], GL_R8UI )
 	} );
 
 	bindSets[ "Heightmap" ] = bindSet( {
-		binding( 0, textures[ "Color Block Front" ], GL_RGBA8UI ),
-		binding( 1, textures[ "Color Block Back" ], GL_RGBA8UI ),
+		binding( 0, textures[ "Color Block Front" ], GL_RGBA8 ),
+		binding( 1, textures[ "Color Block Back" ], GL_RGBA8 ),
 		binding( 2, textures[ "Mask Block Front" ], GL_R8UI ),
 		binding( 3, textures[ "Mask Block Back" ], GL_R8UI ),
 		binding( 4, textures[ "Heightmap" ], GL_RGBA16F )
 	} );
 
 	bindSets[ "Heightmap Back Set" ] = bindSet( {
-		binding( 0, textures[ "Color Block Back" ], GL_RGBA8UI ),
-		binding( 1, textures[ "Color Block Front" ], GL_RGBA8UI ),
+		binding( 0, textures[ "Color Block Back" ], GL_RGBA8 ),
+		binding( 1, textures[ "Color Block Front" ], GL_RGBA8 ),
 		binding( 2, textures[ "Mask Block Back" ], GL_R8UI ),
 		binding( 3, textures[ "Mask Block Front" ], GL_R8UI ),
 		binding( 4, textures[ "Heightmap" ], GL_RGBA16F )
 	} );
 
 	bindSets[ "LoadBuffer" ] = bindSet( {
-		binding( 0, textures[ "Color Block Front" ], GL_RGBA8UI ),
-		binding( 1, textures[ "Color Block Back" ], GL_RGBA8UI ),
+		binding( 0, textures[ "Color Block Front" ], GL_RGBA8 ),
+		binding( 1, textures[ "Color Block Back" ], GL_RGBA8 ),
 		binding( 2, textures[ "Mask Block Front" ], GL_R8UI ),
 		binding( 3, textures[ "Mask Block Back" ], GL_R8UI ),
-		binding( 4, textures[ "LoadBuffer" ], GL_RGBA8UI )
+		binding( 4, textures[ "LoadBuffer" ], GL_RGBA8 )
 	} );
 
 	bindSets[ "LoadBuffer Back Set" ] = bindSet( {
-		binding( 0, textures[ "Color Block Back" ], GL_RGBA8UI ),
-		binding( 1, textures[ "Color Block Front" ], GL_RGBA8UI ),
+		binding( 0, textures[ "Color Block Back" ], GL_RGBA8 ),
+		binding( 1, textures[ "Color Block Front" ], GL_RGBA8 ),
 		binding( 2, textures[ "Mask Block Back" ], GL_R8UI ),
 		binding( 3, textures[ "Mask Block Front" ], GL_R8UI ),
-		binding( 4, textures[ "LoadBuffer" ], GL_RGBA8UI )
+		binding( 4, textures[ "LoadBuffer" ], GL_RGBA8 )
 	} );
 
 // this pair is for the data masking
 	bindSets[ "Basic Operation With Lighting" ] = bindSet( {
-		binding( 0, textures[ "Color Block Front" ], GL_RGBA8UI ),
-		binding( 1, textures[ "Color Block Back" ], GL_RGBA8UI ),
+		binding( 0, textures[ "Color Block Front" ], GL_RGBA8 ),
+		binding( 1, textures[ "Color Block Back" ], GL_RGBA8 ),
 		binding( 2, textures[ "Mask Block Front" ], GL_R8UI ),
 		binding( 3, textures[ "Mask Block Back" ], GL_R8UI ),
 		binding( 4, textures[ "Lighting Block" ], GL_RGBA16F )
 	} );
 
 	bindSets[ "Basic Operation With Lighting Back Set" ] = bindSet( {
-		binding( 0, textures[ "Color Block Back" ], GL_RGBA8UI ),
-		binding( 1, textures[ "Color Block Front" ], GL_RGBA8UI ),
+		binding( 0, textures[ "Color Block Back" ], GL_RGBA8 ),
+		binding( 1, textures[ "Color Block Front" ], GL_RGBA8 ),
 		binding( 2, textures[ "Mask Block Back" ], GL_R8UI ),
 		binding( 3, textures[ "Mask Block Front" ], GL_R8UI ),
 		binding( 4, textures[ "Lighting Block" ], GL_RGBA16F )
 	} );
 
 	bindSets[ "Lighting Operation" ] = bindSet( {
-		binding( 0, textures[ "Color Block Back" ], GL_RGBA8UI ),
-		binding( 1, textures[ "Color Block Front" ], GL_RGBA8UI ),
+		binding( 0, textures[ "Color Block Back" ], GL_RGBA8 ),
+		binding( 1, textures[ "Color Block Front" ], GL_RGBA8 ),
 		binding( 2, textures[ "Mask Block Back" ], GL_R8UI ),
 		binding( 3, textures[ "Mask Block Front" ], GL_R8UI ),
 		binding( 4, textures[ "Lighting Block" ], GL_RGBA16F ),
@@ -389,8 +389,8 @@ other textures, tbd
 	} );
 
 	bindSets[ "Lighting Operation Back Set" ] = bindSet( {
-		binding( 0, textures[ "Color Block Front" ], GL_RGBA8UI ),
-		binding( 1, textures[ "Color Block Back" ], GL_RGBA8UI ),
+		binding( 0, textures[ "Color Block Front" ], GL_RGBA8 ),
+		binding( 1, textures[ "Color Block Back" ], GL_RGBA8 ),
 		binding( 2, textures[ "Mask Block Front" ], GL_R8UI ),
 		binding( 3, textures[ "Mask Block Back" ], GL_R8UI ),
 		binding( 4, textures[ "Lighting Block" ], GL_RGBA16F ),

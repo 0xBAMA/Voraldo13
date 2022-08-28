@@ -2,7 +2,7 @@
 layout( local_size_x = 16, local_size_y = 16, local_size_z = 1 ) in;
 layout( binding = 0, rgba8ui ) uniform uimage2D blueNoiseTexture;
 layout( binding = 1, rgba16f ) uniform image2D accumulatorTexture;
-layout( binding = 2, rgba8ui ) uniform uimage3D colorBlockFront;
+layout( binding = 2, rgba8 ) uniform image3D colorBlockFront;
 layout( binding = 3, rgba16f ) uniform image3D lightingBlock;
 
 // =============================================================================
@@ -61,7 +61,7 @@ void getColorForPixel ( vec3 rO, vec3 rD, inout vec4 color ) {
 	const float stepSize = max( float( ( tMax - tMin ) / numSteps ), 0.001 );
 	const vec3 blockSize = vec3( imageSize( colorBlockFront ) );
 	ivec3 samplePosition = ivec3( ( blockSize / 2.0 ) * ( rO + tCurrent * rD + vec3( 1.0 ) ) );
-	vec4 newRead = imageLoad( colorBlockFront, samplePosition ) / 255.0;
+	vec4 newRead = imageLoad( colorBlockFront, samplePosition );
 	vec4 newLightRead = imageLoad( lightingBlock, samplePosition );
 	for ( int i = 0; i < numSteps; i++ ) {
 		if( tCurrent >= tMin ) {
@@ -73,7 +73,7 @@ void getColorForPixel ( vec3 rO, vec3 rD, inout vec4 color ) {
 			color.rgb /= color.a; // missing piece of a over b alpha blending - can't really see a lot of difference
 			tCurrent -= stepSize;
 			samplePosition = ivec3( ( blockSize / 2.0 ) * ( rO + tCurrent * rD + vec3( 1.0 ) ) );
-			newRead = imageLoad( colorBlockFront, samplePosition ) / 255.0;
+			newRead = imageLoad( colorBlockFront, samplePosition );
 			newLightRead = imageLoad( lightingBlock, samplePosition );
 		}
 	}

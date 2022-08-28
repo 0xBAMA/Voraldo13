@@ -1,7 +1,7 @@
 #version 430
 layout( local_size_x = 8, local_size_y = 8, local_size_z = 1 ) in;
-layout( binding = 0, rgba8ui ) uniform uimage3D colorBlockFront;
-layout( binding = 1, rgba8ui ) uniform uimage3D colorBlockBack;
+layout( binding = 0, rgba8 ) uniform image3D colorBlockFront;
+layout( binding = 1, rgba8 ) uniform image3D colorBlockBack;
 layout( binding = 2, r8ui ) uniform uimage3D maskBlockFront;
 layout( binding = 3, r8ui ) uniform uimage3D maskBlockBack;
 layout( binding = 4, rgba16f ) uniform image3D lightBlock;
@@ -65,16 +65,16 @@ void main () {
 	const ivec3 startLocation = loc.x * bases[ 0 ] + loc.y * bases[ 1 ] + ( ( even ) ? blockSize.z - index : index ) * abs( bases[ 2 ] );
 
 	vec4 previousLight = imageLoad( lightBlock, startLocation );
-	uvec4 previousColor = imageLoad( colorBlockBack, startLocation );
+	vec4 previousColor = imageLoad( colorBlockBack, startLocation );
 
 	vec4 newLightVal = previousLight;
-	if ( ( previousColor.a / 255.0 ) > alphaThreshold ) { // opaque enough to participate
+	if ( previousColor.a > alphaThreshold ) { // opaque enough to participate
 		for ( int dx = -1; dx <= 1; dx++ ) {
 			for ( int dy = -1; dy <= 1; dy++ ) {
 				ivec3 checkLoc = startLocation + dx * bases[ 0 ] + dy * bases[ 1 ] + bases[ 2 ];
 				bool hit = false;
 				while( inBounds( checkLoc ) ) {
-					if ( ( imageLoad( colorBlockBack, checkLoc ).a / 255.0 ) >= alphaThreshold ) {
+					if ( imageLoad( colorBlockBack, checkLoc ).a >= alphaThreshold ) {
 						// take a sample of the lighting at this location, add sFactor times that value to newLightVal
 						newLightVal += imageLoad( lightBlock, checkLoc ) * sFactor;
 						hit = true;

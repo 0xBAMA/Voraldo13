@@ -1578,10 +1578,10 @@ void engine::MenuPointLight () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
-		glm::vec3 position = glm::vec3( 0.0f );
-		float distancePower = 2.0f;
-		float decay = 0.0f;
-		glm::vec4 color = glm::vec4( 0.0f );
+		static glm::vec3 position = glm::vec3( 0.0f );
+		static float distancePower = 2.0f;
+		static float decay = 0.0f;
+		static glm::vec4 color = glm::vec4( 0.0f );
 
 		OrangeText( "Position" );
 		ImGui::SliderFloat( "X", &position.x, 0.0f, float( BLOCKDIM ), "%.3f" );
@@ -1617,13 +1617,13 @@ void engine::MenuConeLight () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
-		glm::vec3 position = glm::vec3( 0.0f );
-		float coneAngle = 0.0f;
-		float distancePower = 2.0f;
-		float theta = 0.0f;
-		float phi = 0.0f;
-		float decay = 0.0f;
-		glm::vec4 color = glm::vec4( 0.0f );
+		static glm::vec3 position = glm::vec3( 0.0f );
+		static float coneAngle = 0.0f;
+		static float distancePower = 2.0f;
+		static float theta = 0.0f;
+		static float phi = 0.0f;
+		static float decay = 0.0f;
+		static glm::vec4 color = glm::vec4( 0.0f );
 
 		OrangeText( "Position" );
 		ImGui::SliderFloat( "X", &position.x, 0.0f, float( BLOCKDIM ), "%.3f" );
@@ -1663,10 +1663,10 @@ void engine::MenuDirectionalLight () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
-		float theta = 0.0f;
-		float phi = 0.0f;
-		float decay = 0.0f;
-		glm::vec4 color = glm::vec4( 0.0f );
+		static float theta = 0.0f;
+		static float phi = 0.0f;
+		static float decay = 0.0f;
+		static glm::vec4 color = glm::vec4( 0.0f );
 
 		OrangeText( "Direction" );
 		ImGui::SliderFloat( "Theta", &theta, -float( pi ), float( pi ), "%.3f" );
@@ -1677,7 +1677,26 @@ void engine::MenuDirectionalLight () {
 		ImGui::SliderFloat( "Intensity Scale", &color.a, 0.0f, 5.0f );
 
 		if ( ImGui::Button( " Directional Light " ) ) {
+			// make sure the texture has a mipmap... hopefully this is kosher
+			glBindTexture( GL_TEXTURE_3D, textures[ "Color Block Front" ] );
+			glGenerateMipmap( GL_TEXTURE_3D );
 
+			json j;
+			render.framesSinceLastInput = 0; // no swap, but will require a renderer refresh
+			bindSets[ "Lighting Operation" ].apply();
+			j[ "shader" ] = "Directional Light";
+			j[ "bindset" ] = "Lighting Operation";
+			AddFloat( j, "theta", theta );
+			AddFloat( j, "phi", phi );
+			AddFloat( j, "decay", decay );
+			AddVec4( j, "color", color );
+			SendUniforms( j );
+
+			// ugh
+			// glUniform1i( glGetUniformLocation( shaders[ "Directional Light" ], "colorBlock" ), 0 );
+			// glUniform1i( glGetUniformLocation( shaders[ "Directional Light" ], "colorBlock" ), 1 );
+
+			BlockDispatch();
 		}
 
 		ImGui::Unindent( 16.0f );
@@ -1920,7 +1939,7 @@ void engine::MenuPostProcessingSettings () {
 	ImGui::Combo( "Tonemapping Mode", &tonemap.tonemapMode, tonemapModesList, IM_ARRAYSIZE( tonemapModesList ) );
 
 	// add dither controls
-		// methodology picker - quantize, palette
+		// methodology picker - quantize ( bitcrush, logarithmic ), palette
 		// color space picker ( quantize or distance metric for palette )
 		// if mode is quantize, give control over bit depth + quantize method ( exponential / bitcrush )
 		// if mode is palette, give a picker for the palette
