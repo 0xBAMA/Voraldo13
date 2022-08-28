@@ -13,7 +13,7 @@ struct bindSet {
 	std::vector<binding> bindings;
 	void apply () {
 		for ( auto b : bindings ) {
-			glBindImageTexture( b.bindPoint, b.texture, 0, GL_FALSE, 0, GL_READ_WRITE, b.type );
+			glBindImageTexture( b.bindPoint, b.texture, 0, GL_TRUE, 0, GL_READ_WRITE, b.type );
 		}
 	}
 };

@@ -145,7 +145,7 @@ void engine::SetupTextures () {
 	// create the image textures
 	Image initial( WIDTH * std::max( SSFACTOR, 1.0 ), HEIGHT * std::max( SSFACTOR, 1.0 ) );
 	glGenTextures( 1, &accumulatorTexture );
-	glActiveTexture( GL_TEXTURE3 );
+	glActiveTexture( GL_TEXTURE1 );
 	glBindTexture( GL_TEXTURE_2D, accumulatorTexture );
 	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA16F, WIDTH * SSFACTOR, HEIGHT * SSFACTOR, 0, GL_RGBA, GL_UNSIGNED_BYTE, &initial.data.data()[ 0 ] );
 	textures[ "Accumulator" ] = accumulatorTexture;
@@ -153,136 +153,143 @@ void engine::SetupTextures () {
 	glGenTextures( 1, &displayTexture );
 	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, displayTexture );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, WIDTH, HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, &initial.data.data()[ 0 ] );
 	bool linearFilter = true;
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, linearFilter ? GL_LINEAR : GL_NEAREST );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, linearFilter ? GL_LINEAR : GL_NEAREST );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, WIDTH, HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, &initial.data.data()[ 0 ] );
 	textures[ "Display Texture" ] = displayTexture;
 
 	// blue noise image on the GPU
 	Image blueNoiseImage{ "resources/noise/blueNoise.png", LODEPNG };
 	glGenTextures( 1, &blueNoiseTexture );
-	glActiveTexture( GL_TEXTURE4 );
+	glActiveTexture( GL_TEXTURE2 );
 	glBindTexture( GL_TEXTURE_2D, blueNoiseTexture );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, blueNoiseImage.width, blueNoiseImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &blueNoiseImage.data.data()[ 0 ] );
 	// make sure that these are complete textures, apparently some drivers require these to be set
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, blueNoiseImage.width, blueNoiseImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &blueNoiseImage.data.data()[ 0 ] );
 	textures[ "Blue Noise" ] = blueNoiseTexture;
 
 	// bayer patterns
-	glActiveTexture( GL_TEXTURE5 );
+	glActiveTexture( GL_TEXTURE3 );
 	glBindTexture( GL_TEXTURE_2D, bayer4 );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_R8, 4, 4, 0, GL_RED, GL_UNSIGNED_BYTE, &BayerData( 4 )[0] );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_R8, 4, 4, 0, GL_RED, GL_UNSIGNED_BYTE, &BayerData( 4 )[0] );
 	textures[ "Bayer4" ] = bayer4;
 
-	glActiveTexture( GL_TEXTURE6 );
+	glActiveTexture( GL_TEXTURE4 );
 	glBindTexture( GL_TEXTURE_2D, bayer8 );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_R8, 8, 8, 0, GL_RED, GL_UNSIGNED_BYTE, &BayerData( 8 )[0] );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_R8, 8, 8, 0, GL_RED, GL_UNSIGNED_BYTE, &BayerData( 8 )[0] );
 	textures[ "Bayer8" ] = bayer8;
 
 	// create the image for the trident
 	Image initialT( trident.blockDimensions.x * 8, trident.blockDimensions.y * 16 );
 	glGenTextures( 1, &tridentImage );
-	glActiveTexture( GL_TEXTURE7 );
+	glActiveTexture( GL_TEXTURE5 );
 	glBindTexture( GL_TEXTURE_2D, tridentImage );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, initialT.width, initialT.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &initialT.data.data()[ 0 ] );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, initialT.width, initialT.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &initialT.data.data()[ 0 ] );
 	trident.PassInImage( tridentImage );
 	textures[ "Trident" ] = tridentImage;
 
 	glGenTextures( 2, &colorTextures[ 0 ] );
-	glActiveTexture( GL_TEXTURE8 );
+	glActiveTexture( GL_TEXTURE6 );
 	glBindTexture( GL_TEXTURE_3D, colorTextures[ 0 ] );
-	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT );
-	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT );
-	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT );
 	glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &initialXOR.data()[ 0 ] );
+	// glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
+	// glGenerateMipmap( GL_TEXTURE_3D );
 	textures[ "Color Block Front" ] = colorTextures[ 0 ];
 
-	glActiveTexture( GL_TEXTURE9 );
+	glActiveTexture( GL_TEXTURE7 );
 	glBindTexture( GL_TEXTURE_3D, colorTextures[ 1 ] );
-	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT );
-	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT );
-	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT );
 	glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &zeroes.data()[ 0 ] );
+	// glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
+	// glGenerateMipmap( GL_TEXTURE_3D );
 	textures[ "Color Block Back" ] = colorTextures[ 1 ];
 
 	// mask blocks ( front and back - can this be consolidated? not sure if two are needed )
 	glGenTextures( 2, &maskTextures[ 0 ] );
-	glActiveTexture( GL_TEXTURE10 );
+	glActiveTexture( GL_TEXTURE8 );
 	glBindTexture( GL_TEXTURE_3D, maskTextures[ 0 ] );
-	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT );
-	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT );
-	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT );
 	glTexImage3D( GL_TEXTURE_3D, 0, GL_R8UI, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, &zeroes.data()[ 0 ] );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
 	textures[ "Mask Block Front" ] = maskTextures[ 0 ];
 
-	glActiveTexture( GL_TEXTURE11 );
+	glActiveTexture( GL_TEXTURE9 );
 	glBindTexture( GL_TEXTURE_3D, maskTextures[ 1 ] );
-	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT );
-	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT );
-	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT );
 	glTexImage3D( GL_TEXTURE_3D, 0, GL_R8UI, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, &zeroes.data()[ 0 ] );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
 	textures[ "Mask Block Back" ] = maskTextures[ 1 ];
 
 	// lighting data ( can probably get away with just the one buffer, tbd )
 	// also, do I need 16-bit floats or can I get away with less ( GL_R11F_G11F_B10F or GL_RGB9_E5? )
 	glGenTextures( 1, &lightTexture );
-	glActiveTexture( GL_TEXTURE12 );
+	glActiveTexture( GL_TEXTURE10 );
 	glBindTexture( GL_TEXTURE_3D, lightTexture );
-	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT );
-	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT );
-	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT );
 	glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA16F, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_FLOAT, &ones.data()[ 0 ] );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+	// glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
+	glGenerateMipmap( GL_TEXTURE_3D );
 	textures[ "Lighting Block" ] = lightTexture;
 
 	// loadbuffer for VAT + load/save
 	glGenTextures( 1, &loadBuffer );
-	glActiveTexture( GL_TEXTURE13 );
+	glActiveTexture( GL_TEXTURE11 );
 	glBindTexture( GL_TEXTURE_3D, loadBuffer );
-	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT );
-	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT );
-	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT );
 	glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &zeroes.data()[ 0 ] );
+	// glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	glTexParameterf( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
 	textures[ "LoadBuffer" ] = loadBuffer;
 
 	glGenTextures( 1, &heightmapTexture );
-	glActiveTexture( GL_TEXTURE14 );
+	glActiveTexture( GL_TEXTURE12 );
 	glBindTexture( GL_TEXTURE_2D, heightmapTexture );
+	newHeightmapDiamondSquare();
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 	textures[ "Heightmap" ] = heightmapTexture;
-	newHeightmapDiamondSquare();
 
 /*==============================================================================
 other textures, tbd
@@ -398,7 +405,6 @@ other textures, tbd
 	} );
 
 
-
 	// other sets - some operations will reqiure a different configuration
 		// heightmap needs heightmap
 
@@ -422,33 +428,40 @@ void engine::ShaderCompile () {
 	// something to put data in the accumulator texture
 	shaders[ "Dummy Draw" ] = computeShader( base + "renderers/dummyDraw.cs.glsl" ).shaderHandle;
 
-	// operations
+	// shape operations
 	shaders[ "AABB" ] = computeShader( base + "operations/AABB.cs.glsl" ).shaderHandle;
-	shaders[ "Ambient Occlusion" ] = computeShader( base + "lighting/ambientOcclusion.cs.glsl" ).shaderHandle;
-	shaders[ "Box Blur" ] = computeShader( base + "operations/boxBlur.cs.glsl" ).shaderHandle;
-	shaders[ "Gaussian Blur" ] = computeShader( base + "operations/gaussBlur.cs.glsl" ).shaderHandle;
-	shaders[ "Clear" ] = computeShader( base + "operations/clear.cs.glsl" ).shaderHandle;
 	shaders[ "Cylinder" ] = computeShader( base + "operations/cylinder.cs.glsl" ).shaderHandle;
 	shaders[ "Data Mask" ] = computeShader( base + "operations/dataMask.cs.glsl" ).shaderHandle;
 	shaders[ "Ellipsoid" ] = computeShader( base + "operations/ellipsoid.cs.glsl" ).shaderHandle;
 	shaders[ "Heightmap" ] = computeShader( base + "operations/heightmap.cs.glsl" ).shaderHandle;
 	shaders[ "Grid" ] = computeShader( base + "operations/grid.cs.glsl" ).shaderHandle;
-	shaders[ "Light Clear" ] = computeShader( base + "lighting/clear.cs.glsl" ).shaderHandle;
-	shaders[ "Light Mash" ] = computeShader( base + "lighting/mash.cs.glsl" ).shaderHandle;
-	shaders[ "Fake GI" ] = computeShader( base + "lighting/fakeGI.cs.glsl" ).shaderHandle;
+	shaders[ "Sphere" ] = computeShader( base + "operations/sphere.cs.glsl" ).shaderHandle;
+	shaders[ "Triangle" ] = computeShader( base + "operations/triangle.cs.glsl" ).shaderHandle;
+	shaders[ "XOR" ] = computeShader( base + "operations/xor.cs.glsl" ).shaderHandle;
+
+	// utility operations
+	shaders[ "Box Blur" ] = computeShader( base + "operations/boxBlur.cs.glsl" ).shaderHandle;
+	shaders[ "Gaussian Blur" ] = computeShader( base + "operations/gaussBlur.cs.glsl" ).shaderHandle;
+	shaders[ "Clear" ] = computeShader( base + "operations/clear.cs.glsl" ).shaderHandle;
 	shaders[ "Load" ] = computeShader( base + "operations/load.cs.glsl" ).shaderHandle;
 	shaders[ "Mask Invert" ] = computeShader( base + "operations/maskInvert.cs.glsl" ).shaderHandle;
 	shaders[ "Mask Clear" ] = computeShader( base + "operations/maskClear.cs.glsl" ).shaderHandle;
 	shaders[ "Shift" ] = computeShader( base + "operations/shift.cs.glsl" ).shaderHandle;
-	shaders[ "Sphere" ] = computeShader( base + "operations/sphere.cs.glsl" ).shaderHandle;
-	shaders[ "Triangle" ] = computeShader( base + "operations/triangle.cs.glsl" ).shaderHandle;
-	shaders[ "XOR" ] = computeShader( base + "operations/xor.cs.glsl" ).shaderHandle;
+
+	// lighting operations
+	shaders[ "Light Clear" ] = computeShader( base + "lighting/clear.cs.glsl" ).shaderHandle;
+	shaders[ "Light Mash" ] = computeShader( base + "lighting/mash.cs.glsl" ).shaderHandle;
+	shaders[ "Fake GI" ] = computeShader( base + "lighting/fakeGI.cs.glsl" ).shaderHandle;
+	shaders[ "Directional Light" ] = computeShader( base + "lighting/directional.cs.glsl" ).shaderHandle;
+	shaders[ "Ambient Occlusion" ] = computeShader( base + "lighting/ambientOcclusion.cs.glsl" ).shaderHandle;
 
 	// color adjustments
 	shaders[ "Tonemap" ] = computeShader( base + "tonemap.cs.glsl" ).shaderHandle;
 
 	// renderers
 	shaders[ "Image3D Raymarch" ] = computeShader( base + "renderers/raymarch.cs.glsl" ).shaderHandle;
+	shaders[ "Sampler Raymarch" ] = computeShader( base + "renderers/raymarchSampler.cs.glsl" ).shaderHandle;
+	// shaders[ "Renderer" ] = shaders[ "Sampler Raymarch" ]; // default
 	shaders[ "Renderer" ] = shaders[ "Image3D Raymarch" ]; // default
 
 	// initialize the text renderer
