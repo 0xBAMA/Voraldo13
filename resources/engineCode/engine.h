@@ -32,6 +32,13 @@ private:
 	// tonemapping parameters + adjustment
 	colorGradeParameters tonemap;
 
+	void setColorMipmapFlag();
+	void setLightMipmapFlag();
+	bool mipmapFlagColor = true;
+	bool mipmapFlagLight = true;
+	void genColorMipmap();
+	void genLightMipmap();
+
 //==============================================================================
 	// initialization
 	void Init ();

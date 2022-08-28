@@ -13,13 +13,13 @@ uniform bool draw;
 uniform int mask;
 
 mat3 RotationMatrix ( vec3 axis, float angle ) {
-	axis = normalize( axis );
+	vec3 ax = normalize( axis );
 	float s = sin( angle );
 	float c = cos( angle );
 	float oc = 1.0 - c;
-	return mat3( oc * axis.x * axis.x + c,          oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,
-				oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,
-				oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c );
+	return mat3( oc * ax.x * ax.x + c,        oc * ax.x * ax.y - ax.z * s,  oc * ax.z * ax.x + ax.y * s,
+				oc * ax.x * ax.y + ax.z * s,  oc * ax.y * ax.y + c,         oc * ax.y * ax.z - ax.x * s,
+				oc * ax.z * ax.x - ax.y * s,  oc * ax.y * ax.z + ax.x * s,  oc * ax.z * ax.z + c );
 }
 
 bool inShape () {

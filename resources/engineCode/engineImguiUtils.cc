@@ -218,6 +218,7 @@ void engine::MenuAABB () {
 
 			// dispatch the compute shader
 			BlockDispatch();
+			setColorMipmapFlag();
 		}
 
 		ImGui::Unindent( 16.0f );
@@ -290,6 +291,7 @@ void engine::MenuCylinderTube () {
 
 			// dispatch the compute shader
 			BlockDispatch();
+			setColorMipmapFlag();
 		}
 
 
@@ -360,6 +362,7 @@ void engine::MenuEllipsoid () {
 
 			// dispatch the compute shader
 			BlockDispatch();
+			setColorMipmapFlag();
 		}
 
 		ImGui::Unindent( 16.0f );
@@ -434,6 +437,7 @@ void engine::MenuGrid () {
 
 			// dispatch the compute shader
 			BlockDispatch();
+			setColorMipmapFlag();
 		}
 
 		ImGui::Unindent( 16.0f );
@@ -515,6 +519,7 @@ void engine::MenuHeightmap () {
 			SendUniforms( j );
 			AddToLog( j );
 			BlockDispatch();
+			setColorMipmapFlag();
 		}
 
 		ImGui::Unindent( 16.0f );
@@ -613,6 +618,7 @@ void engine::MenuSphere () {
 
 			// dispatch the compute shader
 			BlockDispatch();
+			setColorMipmapFlag();
 		}
 
 		ImGui::Unindent( 16.0f );
@@ -686,6 +692,7 @@ void engine::MenuTriangle () {
 
 			// dispatch the compute shader
 			BlockDispatch();
+			setColorMipmapFlag();
 		}
 
 		ImGui::Unindent( 16.0f );
@@ -823,6 +830,7 @@ void engine::MenuVAT () {
 			SendUniforms( j );
 			// AddToLog( j ); // need to revisit this
 			BlockDispatch();
+			setColorMipmapFlag();
 		}
 		ImGui::SameLine();
 		if ( ImGui::Button( " Compute Random " ) ) {
@@ -858,6 +866,7 @@ void engine::MenuVAT () {
 			SendUniforms( j );
 			// AddToLog( j ); // need to revisit this
 			BlockDispatch();
+			setColorMipmapFlag();
 		}
 		ImGui::SameLine();
 		if ( ImGui::Button( " Compute IRandom " ) ) {
@@ -893,6 +902,7 @@ void engine::MenuVAT () {
 			SendUniforms( j );
 			// AddToLog( j ); // need to revisit this
 			BlockDispatch();
+			setColorMipmapFlag();
 		}
 
 
@@ -969,6 +979,7 @@ void engine::MenuXOR () {
 			SendUniforms( j );
 			AddToLog( j );
 			BlockDispatch();
+			setColorMipmapFlag();
 		}
 
 
@@ -1029,6 +1040,7 @@ void engine::MenuClearBlock () {
 
 			// dispatch the compute shader
 			BlockDispatch();
+			setColorMipmapFlag();
 		}
 
 		ImGui::Unindent( 16.0f );
@@ -1076,6 +1088,7 @@ void engine::MenuMasking () {
 			SendUniforms( j );
 			AddToLog( j );
 			BlockDispatch();
+			setColorMipmapFlag();
 		}
 
 		// invert mask
@@ -1091,6 +1104,7 @@ void engine::MenuMasking () {
 			SendUniforms( j );
 			AddToLog( j );
 			BlockDispatch();
+			setColorMipmapFlag();
 		}
 
 		ImGui::Text( " " );
@@ -1157,6 +1171,7 @@ void engine::MenuMasking () {
 
 			// dispatch the compute shader
 			BlockDispatch();
+			setColorMipmapFlag();
 		}
 
 		ImGui::Unindent( 16.0f );
@@ -1204,6 +1219,7 @@ void engine::MenuBlur () {
 			SendUniforms( j );
 			AddToLog( j );
 			BlockDispatch();
+			setColorMipmapFlag();
 		}
 		ImGui::Unindent( 16.0f );
 		OrangeText( "Gaussian Kernel" );
@@ -1220,6 +1236,7 @@ void engine::MenuBlur () {
 			SendUniforms( j );
 			AddToLog( j );
 			BlockDispatch();
+			setColorMipmapFlag();
 		}
 		ImGui::Unindent( 16.0f );
 		ImGui::Unindent( 16.0f );
@@ -1275,6 +1292,7 @@ void engine::MenuShiftTrim () {
 			SendUniforms( j );
 			AddToLog( j );
 			BlockDispatch();
+			setColorMipmapFlag();
 		}
 
 		ImGui::Unindent( 16.0f );
@@ -1318,6 +1336,8 @@ void engine::MenuShiftTrim () {
 			SendUniforms( j );
 			AddToLog( j );
 			BlockDispatch();
+
+			setColorMipmapFlag();
 		}
 
 		ImGui::Unindent( 32.0f );
@@ -1370,6 +1390,7 @@ void engine::MenuLoadSave () {
 			SendUniforms( j );
 			AddToLog( j );
 			BlockDispatch();
+			setColorMipmapFlag();
 		}
 		ImGui::SameLine();
 		ImGui::Checkbox( " Respect Mask on Load", &respectMask );
@@ -1557,6 +1578,7 @@ void engine::MenuClearLightLevels () {
 			SendUniforms( j );
 			AddToLog( j );
 			BlockDispatch();
+			setLightMipmapFlag();
 		}
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
@@ -1580,7 +1602,7 @@ void engine::MenuPointLight () {
 
 		static glm::vec3 position = glm::vec3( 0.0f );
 		static float distancePower = 2.0f;
-		static float decay = 0.0f;
+		static float decay = 2.0f;
 		static glm::vec4 color = glm::vec4( 0.0f );
 
 		OrangeText( "Position" );
@@ -1595,6 +1617,8 @@ void engine::MenuPointLight () {
 
 		if ( ImGui::Button( " Point Light " ) ) {
 
+
+			setLightMipmapFlag();
 		}
 
 		ImGui::Unindent( 16.0f );
@@ -1622,7 +1646,7 @@ void engine::MenuConeLight () {
 		static float distancePower = 2.0f;
 		static float theta = 0.0f;
 		static float phi = 0.0f;
-		static float decay = 0.0f;
+		static float decay = 2.0f;
 		static glm::vec4 color = glm::vec4( 0.0f );
 
 		OrangeText( "Position" );
@@ -1641,6 +1665,8 @@ void engine::MenuConeLight () {
 
 		if ( ImGui::Button( " Cone Light " ) ) {
 
+
+			setLightMipmapFlag();
 		}
 
 		ImGui::Unindent( 16.0f );
@@ -1665,7 +1691,7 @@ void engine::MenuDirectionalLight () {
 
 		static float theta = 0.0f;
 		static float phi = 0.0f;
-		static float decay = 0.0f;
+		static float decay = 2.0f;
 		static glm::vec4 color = glm::vec4( 0.0f );
 
 		OrangeText( "Direction" );
@@ -1678,8 +1704,8 @@ void engine::MenuDirectionalLight () {
 
 		if ( ImGui::Button( " Directional Light " ) ) {
 			// make sure the texture has a mipmap... hopefully this is kosher
-			glBindTexture( GL_TEXTURE_3D, textures[ "Color Block Front" ] );
-			glGenerateMipmap( GL_TEXTURE_3D );
+			// glBindTexture( GL_TEXTURE_3D, textures[ "Color Block Front" ] );
+			// glGenerateMipmap( GL_TEXTURE_3D );
 
 			json j;
 			render.framesSinceLastInput = 0; // no swap, but will require a renderer refresh
@@ -1692,11 +1718,8 @@ void engine::MenuDirectionalLight () {
 			AddVec4( j, "color", color );
 			SendUniforms( j );
 
-			// ugh
-			// glUniform1i( glGetUniformLocation( shaders[ "Directional Light" ], "colorBlock" ), 0 );
-			// glUniform1i( glGetUniformLocation( shaders[ "Directional Light" ], "colorBlock" ), 1 );
-
 			BlockDispatch();
+			setLightMipmapFlag();
 		}
 
 		ImGui::Unindent( 16.0f );
@@ -1763,6 +1786,8 @@ void engine::MenuFakeGI () {
 				glDispatchCompute( BLOCKDIM / 8, BLOCKDIM / 8, 1 );
 				glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 			}
+
+			setLightMipmapFlag();
 		}
 
 		ImGui::Unindent( 16.0f );
@@ -1802,6 +1827,7 @@ void engine::MenuAmbientOcclusion () {
 			SendUniforms( j );
 			AddToLog( j );
 			BlockDispatch();
+			setLightMipmapFlag();
 		}
 
 		ImGui::Unindent( 16.0f );
@@ -1834,6 +1860,8 @@ void engine::MenuLightMash () {
 			SendUniforms( j );
 			AddToLog( j );
 			BlockDispatch();
+			setColorMipmapFlag();
+			setLightMipmapFlag();
 		}
 
 		ImGui::Unindent( 16.0f );
@@ -1898,21 +1926,63 @@ void engine::MenuRenderingSettings () {
 	static int currentlySelectedRenderMode = 0;
 	const char* renderModeList[] = {
 		"Image3D Raymarch",
-		"TODO: Texture Raymarch ( Nearest )",
+		"Texture Raymarch ( Nearest )",
 		"TODO: Texture Raymarch ( Mipmapped )",
+		"TODO: 3D DDA",
 		"TODO: Depth Visualization",
-		"TODO: Position Visualization",
-		"TODO: 3D DDA"
+		"TODO: Position Visualization"
 		// spherical camera here? or as an input toggle - want to try it one way or the other
 	};
 
 	ImGui::Combo( "Render Mode", &currentlySelectedRenderMode, renderModeList, IM_ARRAYSIZE( renderModeList ) );
 	if ( ImGui::IsItemEdited() ) { // updated, need to do the appropriate setup
+		reset = true;
+
 		// ref the shaders[] map with the render mode label
 		// shaders[ "Renderer" ] = shaders[ std::string( renderModeList[ currentlySelectedRenderMode ] ) ];
 		// cout << renderModeList[ currentlySelectedRenderMode ] << endl;
-	}
 
+		switch ( currentlySelectedRenderMode ) {
+		case 0: // Image3D Raymarch
+			shaders[ "Renderer" ] = shaders[ "Image3D Raymarch" ];
+			break;
+		case 1: // Texture Raymarch ( Nearest )
+			shaders[ "Renderer" ] = shaders[ "Sampler Raymarch" ];
+			glBindTexture( GL_TEXTURE_3D, textures[ "Color Block Front" ] );
+			glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+			glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+			glBindTexture( GL_TEXTURE_3D, textures[ "Color Block Back" ] );
+			glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+			glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+			glBindTexture( GL_TEXTURE_3D, textures[ "Lighting Block" ] );
+			glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+			glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+			break;
+		case 2: // Texture Raymarch ( Mipmapped )
+			shaders[ "Renderer" ] = shaders[ "Sampler Raymarch" ];
+			glBindTexture( GL_TEXTURE_3D, textures[ "Color Block Front" ] );
+			glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+			// glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+			glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+			glBindTexture( GL_TEXTURE_3D, textures[ "Color Block Back" ] );
+			glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+			// glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+			glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+			glBindTexture( GL_TEXTURE_3D, textures[ "Lighting Block" ] );
+			glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+			// glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+			glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+			setLightMipmapFlag();
+			setColorMipmapFlag();
+			break;
+		case 3: // 3D DDA
+			break;
+		case 4: // Depth Visualization
+			break;
+		case 5: // Position Visualization
+			break;
+		}
+	}
 
 	// picker for render mode shader
 	ImGui::SliderFloat( "Blend Factor", &render.blendFactor, 0.0f, 1.0f );

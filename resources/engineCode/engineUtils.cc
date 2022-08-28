@@ -50,8 +50,11 @@ void engine::Raymarch () {
 	// don't render redundantly - only run for numFramesHistory frames after any state changes
 	if ( render.framesSinceLastInput <= ( uint32_t ) render.numFramesHistory ) {
 
+		genColorMipmap();
+		genLightMipmap();
 		bindSets[ "Rendering" ].apply();
-		glUseProgram( shaders[ "Renderer" ] );
+		const GLuint shader = shaders[ "Renderer" ];
+		glUseProgram( shader );
 		SendRaymarchParameters();
 
 		static std::random_device r;
@@ -65,8 +68,8 @@ void engine::Raymarch () {
 		constexpr int t = TILESIZE;
 		for ( int x = 0; x < w; x += t ) {
 			for ( int y = 0; y < h; y += t ) {
-				glUniform2i( glGetUniformLocation( shaders[ "Renderer" ], "noiseOffset" ), dist( gen ), dist( gen ) );
-				glUniform2i( glGetUniformLocation( shaders[ "Renderer" ], "tileOffset" ), x, y );
+				glUniform2i( glGetUniformLocation( shader, "noiseOffset" ), dist( gen ), dist( gen ) );
+				glUniform2i( glGetUniformLocation( shader, "tileOffset" ), x, y );
 				glDispatchCompute( t / 16, t / 16, 1 );
 			}
 		}
@@ -491,5 +494,27 @@ void engine::SendUniforms ( json j ) {
 		} else if ( type == "vec4" ) {
 			glUniform4f( glGetUniformLocation( shader, label.c_str() ), val[ "x" ], val[ "y" ], val[ "z" ], val[ "w" ] );
 		}
+	}
+}
+
+void engine::setColorMipmapFlag () {
+	mipmapFlagColor = true;
+}
+
+void engine::setLightMipmapFlag () {
+	mipmapFlagLight = true;
+}
+
+void engine::genColorMipmap () {
+	if ( mipmapFlagColor && shaders[ "Renderer" ] == shaders[ "Sampler Raymarch" ] ) {
+		glBindTexture( GL_TEXTURE_3D, textures[ "Color Block Front" ] );
+		glGenerateMipmap( GL_TEXTURE_3D );
+	}
+}
+
+void engine::genLightMipmap () {
+	if ( mipmapFlagLight && shaders[ "Renderer" ] == shaders[ "Sampler Raymarch" ] ) {
+		glBindTexture( GL_TEXTURE_3D, textures[ "Lighting Block" ] );
+		glGenerateMipmap( GL_TEXTURE_3D );
 	}
 }

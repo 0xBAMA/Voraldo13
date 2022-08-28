@@ -215,7 +215,6 @@ void engine::SetupTextures () {
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	// glGenerateMipmap( GL_TEXTURE_3D );
 	textures[ "Color Block Front" ] = colorTextures[ 0 ];
 
 	glActiveTexture( GL_TEXTURE7 );
@@ -226,7 +225,6 @@ void engine::SetupTextures () {
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	// glGenerateMipmap( GL_TEXTURE_3D );
 	textures[ "Color Block Back" ] = colorTextures[ 1 ];
 
 	// mask blocks ( front and back - can this be consolidated? not sure if two are needed )
@@ -262,7 +260,6 @@ void engine::SetupTextures () {
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glGenerateMipmap( GL_TEXTURE_3D );
 	textures[ "Lighting Block" ] = lightTexture;
 
 	// loadbuffer for VAT + load/save
@@ -458,7 +455,6 @@ void engine::ShaderCompile () {
 	shaders[ "Image3D Raymarch" ] = computeShader( base + "renderers/raymarch.cs.glsl" ).shaderHandle;
 	shaders[ "Sampler Raymarch" ] = computeShader( base + "renderers/raymarchSampler.cs.glsl" ).shaderHandle;
 	shaders[ "Renderer" ] = shaders[ "Image3D Raymarch" ]; // default
-	// shaders[ "Renderer" ] = shaders[ "Sampler Raymarch" ];
 
 	// initialize the text renderer
 	shaders[ "Font Renderer" ] = computeShader( "resources/fonts/fontRenderer/font.cs.glsl" ).shaderHandle;
