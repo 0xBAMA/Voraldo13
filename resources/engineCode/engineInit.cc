@@ -446,6 +446,7 @@ void engine::ShaderCompile () {
 	shaders[ "Light Mash" ] = computeShader( base + "lighting/mash.cs.glsl" ).shaderHandle;
 	shaders[ "Fake GI" ] = computeShader( base + "lighting/fakeGI.cs.glsl" ).shaderHandle;
 	shaders[ "Directional Light" ] = computeShader( base + "lighting/directional.cs.glsl" ).shaderHandle;
+	shaders[ "Point Light" ] = computeShader( base + "lighting/point.cs.glsl" ).shaderHandle;
 	shaders[ "Ambient Occlusion" ] = computeShader( base + "lighting/ambientOcclusion.cs.glsl" ).shaderHandle;
 
 	// color adjustments

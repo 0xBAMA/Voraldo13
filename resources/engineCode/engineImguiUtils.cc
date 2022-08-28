@@ -1600,15 +1600,15 @@ void engine::MenuPointLight () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
-		static glm::vec3 position = glm::vec3( 0.0f );
+		static glm::vec3 lightPosition = glm::vec3( 0.0f );
 		static float distancePower = 2.0f;
 		static float decay = 2.0f;
 		static glm::vec4 color = glm::vec4( 0.0f );
 
 		OrangeText( "Position" );
-		ImGui::SliderFloat( "X", &position.x, 0.0f, float( BLOCKDIM ), "%.3f" );
-		ImGui::SliderFloat( "Y", &position.y, 0.0f, float( BLOCKDIM ), "%.3f" );
-		ImGui::SliderFloat( "Z", &position.z, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "X", &lightPosition.x, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Y", &lightPosition.y, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Z", &lightPosition.z, 0.0f, float( BLOCKDIM ), "%.3f" );
 		OrangeText( "Parameters" );
 		ImGui::SliderFloat( "Distance Power", &distancePower, 0.0f, 5.0f, "%.3f" );
 		ImGui::SliderFloat( "Decay", &decay, 0.0f, 20.0f, "%.3f", ImGuiSliderFlags_Logarithmic );
@@ -1617,7 +1617,18 @@ void engine::MenuPointLight () {
 
 		if ( ImGui::Button( " Point Light " ) ) {
 
+			json j;
+			render.framesSinceLastInput = 0; // no swap, but will require a renderer refresh
+			bindSets[ "Lighting Operation" ].apply();
+			j[ "shader" ] = "Point Light";
+			j[ "bindset" ] = "Lighting Operation";
+			AddVec3( j, "lightPosition", lightPosition );
+			AddFloat( j, "distancePower", distancePower );
+			AddFloat( j, "decay", decay );
+			AddVec4( j, "color", color );
+			SendUniforms( j );
 
+			BlockDispatch();
 			setLightMipmapFlag();
 		}
 
