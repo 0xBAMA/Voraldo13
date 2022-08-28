@@ -61,7 +61,8 @@ void getColorForPixel ( vec3 rO, vec3 rD, inout vec4 color ) {
 	const float stepSize = max( float( ( tMax - tMin ) / numSteps ), 0.001 );
 	vec3 samplePosition = ( rO + tCurrent * rD + vec3( 1.0 ) ) / 2.0;
 	vec4 newRead = texture( colorBlockFront, samplePosition );
-	vec4 newLightRead = texture( lightingBlock, samplePosition );
+	// vec4 newLightRead = texture( lightingBlock, samplePosition );
+	vec4 newLightRead = vec4( 1.0 );
 	for ( int i = 0; i < numSteps; i++ ) {
 		if( tCurrent >= tMin ) {
 			newRead.rgb *= newLightRead.xyz;
@@ -73,7 +74,8 @@ void getColorForPixel ( vec3 rO, vec3 rD, inout vec4 color ) {
 			tCurrent -= stepSize;
 			samplePosition = ( rO + tCurrent * rD + vec3( 1.0 ) ) / 2.0;
 			newRead = texture( colorBlockFront, samplePosition );
-			newLightRead = texture( lightingBlock, samplePosition );
+			// newLightRead = texture( lightingBlock, samplePosition );
+			newLightRead = vec4( 1.0 );
 		}
 	}
 }
