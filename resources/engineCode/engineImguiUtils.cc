@@ -1652,21 +1652,21 @@ void engine::MenuConeLight () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
-		static glm::vec3 lightPosition = glm::vec3( 0.0f );
-		static float coneAngle = 0.0f;
+		static glm::vec3 lightPosition = glm::vec3( 0.01f );
+		static glm::vec3 targetPosition = glm::vec3( BLOCKDIM / 2.0f );
+		static float coneAngle = 0.3f;
 		static float distancePower = 2.0f;
-		static float theta = 0.0f;
-		static float phi = 0.0f;
 		static float decay = 2.0f;
 		static glm::vec4 color = glm::vec4( 0.0f );
 
 		OrangeText( "Position" );
-		ImGui::SliderFloat( "X", &lightPosition.x, 0.0f, float( BLOCKDIM ), "%.3f" );
-		ImGui::SliderFloat( "Y", &lightPosition.y, 0.0f, float( BLOCKDIM ), "%.3f" );
-		ImGui::SliderFloat( "Z", &lightPosition.z, 0.0f, float( BLOCKDIM ), "%.3f" );
-		OrangeText( "Direction" );
-		ImGui::SliderFloat( "Theta", &theta, -float( pi ), float( pi ), "%.3f" );
-		ImGui::SliderFloat( "Phi", &phi, -float( pi ), float( pi ), "%.3f" );
+		ImGui::SliderFloat( "X", &lightPosition.x, 0.01f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Y", &lightPosition.y, 0.01f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Z", &lightPosition.z, 0.01f, float( BLOCKDIM ), "%.3f" );
+		OrangeText( "Target Point" );
+		ImGui::SliderFloat( "X ", &targetPosition.x, 0.01f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Y ", &targetPosition.y, 0.01f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Z ", &targetPosition.z, 0.01f, float( BLOCKDIM ), "%.3f" );
 		OrangeText( "Parameters" );
 		ImGui::SliderFloat( "Cone Angle", &coneAngle, 0.0f, float( 2.0f * pi ), "%.3f" );
 		ImGui::SliderFloat( "Distance Power", &distancePower, 0.0f, 5.0f, "%.3f" );
@@ -1680,11 +1680,13 @@ void engine::MenuConeLight () {
 			bindSets[ "Lighting Operation" ].apply();
 			j[ "shader" ] = "Cone Light";
 			j[ "bindset" ] = "Lighting Operation";
+			if( glm::distance( targetPosition, lightPosition ) < 0.01 ) {
+				// do something to offset one or the other
+			}
 			AddVec3( j, "lightPosition", lightPosition );
+			AddVec3( j, "targetPosition", targetPosition );
 			AddFloat( j, "distancePower", distancePower );
 			AddFloat( j, "coneAngle", coneAngle );
-			AddFloat( j, "theta", theta );
-			AddFloat( j, "phi", phi );
 			AddFloat( j, "decay", decay );
 			AddVec4( j, "color", color );
 			SendUniforms( j );

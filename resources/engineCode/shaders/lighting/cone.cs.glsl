@@ -8,22 +8,12 @@ layout( binding = 4, rgba16f ) uniform image3D lightBlock;
 layout( binding = 5, rgba8ui ) uniform uimage3D blueNoise;
 // =============================================================================
 uniform vec3 lightPosition;
-uniform float theta;
-uniform float phi;
+uniform vec3 targetPosition;
 uniform float coneAngle;
 uniform float distancePower;
 uniform float decay;
 uniform vec4 color;
 // =============================================================================
-mat3 RotationMatrix ( vec3 axis, float angle ) {
-	vec3 ax = normalize( axis );
-	float s = sin( angle );
-	float c = cos( angle );
-	float oc = 1.0 - c;
-	return mat3( oc * ax.x * ax.x + c,        oc * ax.x * ax.y - ax.z * s,  oc * ax.z * ax.x + ax.y * s,
-				oc * ax.x * ax.y + ax.z * s,  oc * ax.y * ax.y + c,         oc * ax.y * ax.z - ax.x * s,
-				oc * ax.z * ax.x - ax.y * s,  oc * ax.y * ax.z + ax.x * s,  oc * ax.z * ax.z + c );
-}
 
 #include "intersect.h"
 
@@ -97,8 +87,6 @@ void traceRay ( vec3 direction ) {
 // =============================================================================
 void main () {
 	vec3 lightDirection = normalize( vec3( gl_GlobalInvocationID.xyz ) - lightPosition );
-	conePointingDirection = vec3( 0.0, 0.0, -1.0 );
-	conePointingDirection *= RotationMatrix( vec3( 1.0, 0.0, 0.0 ), phi );
-	conePointingDirection *= RotationMatrix( vec3( 0.0, 1.0, 0.0 ), theta );
+	conePointingDirection = normalize( targetPosition - lightPosition );
 	traceRay( lightDirection );
 }
