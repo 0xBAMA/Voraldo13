@@ -12,15 +12,6 @@ uniform float distancePower;
 uniform float decay;
 uniform vec4 color;
 // =============================================================================
-mat3 RotationMatrix ( vec3 axis, float angle ) {
-	vec3 ax = normalize( axis );
-	float s = sin( angle );
-	float c = cos( angle );
-	float oc = 1.0 - c;
-	return mat3( oc * ax.x * ax.x + c,        oc * ax.x * ax.y - ax.z * s,  oc * ax.z * ax.x + ax.y * s,
-				oc * ax.x * ax.y + ax.z * s,  oc * ax.y * ax.y + c,         oc * ax.y * ax.z - ax.x * s,
-				oc * ax.z * ax.x - ax.y * s,  oc * ax.y * ax.z + ax.x * s,  oc * ax.z * ax.z + c );
-}
 
 #include "intersect.h"
 

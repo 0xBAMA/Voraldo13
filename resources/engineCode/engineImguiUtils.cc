@@ -1652,7 +1652,7 @@ void engine::MenuConeLight () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
-		static glm::vec3 position = glm::vec3( 0.0f );
+		static glm::vec3 lightPosition = glm::vec3( 0.0f );
 		static float coneAngle = 0.0f;
 		static float distancePower = 2.0f;
 		static float theta = 0.0f;
@@ -1661,9 +1661,9 @@ void engine::MenuConeLight () {
 		static glm::vec4 color = glm::vec4( 0.0f );
 
 		OrangeText( "Position" );
-		ImGui::SliderFloat( "X", &position.x, 0.0f, float( BLOCKDIM ), "%.3f" );
-		ImGui::SliderFloat( "Y", &position.y, 0.0f, float( BLOCKDIM ), "%.3f" );
-		ImGui::SliderFloat( "Z", &position.z, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "X", &lightPosition.x, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Y", &lightPosition.y, 0.0f, float( BLOCKDIM ), "%.3f" );
+		ImGui::SliderFloat( "Z", &lightPosition.z, 0.0f, float( BLOCKDIM ), "%.3f" );
 		OrangeText( "Direction" );
 		ImGui::SliderFloat( "Theta", &theta, -float( pi ), float( pi ), "%.3f" );
 		ImGui::SliderFloat( "Phi", &phi, -float( pi ), float( pi ), "%.3f" );
@@ -1675,7 +1675,21 @@ void engine::MenuConeLight () {
 		ImGui::SliderFloat( "Intensity Scale", &color.a, 0.0f, 5.0f );
 
 		if ( ImGui::Button( " Cone Light " ) ) {
+			json j;
+			render.framesSinceLastInput = 0; // no swap, but will require a renderer refresh
+			bindSets[ "Lighting Operation" ].apply();
+			j[ "shader" ] = "Cone Light";
+			j[ "bindset" ] = "Lighting Operation";
+			AddVec3( j, "lightPosition", lightPosition );
+			AddFloat( j, "distancePower", distancePower );
+			AddFloat( j, "coneAngle", coneAngle );
+			AddFloat( j, "theta", theta );
+			AddFloat( j, "phi", phi );
+			AddFloat( j, "decay", decay );
+			AddVec4( j, "color", color );
+			SendUniforms( j );
 
+			BlockDispatch();
 
 			setLightMipmapFlag();
 		}
