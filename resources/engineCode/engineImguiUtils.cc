@@ -950,13 +950,38 @@ void engine::MenuLetters () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
-
-		OrangeText( "Currently Unimplemented" );
-
-		// letter count
-		// num variants
-		// color etc
 		static letterSelector l;
+		static int letterCount = 0;
+		static int numVariants = 0;
+		static bool respectMask = false;
+		static glm::vec4 color( 0.0f );
+
+		ImGui::SliderInt( "Letter Count", &letterCount, 0, 10000 );
+		ImGui::SliderInt( "Num Variants", &numVariants, 0, 49 );
+		ImGui::Checkbox( "Respect Mask", &respectMask );
+		ImGui::ColorEdit4( "Color", ( float * ) &color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_PickerHueWheel );
+
+		// this is another copy loadbuffer op
+		if ( ImGui::Button( "Draw" ) ) {
+			std::vector< uint8_t > data;
+			data.resize( BLOCKDIM * BLOCKDIM * BLOCKDIM * 4 );
+			l.blockulate( letterCount, numVariants, BLOCKDIM, color, data );
+
+			// buffer to the loadbuffer
+			glBindTexture( GL_TEXTURE_3D, textures[ "LoadBuffer" ] );
+			glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data.data()[ 0 ] );
+
+			// call the copyLoadbuffer shader
+			SwapBlocks();
+			bindSets[ "LoadBuffer" ].apply();
+			json j;
+			j[ "shader" ] = "Load";
+			j[ "bindset" ] = "LoadBuffer";
+			AddBool( j, "respectMask", respectMask );
+			SendUniforms( j );
+			AddToLog( j );
+			BlockDispatch();
+		}
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();

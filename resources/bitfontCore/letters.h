@@ -99,4 +99,57 @@ public:
 		}
 	}
 
+
+	void write ( int x, int y, int z, uint8_t color [ 4 ], std::vector< uint8_t > &data, int dim ) {
+		// this function has to do bounds checking
+		if( x < 0 || x >= dim || y < 0 || y >= dim || z < 0 || z >= dim ) return;
+		int index = 4 * ( x + y * dim + z * dim * dim );
+		data[ index+0 ] = color[ 0 ];
+		data[ index+1 ] = color[ 1 ];
+		data[ index+2 ] = color[ 2 ];
+		data[ index+3 ] = color[ 3 ];
+	}
+
+	void writeLetterToBlock ( letter l, int x, int y, int z, int dir, int scale, uint8_t color[ 4 ], std::vector< uint8_t > &data, int dim ) {
+		int xdim = l.data.size();
+		int ydim = l.data[ 1 ].size();
+		for( int xx = 0; xx < xdim; xx++ )
+		for( int yy = 0; yy < ydim; yy++ )
+		for( int xs = 0; xs < scale; xs++ )
+		for( int ys = 0; ys < scale; ys++ )
+		for( int zs = 0; zs < scale; zs++ )
+		switch( dir ) {
+			case 1: if ( l.data[ xx ][ yy ] == 1 ) write(x+xx*scale+xs,y+yy*scale+ys,z+zs,color,data,dim); break;
+			case 2: if ( l.data[ xx ][ yy ] == 1 ) write(x-xx+xs,y+yy*scale+ys,z+zs,color,data,dim); break;
+			case 3: if ( l.data[ xx ][ yy ] == 1 ) write(x+xx*scale+xs,y+yy*scale+ys,z+zs,color,data,dim); break;
+			case 4: if ( l.data[ xx ][ yy ] == 1 ) write(x+xx*scale+xs,y-yy+ys,z+zs,color,data,dim); break;
+			case 5: if ( l.data[ xx ][ yy ] == 1 ) write(x+xs,y+yy*scale+ys,z+xx*scale+zs,color,data,dim); break;
+			case 6: if ( l.data[ xx ][ yy ] == 1 ) write(x+xs,y+yy*scale+ys,z-xx+zs,color,data,dim); break;
+			default: break;
+		}
+	}
+
+	// function to populate the block with
+		// n glyphs, with m variants, of some color
+		// takes the data block by reference
+	void blockulate ( int n, int m, int dim, glm::vec4 color, std::vector< uint8_t > &data ) {
+		std::mt19937_64 gen;
+		std::random_device r;
+		std::seed_seq s{ r(), r(), r(), r(), r(), r(), r(), r(), r() };
+		gen = std::mt19937_64( s );
+		std::uniform_int_distribution< int > colorDistribution( -15, 15 );
+		std::uniform_int_distribution< int > glyphPick( 0, glyphs.size() );
+		std::uniform_int_distribution< int > locationDistribution( 0, dim );
+		std::uniform_int_distribution< int > directionDistribution( 1, ( m % 6 ) + 1 );
+		std::uniform_int_distribution< int > scaleDistribution( 1, ( m / 6 ) + 1 );
+		unsigned char col[ 4 ];
+		for(int i = 0; i < n; i++) { // n letters
+			// randomize position and color (a small amount with the <random> distributions)
+			for(int j = 0; j < 4; j++) {
+				col[ j ] = ( color[ j ] * 255 ) + colorDistribution( gen );
+			}
+			writeLetterToBlock( glyphs[ glyphPick( gen ) ], locationDistribution( gen ), locationDistribution( gen ), locationDistribution( gen ), directionDistribution( gen ), directionDistribution( gen ), col, data, dim );
+		}
+	}
+
 };
