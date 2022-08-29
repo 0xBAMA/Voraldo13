@@ -72,6 +72,11 @@ constexpr int MSAACount = 1;
 // image load/save/resize/access/manipulation wrapper
 #include "../ImageHandling/image.h"
 
+// letter stamping
+#include "../bitfontCore/letters.h"
+
+// spaceship generator
+
 // #define WIDTH 640
 // #define HEIGHT 480
 

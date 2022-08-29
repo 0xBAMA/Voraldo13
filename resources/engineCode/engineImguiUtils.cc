@@ -925,7 +925,11 @@ void engine::MenuSpaceship () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
+
+
 		OrangeText( "Currently Unimplemented" );
+
+
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -945,7 +949,15 @@ void engine::MenuLetters () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
+
+
 		OrangeText( "Currently Unimplemented" );
+
+		// letter count
+		// num variants
+		// color etc
+		static letterSelector l;
+
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
