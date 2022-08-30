@@ -168,11 +168,12 @@ void engine::HandleEvents () {
 		if ( ( event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_ESCAPE ) || ( event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_X1 )  )
 			quitConfirm = !quitConfirm;
 		if ( !ImGui::GetIO().WantCaptureMouse ) {
+			constexpr float scaleFactor = 0.965f;
 			if ( event.type == SDL_MOUSEWHEEL ) {
 				if ( event.wheel.y > 0 ) {
-					render.scaleFactor -= 0.1f;
+					render.scaleFactor *= scaleFactor;
 				} else if ( event.wheel.y < 0 ) {
-					render.scaleFactor += 0.1f;
+					render.scaleFactor /= scaleFactor;
 				}
 				render.framesSinceLastInput = 0;
 			}

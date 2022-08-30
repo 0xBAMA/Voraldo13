@@ -713,8 +713,39 @@ void engine::MenuUserShader () {
 	ImGui::BeginTabBar( "user shader" );
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
+
+		static TextEditor editor;
+		// static auto lang = TextEditor::LanguageDefinition::CPlusPlus();
+		static auto lang = TextEditor::LanguageDefinition::GLSL();
+		editor.SetLanguageDefinition( lang );
+
+		auto cpos = editor.GetCursorPosition();
+		editor.SetPalette( TextEditor::GetDarkPalette() );
+
+		static bool loaded = false;
+		static const char *fileToEdit = "resources/engineCode/shaders/blit.vs.glsl";
+		if ( !loaded ) {
+			std::ifstream t ( fileToEdit );
+			editor.SetLanguageDefinition( lang );
+			if ( t.good() ) {
+				editor.SetText( std::string( ( std::istreambuf_iterator< char >( t ) ), std::istreambuf_iterator< char >() ) );
+				loaded = true;
+			}
+		}
+
+		ImGui::Text( "%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1,
+			cpos.mColumn + 1, editor.GetTotalLines(),
+			editor.IsOverwrite() ? "Ovr" : "Ins",
+			editor.CanUndo() ? "*" : " ",
+			editor.GetLanguageDefinition().mName.c_str(), fileToEdit );
+
+		editor.Render( "Editor" );
+		ImGui::EndTabItem();
+	}
+	if ( ImGui::BeginTabItem( " Terminal " ) ) {
+		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-		OrangeText( "Currently Unimplemented" );
+
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
