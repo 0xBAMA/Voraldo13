@@ -926,9 +926,8 @@ void engine::MenuSpaceship () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
-
 		OrangeText( "Currently Unimplemented" );
-
+		static spaceshipGenerator ssG;
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();

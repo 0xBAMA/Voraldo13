@@ -1,4 +1,5 @@
-
+#ifndef LETTERS
+#define LETTERS
 
 #include "../JSON/json.h"
 using json = nlohmann::json;
@@ -61,7 +62,10 @@ class letterSelector {
 public:
 
 	letterSelector () {
-		ReadUintModel();
+		if ( glyphs.size() == 0 ) {
+			ReadUintModel();
+		}
+
 		// std::cout << "There are " << glyphs.size() << " glyphs" << endl;
 		// for ( auto& g : glyphs ) {
 			// g.print();
@@ -69,7 +73,9 @@ public:
 	}
 
 
+	// make static?
 	std::vector< letter > glyphs;
+
 	std::string UintToString ( uint64_t data, int width ) {
 		std::string temp;
 		for ( int i = 0; i <= width; i++ ) {
@@ -153,3 +159,5 @@ public:
 	}
 
 };
+
+#endif

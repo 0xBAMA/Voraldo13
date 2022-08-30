@@ -76,6 +76,7 @@ constexpr int MSAACount = 1;
 #include "../bitfontCore/letters.h"
 
 // spaceship generator
+#include "../bitfontCore/spaceship.h"
 
 // #define WIDTH 640
 // #define HEIGHT 480
