@@ -926,8 +926,70 @@ void engine::MenuSpaceship () {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
 
-		OrangeText( "Currently Unimplemented" );
+		static bool respectMask = false;
+		static int count = 1;
+		static float spread = 1.0 / 9.0;
+		static int minXYScale = 1;
+		static int maxXYScale = 1;
+		static int minZScale = 4;
+		static int maxZScale = 10;
+
 		static spaceshipGenerator ssG;
+
+		ImGui::SliderInt( "Operation Count", &count, 0, 20 );
+		ImGui::SliderFloat( "Spread", &spread, 0.0f, 1.0f, "%.3f" );
+		ImGui::SliderInt( "Min XY Scale", &minXYScale, 0, 5 );
+		ImGui::SliderInt( "Max XY Scale", &maxXYScale, 0, 8 );
+		ImGui::SliderInt( "Min Z Scale", &minZScale, 0, 5 );
+		ImGui::SliderInt( "Max Z Scale", &maxZScale, 0, 10 );
+
+		ImGui::Checkbox( "Respect Mask", &respectMask );
+		if ( ImGui::Button( "Palette 1" ) ) {
+			glm::vec4 data1[] = { glm::vec4( 0.5f, 0.5f, 0.5f, 1.0f ), glm::vec4( 0.5f, 0.5f, 0.5f, 1.0f ), glm::vec4( 1.0f, 1.0f, 1.0f, 1.0f ), glm::vec4( 0.0f, 0.1f, 0.2f, 1.0f ) };
+			ssG.setPalette( data1 );
+		}
+		ImGui::SameLine();
+		if ( ImGui::Button( "Palette 2" ) ) {
+			glm::vec4 data2[] = { glm::vec4( 0.5f, 0.5f, 0.5f, 1.0f ), glm::vec4( 0.5f, 0.5f, 0.5f, 1.0f ), glm::vec4( 1.0f, 1.0f, 1.0f, 1.0f ), glm::vec4( 0.8f, 0.9f, 0.3f, 0.1f ) };
+			ssG.setPalette( data2 );
+		}
+		ImGui::SameLine();
+		if ( ImGui::Button( "Palette 3" ) ) {
+			glm::vec4 data3[] = { glm::vec4( 0.5f, 0.5f, 0.5f, 1.0f ), glm::vec4( 0.5f, 0.5f, 0.5f, 1.0f ), glm::vec4( 1.0f, 0.7f, 0.4f, 1.0f ), glm::vec4( 0.0f, 0.15f, 0.2f, 0.1f ) };
+			ssG.setPalette( data3 );
+		}
+		ImGui::SameLine();
+		if ( ImGui::Button( "Random Palette" ) ) {
+			ssG.genRandomPalette();
+		}
+
+		auto flags = ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_PickerHueWheel;
+		ImGui::ColorEdit4( "Color 1", ( float * ) &ssG.palette[ 0 ], flags );
+		ImGui::ColorEdit4( "Color 2", ( float * ) &ssG.palette[ 1 ], flags );
+		ImGui::ColorEdit4( "Color 3", ( float * ) &ssG.palette[ 2 ], flags );
+		ImGui::ColorEdit4( "Color 4", ( float * ) &ssG.palette[ 3 ], flags );
+
+		if ( ImGui::Button( "Draw" ) ) {
+			std::vector< uint8_t > data;
+			data.resize( BLOCKDIM * BLOCKDIM * BLOCKDIM * 4, 0 );
+			ssG.genSpaceship( count, spread, minXYScale, maxXYScale, minZScale, maxZScale );
+			ssG.getData( data, BLOCKDIM );
+
+			// buffer to the loadbuffer
+			glBindTexture( GL_TEXTURE_3D, textures[ "LoadBuffer" ] );
+			glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data.data()[ 0 ] );
+
+			// call the copyLoadbuffer shader
+			SwapBlocks();
+			bindSets[ "LoadBuffer" ].apply();
+			json j;
+			j[ "shader" ] = "Load";
+			j[ "bindset" ] = "LoadBuffer";
+			AddBool( j, "respectMask", respectMask );
+			SendUniforms( j );
+			AddToLog( j );
+			BlockDispatch();
+		}
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
