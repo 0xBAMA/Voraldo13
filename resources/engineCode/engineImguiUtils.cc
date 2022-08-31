@@ -737,7 +737,10 @@ void engine::MenuUserShader () {
 			cpos.mColumn + 1, editor.GetTotalLines(),
 			editor.IsOverwrite() ? "Ovr" : "Ins",
 			editor.CanUndo() ? "*" : " ",
-			editor.GetLanguageDefinition().mName.c_str(), fileToEdit );
+			editor.GetLanguageDefinition().mName.c_str(),
+			// fileToEdit );
+			"User Shader" );
+
 
 		editor.Render( "Editor" );
 		ImGui::EndTabItem();

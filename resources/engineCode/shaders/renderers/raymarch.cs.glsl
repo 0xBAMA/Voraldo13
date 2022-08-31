@@ -26,8 +26,14 @@ uniform ivec2 noiseOffset;
 
 #include "intersect.h"
 
+vec4 blue() {
+	const ivec2 noiseLoc = ( noiseOffset + ivec2( gl_GlobalInvocationID.xy ) + tileOffset ) % imageSize( blueNoiseTexture );
+	return jitterFactor * ( imageLoad( blueNoiseTexture, noiseLoc ) / 255.0 );
+}
+
 void getColorForPixel ( vec3 rO, vec3 rD, inout vec4 color ) {
-	float tCurrent = tMax;
+	// want to add some jittering to this - currently getting some aliasing that I think that will help with
+	float tCurrent = tMax + 0.001 * blue().z;
 	const float stepSize = max( float( ( tMax - tMin ) / numSteps ), 0.001 );
 	const vec3 blockSize = vec3( imageSize( colorBlockFront ) );
 	ivec3 samplePosition = ivec3( ( blockSize / 2.0 ) * ( rO + tCurrent * rD + vec3( 1.0 ) ) );
@@ -55,9 +61,7 @@ void main () {
 	const ivec2 iDimensions  = imageSize( accumulatorTexture );
 	const vec2 dimensions    = vec2( iDimensions );
 	const float aspectRatio  = dimensions.y / dimensions.x;
-	const ivec2 noiseLoc     = ( noiseOffset + invocation ) % imageSize( blueNoiseTexture );
-	const vec2 blueNoiseRead = jitterFactor * ( imageLoad( blueNoiseTexture, noiseLoc ).xy / 255.0 );
-	const vec2 uv            = ( location + blueNoiseRead ) / dimensions;
+	const vec2 uv            = ( location + blue().xy ) / dimensions;
 	const vec2 mappedPos     = scale * ( ( uv - vec2( 0.5 ) ) * vec2( 1.0, aspectRatio ) );
 	const vec3 rayOrigin     = invBasis * vec3( mappedPos, 2.0 );
 	const vec3 rayDirection  = invBasis * vec3( perspectiveFactor * mappedPos, -2.0 );

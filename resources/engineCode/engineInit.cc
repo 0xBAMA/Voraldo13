@@ -470,7 +470,6 @@ void engine::ShaderCompile () {
 	trident.PassInShaders( shaders[ "Trident Raymarch" ], shaders[ "Trident Blit" ] );
 
 	cout << T_GREEN << "done." << T_RED << " ( " << Tock() << " us )" << RESET << endl;
-
 }
 
 void engine::ImguiSetup () {
@@ -486,6 +485,7 @@ void engine::ImguiSetup () {
 	// font config
 	defaultFont = io.Fonts->AddFontDefault();
 	titleFont = io.Fonts->AddFontFromFileTTF( "resources/fonts/ttf/Cinzel-VariableFont_wght.ttf", 26 );
+	// another one for top bar titles? tbd
 
 	// enable docking
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
