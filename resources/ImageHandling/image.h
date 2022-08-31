@@ -173,6 +173,10 @@ public:
 	}
 
 	void Resize ( float scaleFactor ) {
+		if ( scaleFactor == 1.0f ) {
+			return;
+		}
+
 		int newX = std::floor( scaleFactor * float( width ) );
 	 	int newY = std::floor( scaleFactor * float( height ) );
 
@@ -201,6 +205,8 @@ public:
 		for ( unsigned int i = 0; i < newSize; i++ ) {
 			data.push_back( newData[ i ] );
 		}
+
+		free( newData );
 	}
 
 	rgba GetAtXY ( int x, int y ) {

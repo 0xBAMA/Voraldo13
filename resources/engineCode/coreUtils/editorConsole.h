@@ -1,3 +1,28 @@
+#include "../includes.h"
+
+class editorConsole {
+public:
+	editorConsole();
+
+	void draw();
+
+
+
+	// config flags
+
+};
+
+
+inline void draw () {
+	
+}
+
+
+
+
+
+
+
 // this is the old implementation - a lot of room for improvement
 
 

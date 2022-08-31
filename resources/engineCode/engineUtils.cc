@@ -394,6 +394,7 @@ void engine::CapturePostprocessScreenshot () {
 	auto inTime_tP = std::chrono::system_clock::to_time_t( nowP );
 	std::stringstream ssP;
 	ssP << std::put_time( std::localtime( &inTime_tP ), "screenshots/Voraldo13ssP-%Y-%m-%d %X.png" );
+	screenshotP.Resize( postprocessScreenshotScaleFactor );
 	screenshotP.Save( ssP.str(), LODEPNG );
 }
 

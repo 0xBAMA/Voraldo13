@@ -1631,6 +1631,10 @@ void engine::MenuScreenshot () {
 	ImGui::Indent( 16.0f );
 
 	ImGui::Text( " " );
+	static float resize = 1.0;
+	ImGui::SliderFloat( "Resize on Output", &resize, 0.1f, 10.0f, "%.3f" );
+	ImGui::Text( " " );
+	ImGui::Text( " " );
 	OrangeText( "Accumulator Screenshot" );
 	ImGui::Separator();
 	ImGui::TextWrapped( "Accumulator texture just has the averaged samples. This is before tonemapping, etc, and does not include any filtering. It will be the size of the image buffer times the SSFACTOR on each x and y." );
@@ -1646,6 +1650,7 @@ void engine::MenuScreenshot () {
 		auto inTime_tA = std::chrono::system_clock::to_time_t( nowA );
 		std::stringstream ssA;
 		ssA << std::put_time( std::localtime( &inTime_tA ), "screenshots/Voraldo13ssA-%Y-%m-%d %X.png" );
+		screenshotA.Resize( resize );
 		screenshotA.Save( ssA.str(), LODEPNG );
 	}
 	ImGui::Unindent( 16.0f );
@@ -1659,6 +1664,7 @@ void engine::MenuScreenshot () {
 	ImGui::Indent( 16.0f );
 	if ( ImGui::Button( "Get Postprocessed Screenshot" ) ) {
 		wantCapturePostprocessScreenshot = true;
+		postprocessScreenshotScaleFactor = resize;
 	}
 	ImGui::Unindent( 16.0f );
 	ImGui::Separator();
@@ -1681,6 +1687,7 @@ void engine::MenuScreenshot () {
 		auto inTime_tB = std::chrono::system_clock::to_time_t( nowB );
 		std::stringstream ssB;
 		ssB << std::put_time( std::localtime( &inTime_tB ), "screenshots/Voraldo13ssB-%Y-%m-%d %X.png" );
+		screenshotB.Resize( resize );
 		screenshotB.Save( ssB.str(), LODEPNG );
 	}
 	ImGui::Unindent( 16.0f );

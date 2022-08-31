@@ -74,6 +74,7 @@ private:
 	int currentlySelectedMenuItem = -1;
 	void MenuSplash ();
 	bool wantCapturePostprocessScreenshot = false;
+	float postprocessScreenshotScaleFactor = 1.0f; 
 	void OrangeText ( const char *string );
 	void ColorPickerHelper ( bool& draw, int& mask, glm::vec4& color );
 	ImFont * defaultFont;
