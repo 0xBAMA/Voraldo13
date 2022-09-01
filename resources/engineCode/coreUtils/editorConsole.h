@@ -48,7 +48,9 @@ inline void editorConsole::draw () {
 		editor.GetLanguageDefinition().mName.c_str(),
 		"User Shader" );
 
+	// push selected font
 	editor.Render( "Editor" );
+	// pop the font
 }
 
 inline void editorConsole::setupConsole () {
@@ -68,7 +70,7 @@ inline void editorConsole::setupEditor () {
 	editor.SetPalette( TextEditor::GetDarkPalette() );
 
 	// I think this is going to expose the whole shader, for flexibility
-	
+
 }
 
 #endif

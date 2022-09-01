@@ -75,7 +75,7 @@ static string GetStringForEnum ( GLenum shaderType ) {
 Create and compile shader and report any errors - return shader handle
 ==============================================================================*/
 static GLuint ShaderCompile ( const char * source, GLenum shaderType, bool &result ) {
-	if ( !result ) return;
+	if ( !result ) return 0;
 	GLuint shader = glCreateShader( shaderType );
 	glShaderSource( shader, 1, &source, NULL );
 	glCompileShader( shader );
@@ -119,7 +119,7 @@ Construct a standard vertex+fragment pair from the given input strings
 ==============================================================================*/
 class regularShader {
 public:
-	bool success;
+	bool success = true;
 	GLuint shaderHandle;
 	regularShader ( string pathV, string pathF ) {
 		// read the source
@@ -140,7 +140,7 @@ depending on usage, should be fairly self explanatory
 ==============================================================================*/
 class computeShader {
 public:
-	bool success;
+	bool success = true;
 	GLuint shaderHandle;
 	enum class shaderSource { fromFile, fromString };
 	computeShader ( string input, shaderSource source = shaderSource::fromFile ) {
