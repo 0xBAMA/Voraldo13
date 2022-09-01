@@ -69,6 +69,9 @@ constexpr int MSAACount = 1;
 // managing bindings of textures to binding points
 #include "coreUtils/bindset.h"
 
+// editor + console
+#include "coreUtils/editorConsole.h"
+
 // image load/save/resize/access/manipulation wrapper
 #include "../ImageHandling/image.h"
 
@@ -77,6 +80,10 @@ constexpr int MSAACount = 1;
 
 // spaceship generator
 #include "../bitfontCore/spaceship.h"
+
+
+// move this shit to a config file -
+	// will be much better to do it that way and load at startup rather than compile time
 
 // #define WIDTH 640
 // #define HEIGHT 480
@@ -133,5 +140,12 @@ constexpr int MSAACount = 1;
 #include "../JSON/json.h"
 using json = nlohmann::json;
 
+inline string currentTimeAndDate() {
+	auto now = std::chrono::system_clock::now();
+	auto inTime_t = std::chrono::system_clock::to_time_t( now );
+	std::stringstream ss;
+	ss << std::put_time( std::localtime( &inTime_t ), "[%X | %d/%m/%Y] " );
+	return ss.str();
+}
 
 #endif

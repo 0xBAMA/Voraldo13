@@ -74,14 +74,17 @@ static string GetStringForEnum ( GLenum shaderType ) {
 /*==============================================================================
 Create and compile shader and report any errors - return shader handle
 ==============================================================================*/
-static GLuint ShaderCompile ( const char * source, GLenum shaderType ) {
+static GLuint ShaderCompile ( const char * source, GLenum shaderType, bool &result ) {
+	if ( !result ) return;
 	GLuint shader = glCreateShader( shaderType );
 	glShaderSource( shader, 1, &source, NULL );
 	glCompileShader( shader );
 	GLint success;
 	GLchar infoLog[ numCharsReport ];
 	glGetShaderiv( shader, GL_COMPILE_STATUS, &success );
+	result = true;
 	if ( !success ) {
+		result = false;
 		glGetShaderInfoLog( shader, numCharsReport, NULL, infoLog );
 		cout << "shader compilation failed during " << GetStringForEnum( shaderType )
 			<< " compilation ... " << endl << infoLog << endl;
@@ -92,7 +95,8 @@ static GLuint ShaderCompile ( const char * source, GLenum shaderType ) {
 /*==============================================================================
 program becomes the linked shader program, or reports failure
 ==============================================================================*/
-static void AttachAndLink ( GLuint& program, vector<GLuint> shaders ) {
+static void AttachAndLink ( GLuint& program, vector<GLuint> shaders, bool &result ) {
+	if ( !result ) return;
 	program = glCreateProgram();
 	for ( auto& shader : shaders )
 		glAttachShader( program, shader );
@@ -100,7 +104,9 @@ static void AttachAndLink ( GLuint& program, vector<GLuint> shaders ) {
 	GLchar infoLog[ numCharsReport ];
 	glLinkProgram( program );
 	glGetProgramiv( program, GL_LINK_STATUS, &success );
+	result = true;
 	if ( !success ) {
+		result = false;
 		glGetProgramInfoLog( program, numCharsReport, NULL, infoLog );
 		cout << "linking failed " << endl << infoLog << endl;
 	}
@@ -113,15 +119,16 @@ Construct a standard vertex+fragment pair from the given input strings
 ==============================================================================*/
 class regularShader {
 public:
+	bool success;
 	GLuint shaderHandle;
 	regularShader ( string pathV, string pathF ) {
 		// read the source
 		string codeV = ProcessIncludeString( LoadStringFromFile( pathV ) );
 		string codeF = ProcessIncludeString( LoadStringFromFile( pathF ) );
 		// compile it
-		GLuint shaderV = ShaderCompile( codeV.c_str(), GL_VERTEX_SHADER );
-		GLuint shaderF = ShaderCompile( codeF.c_str(), GL_FRAGMENT_SHADER );
-		AttachAndLink( shaderHandle, { shaderV, shaderF } );
+		GLuint shaderV = ShaderCompile( codeV.c_str(), GL_VERTEX_SHADER, success );
+		GLuint shaderF = ShaderCompile( codeF.c_str(), GL_FRAGMENT_SHADER, success );
+		AttachAndLink( shaderHandle, { shaderV, shaderF }, success );
 	}
 };
 
@@ -133,8 +140,9 @@ depending on usage, should be fairly self explanatory
 ==============================================================================*/
 class computeShader {
 public:
-	enum class shaderSource { fromFile, fromString };
+	bool success;
 	GLuint shaderHandle;
+	enum class shaderSource { fromFile, fromString };
 	computeShader ( string input, shaderSource source = shaderSource::fromFile ) {
 		switch ( source ) {
 		case shaderSource::fromFile:
@@ -144,8 +152,8 @@ public:
 		case shaderSource::fromString:
 			// compile with "input" treated as the program source
 			input = ProcessIncludeString( input );
-			GLuint shaderC = ShaderCompile( input.c_str(), GL_COMPUTE_SHADER );
-			AttachAndLink( shaderHandle, { shaderC } );
+			GLuint shaderC = ShaderCompile( input.c_str(), GL_COMPUTE_SHADER, success );
+			AttachAndLink( shaderHandle, { shaderC }, success );
 			break;
 		}
 	}
