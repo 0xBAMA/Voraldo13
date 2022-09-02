@@ -393,7 +393,7 @@ void engine::CapturePostprocessScreenshot () {
 	auto nowP = std::chrono::system_clock::now();
 	auto inTime_tP = std::chrono::system_clock::to_time_t( nowP );
 	std::stringstream ssP;
-	ssP << std::put_time( std::localtime( &inTime_tP ), "screenshots/Voraldo13ssP-%Y-%m-%d %X.png" );
+	ssP << std::put_time( std::localtime( &inTime_tP ), "data/screenshots/Voraldo13ssP-%Y-%m-%d %X.png" );
 	screenshotP.Resize( postprocessScreenshotScaleFactor );
 	screenshotP.Save( ssP.str(), LODEPNG );
 }
@@ -418,7 +418,7 @@ void engine::updateSavesList () {
 		}
 	};
 	savesList.clear();
-	std::filesystem::path p( "saves" );
+	std::filesystem::path p( "data/saves" );
 	std::filesystem::directory_iterator start( p );
 	std::filesystem::directory_iterator end;
 	std::transform( start, end, std::back_inserter( savesList ), pathLeafString() );

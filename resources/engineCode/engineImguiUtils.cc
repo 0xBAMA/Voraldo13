@@ -726,8 +726,9 @@ void engine::MenuUserShader () {
 			consoleCommands.push_back( "history" ); // list out all the commands that have been entered
 			consoleCommands.push_back( "clear" ); // clear the history
 
-			for ( int i = 0; i < 100; i++ )
+			for ( int i = 0; i < 100; i++ ) {
 				consoleItems.push_back( "TEST " + std::to_string( i ) );
+			}
 
 		}
 
@@ -773,6 +774,7 @@ void engine::MenuUserShader () {
 			ImGui::PushStyleVar( ImGuiStyleVar_ItemSpacing, ImVec2( 4, 1 ) ); // Tighten spacing
 			ImGui::PushTextWrapPos( ImGui::GetWindowSize().x );
 			for ( unsigned int i = 0; i < consoleItems.size(); i++ ) {
+				// if the leading character is a >, do it in another color
 				ImGui::TextUnformatted( consoleItems[ i ].c_str() );
 			}
 			ImGui::PopTextWrapPos();
@@ -790,7 +792,7 @@ void engine::MenuUserShader () {
 				ImGuiInputTextFlags_CallbackHistory;
 
 			ImGui::PushItemWidth( ImGui::GetWindowWidth() );
-			if ( ImGui::InputText( "##", consoleInputBuffer, IM_ARRAYSIZE( consoleInputBuffer ), flags ) ) {
+			if ( ImGui::InputText( "##", consoleInputBuffer, IM_ARRAYSIZE( consoleInputBuffer ), flags, &textEditCallbackStub, ( void * ) this ) ) {
 				executeCommand( string( consoleInputBuffer ) );
 				reclaimFocus = true;
 			}
@@ -842,13 +844,17 @@ void engine::MenuUserShader () {
 		}
 
 		void executeCommand( string command ) {
-			cout << "the command is: " << command << endl;
+			scrollToBottom = true;
+			historyPosition = -1;
 			if ( command == "clear" ) {
 				clearConsoleHistory();
+				clearConsoleLog();
 			} else if ( command == "help" ) {
 
 			} else if ( command == "history" ) {
-
+				for ( unsigned int i = 0; i < consoleHistory.size(); i++ ) {
+					addConsoleHistoryItem( consoleHistory[ i ] );
+				}
 			} else if ( command == "compile" ) {
 
 			} else if ( command == "save" ) { // need to only look oat the first couple chars, tbd
@@ -859,23 +865,52 @@ void engine::MenuUserShader () {
 
 			} else {
 				// report command + command not found
+				// return, so the console doesn't add this to the history + the input buffer is retained
+				addConsoleHistoryItem( "unrecognized command: \"" + command + "\"" );
+				return;
 			}
-			scrollToBottom = true;
 			consoleInputBuffer[ 0 ] = '\0'; // clear input string
+			consoleHistory.push_back( command );
+			addConsoleHistoryItem( "> " + command );
 		}
 
+		static int textEditCallbackStub( ImGuiInputTextCallbackData *data ) {
+			editorConsole *console = ( editorConsole * ) data->UserData;
+			return console->textEditCallback( data );
+		}
+		int historyPosition = -1;
 		int textEditCallback( ImGuiInputTextCallbackData *data ) {
+			const int previousHistoryPosition = historyPosition;
 			switch( data->EventFlag ) {
 			case ImGuiInputTextFlags_CallbackCompletion:
+				// ehhhhhh... this seems like a lot of hassle, and I never used it
 				break;
 
 			case ImGuiInputTextFlags_CallbackHistory:
+				if ( data->EventKey == ImGuiKey_UpArrow ) {
+					if ( historyPosition == -1 ) {
+						historyPosition = consoleHistory.size() - 1;
+					} else if ( historyPosition > 0 ) {
+						historyPosition--;
+					}
+				} else if ( data->EventKey == ImGuiKey_DownArrow ) {
+					if ( historyPosition != -1 ) {
+						if ( ++historyPosition >= int( consoleHistory.size() ) ) {
+							historyPosition = -1;
+						}
+					}
+				}
+
+				if ( previousHistoryPosition != historyPosition ) {
+					const char *historyString = ( historyPosition >= 0 && historyPosition < int( consoleHistory.size() ) ) ? consoleHistory[ historyPosition ].c_str() : "";
+					data->DeleteChars( 0, data->BufTextLen );
+					data->InsertChars( 0, historyString );
+				}
 				break;
 
 			default:
 				break;
 			}
-
 			return 0;
 		}
 
@@ -1695,7 +1730,7 @@ void engine::MenuLoadSave () {
 			glGetTexImage( GL_TEXTURE_3D, 0, GL_RGBA, GL_UNSIGNED_BYTE, &bytesToSave[ 0 ] );
 
 			Image saveImage( BLOCKDIM, BLOCKDIM * BLOCKDIM, &bytesToSave.data()[ 0 ] );
-			saveImage.Save( "saves/" + saveString, LODEPNG );
+			saveImage.Save( "data/saves/" + saveString, LODEPNG );
 
 			// get the list with this included
 			updateSavesList();
@@ -1798,7 +1833,7 @@ void engine::MenuScreenshot () {
 		auto nowA = std::chrono::system_clock::now();
 		auto inTime_tA = std::chrono::system_clock::to_time_t( nowA );
 		std::stringstream ssA;
-		ssA << std::put_time( std::localtime( &inTime_tA ), "screenshots/Voraldo13ssA-%Y-%m-%d %X.png" );
+		ssA << std::put_time( std::localtime( &inTime_tA ), "data/screenshots/Voraldo13ssA-%Y-%m-%d %X.png" );
 		screenshotA.Resize( resize );
 		screenshotA.Save( ssA.str(), LODEPNG );
 	}
@@ -1835,7 +1870,7 @@ void engine::MenuScreenshot () {
 		auto nowB = std::chrono::system_clock::now();
 		auto inTime_tB = std::chrono::system_clock::to_time_t( nowB );
 		std::stringstream ssB;
-		ssB << std::put_time( std::localtime( &inTime_tB ), "screenshots/Voraldo13ssB-%Y-%m-%d %X.png" );
+		ssB << std::put_time( std::localtime( &inTime_tB ), "data/screenshots/Voraldo13ssB-%Y-%m-%d %X.png" );
 		screenshotB.Resize( resize );
 		screenshotB.Save( ssB.str(), LODEPNG );
 	}

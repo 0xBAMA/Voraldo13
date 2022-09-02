@@ -2,4 +2,5 @@
 build
 exe
 imgui.ini
-screenshots/*
+data/screenshots/*
+
