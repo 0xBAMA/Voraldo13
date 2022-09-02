@@ -129,31 +129,30 @@ struct consoleclass {
 
 	for (int i = 0; i < Items.Size; i++) {
 	  const char *item = Items[i];
-	  if (!Filter.PassFilter(item))
-		continue;
+	  // if (!Filter.PassFilter(item))
+		// continue;
 
 	  // Normally you would store more information in your item than just a
 	  // string. (e.g. make Items[] an array of structure, store color/type
 	  // etc.)
-	  ImVec4 color;
-	  bool has_color = false;
-	  if (strstr(item, "[error]")) {
-		color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
-		has_color = true;
-	  } else if (strncmp(item, "> ", 2) == 0) {
-		color = ImVec4(1.0f, 0.618f, 0.218f, 1.0f);
-		has_color = true;
-	  }
-	  if (has_color)
-		ImGui::PushStyleColor(ImGuiCol_Text, color);
+	  // ImVec4 color;
+	  // bool has_color = false;
+	  // if (strstr(item, "[error]")) {
+		// color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
+		// has_color = true;
+	  // } else if (strncmp(item, "> ", 2) == 0) {
+		// color = ImVec4(1.0f, 0.618f, 0.218f, 1.0f);
+		// has_color = true;
+	  // }
+	  // if (has_color)
+		// ImGui::PushStyleColor(ImGuiCol_Text, color);
 	  // ImGui::TextUnformatted(item);
 	  WrappedText(item);
-	  if (has_color)
-		ImGui::PopStyleColor();
+	  // if (has_color)
+		// ImGui::PopStyleColor();
 	}
 
-	if (ScrollToBottom ||
-		(AutoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()))
+	if (ScrollToBottom || ( AutoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY() ) )
 	  ImGui::SetScrollHereY(1.0f);
 	ScrollToBottom = false;
 
@@ -304,8 +303,7 @@ struct consoleclass {
 
 	  if (candidates.Size == 0) {
 		// No match
-		AddLog("No match for \"%.*s\"!\n", (int)(word_end - word_start),
-			   word_start);
+		AddLog("No match for \"%.*s\"!\n", (int)(word_end - word_start), word_start);
 	  } else if (candidates.Size == 1) {
 		// Single match. Delete the beginning of the word and replace it
 		// entirely so we've got nice casing.

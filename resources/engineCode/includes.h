@@ -69,9 +69,6 @@ constexpr int MSAACount = 1;
 // managing bindings of textures to binding points
 #include "coreUtils/bindset.h"
 
-// editor + console
-#include "coreUtils/editorConsole.h"
-
 // image load/save/resize/access/manipulation wrapper
 #include "../ImageHandling/image.h"
 
@@ -81,9 +78,11 @@ constexpr int MSAACount = 1;
 // spaceship generator
 #include "../bitfontCore/spaceship.h"
 
+//==============================================================================
 
 // move this shit to a config file -
 	// will be much better to do it that way and load at startup rather than compile time
+	// because any change in this file triggers a full rebuild
 
 // #define WIDTH 640
 // #define HEIGHT 480
@@ -99,6 +98,8 @@ constexpr int MSAACount = 1;
 #define BLOCKDIM 256
 #define SSFACTOR 1.0
 #define TILESIZE 64
+
+//==============================================================================
 
 // wrapper around window management
 #include "coreUtils/windowHandler.h"

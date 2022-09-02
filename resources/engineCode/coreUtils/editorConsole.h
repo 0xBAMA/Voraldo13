@@ -1,9 +1,9 @@
-#include "../includes.h"
+// #include "../includes.h"
+#include "../engine.h"
 
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-class engine; // forward declare
 
 class editorConsole {
 public:
@@ -15,6 +15,7 @@ public:
 	void setupConsole();
 	void setupEditor();
 	void draw();
+	void drawConfig();
 
 	// config flags ... tbd
 		// palette switching
@@ -34,42 +35,82 @@ public:
 
 	// console data + manip
 	void clearConsoleHistory();
+	void clearConsoleLog();
 	void addConsoleHistoryItem( string item );
 	void executeCommand( string command );
 	int textEditCallback( ImGuiInputTextCallbackData *data ); // tbd
 
+	char consoleInputBuffer[ 256 ];
 	std::vector< string > consoleCommands;
-	std::vector< string > consoleHistory;
-	std::vector< string > consoleItems;
+	std::vector< string > consoleHistory; // list of commands that have been entered ( for completion )
+	std::vector< string > consoleItems; // list of display elements
 };
 
 inline void editorConsole::draw () {
+
 	auto cpos = editor.GetCursorPosition();
 	ImGui::Text( "%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1,
 		cpos.mColumn + 1, editor.GetTotalLines(),
 		editor.IsOverwrite() ? "Ovr" : "Ins",
 		editor.CanUndo() ? "*" : " ",
 		editor.GetLanguageDefinition().mName.c_str(),
-		"User Shader" );
+		"User Shader" ); // show User Shader ( Basic ) or User Shader ( Advanced )
 
-	// push selected font
-	editor.Render( "Editor", ImVec2( -FLT_MIN, 2 * ImGui::GetWindowHeight() / 3 ) );
+	// push selected monospace font
+	editor.Render( "Editor", ImVec2( -FLT_MIN, ( 2.0f * ImGui::GetWindowSize().y ) / 3.0f + 18.0f ) );
 	// pop the font
-
 
 	if ( ImGui::SmallButton( " Compile and Run " ) ) {
 
 	}
 	ImGui::SameLine();
 	if ( ImGui::SmallButton( " Clear Editor " ) ) {
-
+		// reset the contents of the editor to the base shader
 	}
 	ImGui::SameLine();
 	if ( ImGui::SmallButton( " Clear Console " ) ) {
 		clearConsoleLog();
 	}
+	// slider for the sample count? tbd
 
-	// draw the console contents
+	ImGui::Separator(); // draw the console contents
+	const float footerHeightReserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
+	ImGui::BeginChild( "ScrollingRegion", ImVec2( 0, -footerHeightReserve ), false, ImGuiWindowFlags_HorizontalScrollbar );
+	ImGui::PushStyleVar( ImGuiStyleVar_ItemSpacing, ImVec2( 4, 1 ) ); // Tighten spacing
+	ImGui::PushTextWrapPos( ImGui::GetWindowSize().x );
+	for ( unsigned int i = 0; i < consoleItems.size(); i++ ) {
+		ImGui::TextUnformatted( consoleItems[ i ].c_str() );
+	}
+	ImGui::PopTextWrapPos();
+	ImGui::PopStyleVar();
+	ImGui::EndChild();
+	ImGui::Separator();
+
+	bool reclaimFocus = false;
+	ImGuiInputTextFlags flags =
+		ImGuiInputTextFlags_EnterReturnsTrue |
+		ImGuiInputTextFlags_CallbackCompletion |
+		ImGuiInputTextFlags_CallbackHistory;
+
+	ImGui::PushItemWidth( ImGui::GetWindowWidth() );
+	if ( ImGui::InputText( "##", consoleInputBuffer, IM_ARRAYSIZE( consoleInputBuffer ), flags ) ) {
+		executeCommand( string( consoleInputBuffer ) );
+		reclaimFocus = true;
+	}
+	ImGui::PopItemWidth();
+
+	ImGui::SetItemDefaultFocus(); // Auto-focus on window apparition
+	if ( reclaimFocus ) {
+		ImGui::SetKeyboardFocusHere( -1 ); // Auto focus previous widget
+	}
+}
+
+inline void editorConsole::drawConfig () {
+	// setting the config on the editor
+	parent->OrangeText( "Configuration" );
+
+
+
 }
 
 inline void editorConsole::setupConsole () {
@@ -80,6 +121,33 @@ inline void editorConsole::setupConsole () {
 	consoleCommands.push_back( "save" ); // save the current script to the saved scripts
 	consoleCommands.push_back( "history" ); // list out all the commands that have been entered
 	consoleCommands.push_back( "clear" ); // clear the history
+
+	consoleItems.push_back( "TEST" );
+	consoleItems.push_back( "TEST" );
+	consoleItems.push_back( "TEST" );
+	consoleItems.push_back( "TEST" );
+	consoleItems.push_back( "TEST" );
+	consoleItems.push_back( "TEST" );
+	consoleItems.push_back( "THE NUT" );
+	consoleItems.push_back( "THE NUT" );
+	consoleItems.push_back( "THE NUT, MY BUTT" );
+	consoleItems.push_back( "THE NUT, MY BUTT" );
+	consoleItems.push_back( "THE NUT, MY BUTT" );
+	consoleItems.push_back( "THE NUT, MY BUTT" );
+	consoleItems.push_back( "THE NUT, MY BUTT" );
+	consoleItems.push_back( "THE NUT, MY BUTT" );
+	consoleItems.push_back( "THE NUT, MY BUTT" );
+	consoleItems.push_back( "THE NUT, MY BUTT" );
+	consoleItems.push_back( "THE NUT, MY BUTT" );
+	consoleItems.push_back( "THE NUT, MY BUTT" );
+	consoleItems.push_back( "THE NUT, MY BUTT" );
+	consoleItems.push_back( "THE NUT, MY BUTT" );
+	consoleItems.push_back( "THE NUT, MY BUTT" );
+	consoleItems.push_back( "THE NUT, MY BUTT" );
+	consoleItems.push_back( "THE NUT, MY BUTT" );
+	consoleItems.push_back( "THE NUT, MY BUTT" );
+	consoleItems.push_back( "THE NUT, MY BUTT" );
+	consoleItems.push_back( "THE NUT, MY BUTT, I DIE" );
 }
 
 inline void editorConsole::setupEditor () {
@@ -98,7 +166,7 @@ inline void editorConsole::clearConsoleHistory() {
 
 inline void editorConsole::clearConsoleLog() {
 	consoleItems.clear();
-	consoleItems.push_back( currentTimeAndDate + "Welcome to the Voraldo 13 User Shader Console.\n  'help' for command list. " );
+	consoleItems.push_back( currentTimeAndDate() + "Welcome to the Voraldo 13 User Shader Console.\n  'help' for command list. " );
 }
 
 inline void editorConsole::addConsoleHistoryItem( string item ) {
@@ -106,6 +174,8 @@ inline void editorConsole::addConsoleHistoryItem( string item ) {
 }
 
 inline void editorConsole::executeCommand( string command ) {
+	cout << "the command is: " << command << endl;
+
 	if ( command == "clear" ) {
 		clearConsoleHistory();
 	} else if ( command == "help" ) {
