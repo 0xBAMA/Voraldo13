@@ -1809,7 +1809,18 @@ void engine::MenuLimiterCompressor () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-		OrangeText( "Currently Unimplemented" );
+
+
+		// mode select:
+			// narrowing
+			// clamping
+
+		// for each, r, g, b, a, rl, gl, bl
+			// channel use flag
+			// new min, new max
+			// ...
+
+
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}
@@ -2322,12 +2333,21 @@ void engine::MenuRenderingSettings () {
 	ImGui::SliderInt( "Max Volume Steps", &render.volumeSteps, 0, 1400 );
 	reset = reset || ImGui::IsItemEdited();
 	if( ImGui::IsItemEdited() ) render.framesSinceLastInput = 0;
+	reset = reset || ImGui::IsItemEdited();
+
+	ImGui::Text( " " );
+
+	ImGui::Checkbox( "Thin Lens DoF", &render.useThinLens );
+	reset = reset || ImGui::IsItemEdited();
+	if ( render.useThinLens ) {
+		ImGui::SliderFloat( "Focus Distance", &render.thinLensFocusDist, 0.0f, 4.0f, "%.3f" );
+		reset = reset || ImGui::IsItemEdited();
+	}
 
 	ImGui::Text( " " );
 
 	// render mode - then set what shaders[ "Renderer" ] points to
 	// need to switch - store the result to the map
-	static int currentlySelectedRenderMode = 0;
 	const char* renderModeList[] = {
 		"Image3D Raymarch",
 		"Texture Raymarch ( Nearest )",
@@ -2338,7 +2358,7 @@ void engine::MenuRenderingSettings () {
 		// spherical camera here? or as an input toggle - want to try it one way or the other
 	};
 
-	ImGui::Combo( "Render Mode", &currentlySelectedRenderMode, renderModeList, IM_ARRAYSIZE( renderModeList ) );
+	ImGui::Combo( "Render Mode", &render.renderMode, renderModeList, IM_ARRAYSIZE( renderModeList ) );
 	if ( ImGui::IsItemEdited() ) { // updated, need to do the appropriate setup
 		reset = true;
 
@@ -2346,7 +2366,7 @@ void engine::MenuRenderingSettings () {
 		// shaders[ "Renderer" ] = shaders[ std::string( renderModeList[ currentlySelectedRenderMode ] ) ];
 		// cout << renderModeList[ currentlySelectedRenderMode ] << endl;
 
-		switch ( currentlySelectedRenderMode ) {
+		switch ( render.renderMode ) {
 		case 0: // Image3D Raymarch
 			shaders[ "Renderer" ] = shaders[ "Image3D Raymarch" ];
 			break;

@@ -42,6 +42,8 @@ void engine::SendRaymarchParameters () {
 	glUniform1f( glGetUniformLocation( shader, "alphaPower" ), render.alphaCorrectionPower );
 	glUniform1i( glGetUniformLocation( shader, "numSteps" ), render.volumeSteps );
 	glUniform1f( glGetUniformLocation( shader, "jitterFactor" ), render.jitterAmount );
+	glUniform1i( glGetUniformLocation( shader, "useThinLens" ), render.useThinLens );
+	glUniform1f( glGetUniformLocation( shader, "thinLensFocusDist" ), render.thinLensFocusDist );
 }
 
 void engine::Raymarch () {

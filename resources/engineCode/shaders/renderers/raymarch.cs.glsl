@@ -15,6 +15,10 @@ uniform float blendFactor;
 uniform float jitterFactor;
 uniform int numSteps;
 
+// thin lens approximation
+uniform bool useThinLens;
+uniform float thinLensFocusDist;
+
 // basis vectors used to construct view ray
 uniform mat3 invBasis;
 
@@ -56,21 +60,31 @@ void getColorForPixel ( vec3 rO, vec3 rD, inout vec4 color ) {
 }
 
 void main () {
-	const ivec2 invocation   = ivec2( gl_GlobalInvocationID.xy ) + tileOffset;
-	const ivec2 location     = invocation + ivec2( renderOffset );
-	const ivec2 iDimensions  = imageSize( accumulatorTexture );
-	const vec2 dimensions    = vec2( iDimensions );
-	const float aspectRatio  = dimensions.y / dimensions.x;
-	const vec2 uv            = ( location + blue().xy ) / dimensions;
-	const vec2 mappedPos     = scale * ( ( uv - vec2( 0.5 ) ) * vec2( 1.0, aspectRatio ) );
-	const vec3 rayOrigin     = invBasis * vec3( mappedPos, 2.0 );
-	const vec3 rayDirection  = invBasis * vec3( perspectiveFactor * mappedPos, -2.0 );
-	const vec4 prevColor     = imageLoad( accumulatorTexture, invocation );
+	const ivec2 invocation  = ivec2( gl_GlobalInvocationID.xy ) + tileOffset;
+	const ivec2 location    = invocation + ivec2( renderOffset );
+	const ivec2 iDimensions = imageSize( accumulatorTexture );
+	const vec2 dimensions   = vec2( iDimensions );
+	const float aspectRatio = dimensions.y / dimensions.x;
+	const vec2 uv           = ( location + blue().xy ) / dimensions;
+	const vec2 mappedPos    = scale * ( ( uv - vec2( 0.5 ) ) * vec2( 1.0, aspectRatio ) );
+	const vec3 rayOrigin    = invBasis * vec3( mappedPos, 2.0 );
+	const vec3 rayDirection = invBasis * vec3( perspectiveFactor * mappedPos, -2.0 );
+	const vec4 prevColor    = imageLoad( accumulatorTexture, invocation );
+
+	vec3 rayDirectionDoF = vec3( 0.0 );
+	if ( useThinLens == true ) {
+		const vec2 uvNoJitter           = ( location + vec2( 0.5 ) ) / dimensions;
+		const vec2 mappedPosNoJitter    = scale * ( ( uvNoJitter - vec2( 0.5 ) ) * vec2( 1.0, aspectRatio ) );
+		const vec3 rayOriginNoJitter    = invBasis * vec3( mappedPosNoJitter, 2.0 );
+		const vec3 rayDirectionNoJitter = invBasis * vec3( perspectiveFactor * mappedPosNoJitter, -2.0 );
+		const vec3 focusPoint           = rayOriginNoJitter + thinLensFocusDist * rayDirectionNoJitter;
+		rayDirectionDoF                 = normalize( focusPoint - rayOrigin );
+	}
 
 	vec4 color = clearColor;
 	if ( invocation.x < iDimensions.x && invocation.y < iDimensions.y ) {
-		if ( Intersect( rayOrigin, rayDirection ) ) {
-			getColorForPixel( rayOrigin, rayDirection, color );
+		if ( Intersect( rayOrigin, useThinLens ? rayDirectionDoF : rayDirection ) ) {
+			getColorForPixel( rayOrigin, useThinLens ? rayDirectionDoF : rayDirection, color );
 		}
 		imageStore( accumulatorTexture, invocation, color * ( 1.0 - blendFactor ) + prevColor * blendFactor );
 	}

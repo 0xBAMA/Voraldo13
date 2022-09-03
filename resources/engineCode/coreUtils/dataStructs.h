@@ -43,7 +43,11 @@ struct renderState {
 	// TODO: stuff for the spherical camera - use perspective factor to multiply uv, I think
 		// maybe roll this into the rendermode? tbd
 	bool sphericalCamera = false;
-	int renderMode = 3;
+	int renderMode = 1;
+
+	// thin lens approximation
+	bool useThinLens = false;
+	float thinLensFocusDist = 2.0f;
 
 	// accumulation stuff
 	float blendFactor = 0.618f;
