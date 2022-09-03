@@ -262,7 +262,7 @@ struct consoleclass {
 	} else if (Stricmp(command_line, "compile") == 0) {
 	  // compile what's in the box
 	  AddLog("%s\n",
-			 parent->GPU_Data.compile_user_script(std::string(text), user_samples).c_str());
+			parent->GPU_Data.compile_user_script(std::string(text), user_samples).c_str());
 	} else {
 	  AddLog("'%s' not found.\n", command_line);
 	}

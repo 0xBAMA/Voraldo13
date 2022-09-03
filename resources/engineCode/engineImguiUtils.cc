@@ -725,11 +725,9 @@ void engine::MenuUserShader () {
 			consoleCommands.push_back( "save" ); // save the current script to the saved scripts
 			consoleCommands.push_back( "history" ); // list out all the commands that have been entered
 			consoleCommands.push_back( "clear" ); // clear the history
+			std::sort( consoleCommands.begin(), consoleCommands.end() );
 
-			for ( int i = 0; i < 100; i++ ) {
-				consoleItems.push_back( "TEST " + std::to_string( i ) );
-			}
-
+			clearConsoleLog();
 		}
 
 		void setupEditor() {
@@ -778,8 +776,9 @@ void engine::MenuUserShader () {
 				ImGui::TextUnformatted( consoleItems[ i ].c_str() );
 			}
 			ImGui::PopTextWrapPos();
-			if ( scrollToBottom || ( autoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY() ) )
-			  ImGui::SetScrollHereY(1.0f);
+			if ( scrollToBottom || ( autoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY() ) ) {
+				ImGui::SetScrollHereY( 1.0f );
+			}
 			scrollToBottom = false;
 			ImGui::PopStyleVar();
 			ImGui::EndChild();
@@ -843,6 +842,32 @@ void engine::MenuUserShader () {
 			consoleItems.push_back( item );
 		}
 
+		void compile() {
+			Tick();
+			computeShader userShader( editor.GetText(), computeShader::shaderSource::fromString );
+			if ( !userShader.success ) {
+				addConsoleHistoryItem( userShader.report.str() );
+			} else {
+				parent->shaders[ "User Shader" ] = userShader.shaderHandle;
+
+				parent->SwapBlocks(); // swap the front/back buffers
+				parent->bindSets[ "Basic Operation" ].apply(); // apply the bindset
+
+				json j;
+				j[ "shader" ] = "User Shader";
+				j[ "bindset" ] = "Basic Operation";
+				j[ "text" ] = parent->processAddEscapeSequences( editor.GetText() );
+
+				parent->SendUniforms( j );
+				parent->AddToLog( j );
+				parent->BlockDispatch(); // dispatch the compute shader
+				parent->setColorMipmapFlag();
+
+				float totalTime = Tock();
+				addConsoleHistoryItem( "Shader Successfully Run : " + std::to_string( totalTime / 1000.0f ) + "ms" );
+			}
+		}
+
 		void executeCommand( string command ) {
 			scrollToBottom = true;
 			historyPosition = -1;
@@ -850,28 +875,57 @@ void engine::MenuUserShader () {
 				clearConsoleHistory();
 				clearConsoleLog();
 			} else if ( command == "help" ) {
-
+				for ( const auto& i : consoleCommands ) {
+					addConsoleHistoryItem( "  " + i );
+				}
+				addConsoleHistoryItem( "> " + command );
 			} else if ( command == "history" ) {
 				for ( unsigned int i = 0; i < consoleHistory.size(); i++ ) {
 					addConsoleHistoryItem( consoleHistory[ i ] );
 				}
+				addConsoleHistoryItem( "> " + command );
 			} else if ( command == "compile" ) {
-
-			} else if ( command == "save" ) { // need to only look oat the first couple chars, tbd
-
-			} else if ( command == "load" ) { // same
-
+				addConsoleHistoryItem( "> " + command );
+				compile();
+			} else if ( command.rfind( "save ", 0 ) == 0 && command.length() > 5 ) { // filename needs at least one char
+				string filename = "data/userShaders/" + command.substr( 5 ) + ".txt";
+				std::ofstream file( filename );
+				string saveText( editor.GetText() );
+				file << saveText;
+				addConsoleHistoryItem( "saved to " + filename );
+				addConsoleHistoryItem( "> " + command );
+			} else if ( command.rfind( "load ", 0 ) == 0 && command.length() > 5 ) {
+				string filename = "data/userShaders/" + command.substr( 5 ) + ".txt"; /// ehhhhh need to check for extension, tbd
+				std::ifstream file( filename );
+				std::string loaded{ std::istreambuf_iterator<char>( file ), std::istreambuf_iterator<char>() };
+				editor.SetText( loaded );
+				addConsoleHistoryItem( filename + " loaded" );
+				addConsoleHistoryItem( "> " + command );
 			} else if ( command == "list" ) {
-
+				struct pathLeafString {
+					std::string operator()( const std::filesystem::directory_entry &entry ) const {
+						return entry.path().string();
+					}
+				};
+				std::vector<string> directoryStrings;
+				directoryStrings.clear();
+				std::filesystem::path p( "data/userShaders/" );
+				std::filesystem::directory_iterator start( p );
+				std::filesystem::directory_iterator end;
+				std::transform( start, end, std::back_inserter( directoryStrings ), pathLeafString() );
+				std::sort( directoryStrings.begin(), directoryStrings.end() ); // sort alphabetically
+				for ( const auto& i : directoryStrings ) {
+					addConsoleHistoryItem( "  " + i );
+				}
+				addConsoleHistoryItem( "> " + command );
 			} else {
-				// report command + command not found
+				// report command not found + command
 				// return, so the console doesn't add this to the history + the input buffer is retained
 				addConsoleHistoryItem( "unrecognized command: \"" + command + "\"" );
 				return;
 			}
 			consoleInputBuffer[ 0 ] = '\0'; // clear input string
 			consoleHistory.push_back( command );
-			addConsoleHistoryItem( "> " + command );
 		}
 
 		static int textEditCallbackStub( ImGuiInputTextCallbackData *data ) {

@@ -476,7 +476,8 @@ void engine::SendUniforms ( json j ) {
 		string label( element.key() );
 
 		// the type of the uniform - "null" is a special value for the shader label + bindset
-		string type( label == "shader" || label == "bindset" ? "null" : element.value()[ "type" ] );
+		bool ignore = ( label == "shader" || label == "bindset" || label == "text" );
+		string type( ignore ? "null" : element.value()[ "type" ] );
 
 		// shortens references
 		json val = element.value();
@@ -519,4 +520,19 @@ void engine::genLightMipmap () {
 		glBindTexture( GL_TEXTURE_3D, textures[ "Lighting Block" ] );
 		glGenerateMipmap( GL_TEXTURE_3D );
 	}
+}
+
+string engine::processAddEscapeSequences( string input ) {
+	// parse string - change tab to two spaces, newline to \n, etc
+	std::string output;
+	for ( const auto& c : input ) {
+		if ( c == '\t' ){
+			output += std::string( "  " );
+		} else if ( c == '\n' ) {
+			output += std::string( "\\n" );
+		} else {
+			output += c;
+		}
+	}
+	return output;
 }

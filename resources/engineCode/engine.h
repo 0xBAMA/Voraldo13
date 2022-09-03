@@ -145,6 +145,8 @@ private:
 	void AddVec3 ( json& j, string label, glm::vec3 value );
 	void AddVec4 ( json& j, string label, glm::vec4 value );
 
+	string processAddEscapeSequences( string input );
+
 //==============================================================================
 	// shutdown procedures
 	void ImguiQuit ();
