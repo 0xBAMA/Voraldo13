@@ -320,14 +320,16 @@ other textures, tbd
 		binding( 0, textures[ "Color Block Front" ], GL_RGBA8 ),
 		binding( 1, textures[ "Color Block Back" ], GL_RGBA8 ),
 		binding( 2, textures[ "Mask Block Front" ], GL_R8UI ),
-		binding( 3, textures[ "Mask Block Back" ], GL_R8UI )
+		binding( 3, textures[ "Mask Block Back" ], GL_R8UI ),
+		binding( 4, textures[ "Blue Noise" ], GL_RGBA8UI )
 	} );
 
 	bindSets[ "Basic Operation Back Set" ] = bindSet( {
 		binding( 0, textures[ "Color Block Back" ], GL_RGBA8 ),
 		binding( 1, textures[ "Color Block Front" ], GL_RGBA8 ),
 		binding( 2, textures[ "Mask Block Back" ], GL_R8UI ),
-		binding( 3, textures[ "Mask Block Front" ], GL_R8UI )
+		binding( 3, textures[ "Mask Block Front" ], GL_R8UI ),
+		binding( 4, textures[ "Blue Noise" ], GL_RGBA8UI )
 	} );
 
 	bindSets[ "Heightmap" ] = bindSet( {

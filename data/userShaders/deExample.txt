@@ -1,0 +1,98 @@
+#version 430
+layout( local_size_x = 8, local_size_y = 8, local_size_z = 8 ) in;
+layout( binding = 0, rgba8 ) uniform image3D colorBlockFront;
+layout( binding = 1, rgba8 ) uniform image3D colorBlockBack;
+layout( binding = 2, r8ui ) uniform uimage3D maskBlockFront;
+layout( binding = 3, r8ui ) uniform uimage3D maskBlockBack;
+layout( binding = 4, rgba8ui ) uniform uimage2D blueNoise;
+
+vec4 blue ( ivec2 offset ) {
+	const ivec2 noiseLoc = ivec2( gl_GlobalInvocationID.xy + offset ) % imageSize( blueNoise );
+	return vec4( imageLoad( blueNoise, noiseLoc ) ) / 255.0;
+}
+
+vec3 getLocation( vec3 jitter ) {
+	const vec3 computeLoc = vec3( gl_GlobalInvocationID.xyz );
+	const vec3 loc = computeLoc + jitter;
+	const vec3 blockDim = vec3( imageSize( colorBlockFront ) );
+	return ( loc - blockDim / 2.0 ) / ( blockDim / 2.0 );
+}
+
+// the intersection record
+struct irec {
+	bool draw;
+	vec4 color;
+	int mask;
+};
+
+irec defaultIrec () {
+	irec temp;
+	temp.draw = false;
+	temp.color = vec4( 0.0 );
+	temp.mask = 0;
+	return temp;
+}
+
+  float de(vec3 p) {
+    const float width=.22;
+    const float scale=4.;
+    float t=0.2;
+    float dotp=dot(p,p);
+    p.x+=sin(t*40.)*.007;
+    p=p/dotp*scale;
+    p=sin(p+vec3(sin(1.+t)*2.,-t,-t*2.));
+    float d=length(p.yz)-width;
+    d=min(d,length(p.xz)-width);
+    d=min(d,length(p.xy)-width);
+    d=min(d,length(p*p*p)-width*.3);
+    return d*dotp/scale;
+  }
+
+const float scalar = 4.0;
+const float epsilon = 0.001;
+irec isInside ( vec3 p ) { // check Documentation tab for details
+	irec temp = defaultIrec();
+	p *= scalar;
+
+	if ( de( p ) < epsilon ) {
+		temp.draw = true;
+		temp.color = vec4( 1.0 );
+		temp.mask = 0;
+	}
+
+	return temp;
+}
+
+
+void main () {
+	vec4 previousColor = imageLoad( colorBlockBack, ivec3( gl_GlobalInvocationID.xyz ) );
+	uint previousMask = imageLoad( maskBlockBack, ivec3( gl_GlobalInvocationID.xyz ) ).r;
+
+	float hitCount = 0.0; // number of true hits
+	float maskTotal = 0.0; // accumulated mask total
+	vec4 accumulatedColor = vec4( 0.0 );
+
+	const int numSamples = 32;
+	for ( int i = 0; i < numSamples; i++ ) {
+		irec sampleValue = isInside( getLocation( blue( ivec2( i ) ).xyz ) );
+		if ( sampleValue.draw ) {
+			hitCount++;
+			maskTotal += sampleValue.mask;
+			accumulatedColor += sampleValue.color;
+		}
+	}
+
+	// blend with the previous color, based on the number of samples inside vs outside ... think about how this is implemented
+	vec4 color = vec4( 0.0 );
+	uint mask = 0;
+	bool draw = false;
+	if ( hitCount > 0 ) {
+		draw = true;
+		const float blendFactor = hitCount / float( numSamples );
+		mask = uint( maskTotal * blendFactor );
+		color = accumulatedColor * blendFactor;
+	}
+
+	imageStore( colorBlockFront, ivec3( gl_GlobalInvocationID.xyz ), draw ? mix( color, previousColor, previousMask / 255.0 ) : previousColor );
+	imageStore( maskBlockFront, ivec3( gl_GlobalInvocationID.xyz ), uvec4( ( previousMask > mask ) ? previousMask : mask ) );
+}
