@@ -18,9 +18,9 @@ void engine::ComputePasses () {
 	ZoneScoped;
 	Raymarch();
 	Tonemap();
+	Dither();
 
-	// shader to apply dithering
-	// other postprocessing
+	// other postprocessing... tbd
 
 	if ( wantCapturePostprocessScreenshot ) {
 		CapturePostprocessScreenshot();
@@ -95,6 +95,27 @@ void engine::Tonemap () {
 	glDispatchCompute( ( WIDTH + 15 ) / 16, ( HEIGHT + 15 ) / 16, 1 );
 	glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 }
+
+void engine::SendDitherParameters () {
+
+}
+
+void engine::Dither () {
+	switch ( render.ditherMode ) {
+	case 0: // no dithering
+		break;
+
+	case 1: // quantize dither
+		break;
+
+	case 2: // palette dither
+		break;
+
+	default:
+		break;
+	}
+}
+
 
 void engine::TridentAndTiming () {
 	ZoneScoped;
@@ -456,6 +477,16 @@ void engine::AddVec3 ( json& j, string label, glm::vec3 value ) {
 	j[ label.c_str() ][ "z" ] = value.z;
 }
 
+// void AddVec3Array ( json& j, string label, std::vector< glm::vec3 > values ) {
+// 	j[ label.c_str() ][ "type" ] = "vec3Array";
+// 	j[ label.c_str() ][ "count" ] = values.size();
+// 	for ( unsigned int i = 0; i < values.size(); i++ ) {
+// 		j[ label.c_str() ][ i ][ "x" ] = values[ i ].r;
+// 		j[ label.c_str() ][ i ][ "y" ] = values[ i ].g;
+// 		j[ label.c_str() ][ i ][ "z" ] = values[ i ].b;
+// 	}
+// } // for some reason I thought you could have variable size uniform arrays - may have to use ssbo instead
+
 void engine::AddVec4 ( json& j, string label, glm::vec4 value ) {
 	j[ label.c_str() ][ "type" ] = "vec4";
 	j[ label.c_str() ][ "x" ] = value.x;
@@ -496,6 +527,14 @@ void engine::SendUniforms ( json j ) {
 			glUniform3i( glGetUniformLocation( shader, label.c_str() ), val[ "x" ], val[ "y" ], val[ "z" ] );
 		} else if ( type == "vec3" ) {
 			glUniform3f( glGetUniformLocation( shader, label.c_str() ), val[ "x" ], val[ "y" ], val[ "z" ] );
+		// } else if ( type == "vec3Array" ) {
+		// 	std::vector< glm::vec3 > values;
+		// 	const int count = val[ "count" ];
+		// 	for ( int i = 0; i < count; i++ ) {
+		// 		values.push_back( glm::vec3( val[ i ][ "x" ], val[ i ][ "y" ], val[ i ][ "z" ] ) );
+		// 	}
+		// 	glUniform3fv( glGetUniformLocation( shader, label.c_str() ), count, values.data() );
+		// 	glUniform1i( glGetUniformLocation( shader, ( label + "_count" ).c_str() ), count );
 		} else if ( type == "vec4" ) {
 			glUniform4f( glGetUniformLocation( shader, label.c_str() ), val[ "x" ], val[ "y" ], val[ "z" ], val[ "w" ] );
 		}

@@ -2,18 +2,6 @@
 #define DATASTRUCTS
 
 /*==============================================================================
-configuration structs for all the operations
-==============================================================================*/
-	// does it make sense to do these as separate values? I think it can work on
-	// a json record, with labels as the uniform labels - iterate through and send
-	// but will also need to know the type on them... maybe part of the json
-
-	// I just want to avoid having the data load that there was last time, it got
-	// extremely disorganized - construct the record inside of the if statement
-	// on the button to invoke... I still want to be able to support the scripting
-	// interface that 12 had, it was fairly complete
-
-/*==============================================================================
 settings structs, for maintaining program state
 ==============================================================================*/
 struct colorGradeParameters {
@@ -43,7 +31,7 @@ struct renderState {
 	// TODO: stuff for the spherical camera - use perspective factor to multiply uv, I think
 		// maybe roll this into the rendermode? tbd
 	bool sphericalCamera = false;
-	int renderMode = 1;
+	int renderMode = 0;
 
 	// thin lens approximation
 	bool useThinLens = false;

@@ -44,7 +44,7 @@ void getColorForPixel ( vec3 rO, vec3 rD, inout vec4 color ) {
 	vec4 newRead = imageLoad( colorBlockFront, samplePosition );
 	vec4 newLightRead = imageLoad( lightingBlock, samplePosition );
 	for ( int i = 0; i < numSteps; i++ ) {
-		if( tCurrent >= tMin ) {
+		if ( tCurrent >= tMin ) {
 			newRead.rgb *= newLightRead.xyz;
 			float alphaSquared = pow( newRead.a, alphaPower ); // gives more usable range on the alpha channel
 			// alpha blending, new sample over running color

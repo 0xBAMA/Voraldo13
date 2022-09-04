@@ -61,6 +61,8 @@ private:
 	void Raymarch ();
 	void SendTonemappingParameters ();
 	void Tonemap ();
+	void SendDitherParameters ();
+	void Dither ();
 	void TridentAndTiming ();
 	void ImguiPass ();
 	void ImguiFrameStart ();
@@ -143,6 +145,7 @@ private:
 	void AddFloat ( json& j, string label, float value );
 	void AddIvec3 ( json& j, string label, glm::ivec3 value );
 	void AddVec3 ( json& j, string label, glm::vec3 value );
+	// void AddVec3Array ( json& j, string label, std::vector< glm::vec3 > values );
 	void AddVec4 ( json& j, string label, glm::vec4 value );
 
 	string processAddEscapeSequences( string input );
