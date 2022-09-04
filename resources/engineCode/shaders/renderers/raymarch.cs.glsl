@@ -32,7 +32,7 @@ uniform ivec2 noiseOffset;
 
 vec4 blue() {
 	const ivec2 noiseLoc = ( noiseOffset + ivec2( gl_GlobalInvocationID.xy ) + tileOffset ) % imageSize( blueNoiseTexture );
-	return jitterFactor * ( imageLoad( blueNoiseTexture, noiseLoc ) / 255.0 );
+	return ( imageLoad( blueNoiseTexture, noiseLoc ) / 255.0 );
 }
 
 void getColorForPixel ( vec3 rO, vec3 rD, inout vec4 color ) {
@@ -65,7 +65,7 @@ void main () {
 	const ivec2 iDimensions = imageSize( accumulatorTexture );
 	const vec2 dimensions   = vec2( iDimensions );
 	const float aspectRatio = dimensions.y / dimensions.x;
-	const vec2 uv           = ( location + blue().xy ) / dimensions;
+	const vec2 uv           = ( location + vec2( 0.5 ) + ( jitterFactor * ( blue().xy - vec2( 0.5 ) ) ) ) / dimensions;
 	const vec2 mappedPos    = scale * ( ( uv - vec2( 0.5 ) ) * vec2( 1.0, aspectRatio ) );
 	const vec3 rayOrigin    = invBasis * vec3( mappedPos, 2.0 );
 	const vec3 rayDirection = invBasis * vec3( perspectiveFactor * mappedPos, -2.0 );

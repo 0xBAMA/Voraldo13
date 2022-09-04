@@ -2324,7 +2324,7 @@ void engine::MenuRenderingSettings () {
 
 	ImGui::SliderFloat( "Alpha Correction Power", &render.alphaCorrectionPower, 0.0f, 4.0f );
 	reset = reset || ImGui::IsItemEdited();
-	ImGui::SliderFloat( "Jitter Amount", &render.jitterAmount, 0.0f, 20.0f, "%.2f", ImGuiSliderFlags_Logarithmic );
+	ImGui::SliderFloat( "Jitter Amount", &render.jitterAmount, 0.0f, 200.0f, "%.2f", ImGuiSliderFlags_Logarithmic );
 	reset = reset || ImGui::IsItemEdited();
 	ImGui::SliderFloat( "Perspective", &render.perspective, -2.0f, 4.0f );
 	reset = reset || ImGui::IsItemEdited();
