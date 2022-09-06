@@ -2438,36 +2438,44 @@ void engine::MenuPostProcessingSettings () {
 	const char* ditherModeList[] = { " None", " Quantize", " Palette Based" };
 	ImGui::Combo( "Dither Mode", &render.ditherMode, ditherModeList, IM_ARRAYSIZE( ditherModeList ) );
 
-	switch ( render.ditherMode ) {
-	case 0: // No dither
-		break;
-
-	case 1: // No dither
-		ImGui::SliderInt( "Bit Depth", &render.ditherNumBits, 0, 8 );
-		break;
-
-	case 2: // palette based
-	// if mode is palette, give a picker for the palette
-		// button for random palette - maybe some more effective way to index a massive
-		// quantity of palettes... imgui has some kind of text filtering thing, tbd
-		break;
-
-	default:
-		break;
-	}
-
 	// color space picker ( quantize or distance metric for palette )
 	const char* colorspaceModesList[] = { " RGB", " SRGB", " XYZ", " XYY", " HSV", " HSL", " HCY",
 		" YPBPR", " YPBPR601", " YCBCR1", " YCBCR2", " YCCBCCRC", " YCOCG", " BCH", " CHROMAMAX",
 		" OKLAB" };
-	ImGui::Combo( "Colorspace Select", &render.ditherSpaceSelect, colorspaceModesList, IM_ARRAYSIZE( colorspaceModesList ) );
 
 	const char* ditherPatternList[] = {  " None", " Bayer 2x2", " Bayer 4x4", " Bayer 8x8",
 		" Blue Noise Single Channel", " Blue Noise Three Channel", " Blue Noise Single Channel ( Cycled )",
 		" Blue Noise Three channel ( Cycled ) ", " Uniform Random Noise", " Interleaved Gradient Noise",
 		" Vlachos", " Triangle Remap Vlachos", " Triangle Remap Uniform Noise",
 		" Triangle Remap Uniform Noise ( Three Channel )" };
-	ImGui::Combo( "Dither Pattern", &render.ditherPattern, ditherPatternList, IM_ARRAYSIZE( ditherPatternList ) );
+
+	switch ( render.ditherMode ) {
+	case 0: // No dither
+		break;
+
+	case 1: // quantize
+		ImGui::SliderInt( "Bit Depth", &render.ditherNumBits, 0, 8 );
+		ImGui::Combo( "Colorspace Select", &render.ditherSpaceSelect, colorspaceModesList, IM_ARRAYSIZE( colorspaceModesList ) );
+		ImGui::Combo( "Dither Pattern", &render.ditherPattern, ditherPatternList, IM_ARRAYSIZE( ditherPatternList ) );
+		break;
+
+	case 2: // palette based
+	// if mode is palette, give a picker for the palette
+		// button for random palette - maybe some more effective way to index a massive
+		// quantity of palettes... imgui has some kind of text filtering thing, tbd
+
+
+
+
+
+		ImGui::Combo( "Colorspace Select", &render.ditherSpaceSelect, colorspaceModesList, IM_ARRAYSIZE( colorspaceModesList ) );
+		ImGui::Combo( "Dither Pattern", &render.ditherPattern, ditherPatternList, IM_ARRAYSIZE( ditherPatternList ) );
+		break;
+
+	default:
+		break;
+	}
+
 
 
 	ImGui::Unindent( 16.0f );
