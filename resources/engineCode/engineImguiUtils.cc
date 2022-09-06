@@ -2432,7 +2432,6 @@ void engine::MenuPostProcessingSettings () {
 	ImGui::SliderFloat( "Color Temperature", &tonemap.colorTemp, 1000.0f, 40000.0f, "%.2f", ImGuiSliderFlags_Logarithmic );
 	ImGui::Combo( "Tonemapping Mode", &tonemap.tonemapMode, tonemapModesList, IM_ARRAYSIZE( tonemapModesList ) );
 
-
 	OrangeText( "Dithering" );
 
 	// methodology picker - quantize, palette
@@ -2463,7 +2462,7 @@ void engine::MenuPostProcessingSettings () {
 		" OKLAB" };
 	ImGui::Combo( "Colorspace Select", &render.ditherSpaceSelect, colorspaceModesList, IM_ARRAYSIZE( colorspaceModesList ) );
 
-	const char* ditherPatternList[] = {  " None", " Bayer 2x2", "Bayer 4x4", "Bayer 8x8",
+	const char* ditherPatternList[] = {  " None", " Bayer 2x2", " Bayer 4x4", " Bayer 8x8",
 		" Blue Noise Single Channel", " Blue Noise Three Channel", " Blue Noise Single Channel ( Cycled )",
 		" Blue Noise Three channel ( Cycled ) ", " Uniform Random Noise", " Interleaved Gradient Noise",
 		" Vlachos", " Triangle Remap Vlachos", " Triangle Remap Uniform Noise",

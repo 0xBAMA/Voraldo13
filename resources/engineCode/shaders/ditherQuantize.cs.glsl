@@ -24,17 +24,19 @@ vec3 getNoise ( int mode ) {
 	case 1:
 	case 2:
 	case 3: // bayer matricies
-	case 4: // blue noise
 		return imageLoad( pattern, location % imageSize( pattern ) ).rrr;
 		break;
+	case 4: // blue noise
+		return imageLoad( blueNoise, location % imageSize( blueNoise ) ).rrr / 255.0;
+		break;
 	case 5:	// rgb blue noise
-		return imageLoad( pattern, location % imageSize( pattern ) ).rgb;
+		return imageLoad( blueNoise, location % imageSize( blueNoise ) ).rgb / 255.0;
 		break;
 	case 6: // cycled mono blue
-		return vec3( cycle( imageLoad( pattern, location % imageSize( pattern ) ).r, frameNumber ) );
+		return vec3( cycle( imageLoad( blueNoise, location % imageSize( blueNoise ) ).r / 255.0, frameNumber ) );
 		break;
 	case 7: // cycled rgb blue
-		return cycle( imageLoad( pattern, location % imageSize( pattern ) ).rgb, frameNumber );
+		return cycle( imageLoad( blueNoise, location % imageSize( blueNoise ) ).rgb / 255.0, frameNumber );
 		break;
 
 	// noise based

@@ -109,6 +109,21 @@ void engine::SendDitherParametersP () {
 }
 
 void engine::Dither () {
+	// simpler to manually manage the binding of the dither texture
+	if ( render.ditherPattern == 1 || render.ditherPattern == 2 || render.ditherPattern == 3 ) {
+		switch ( render.ditherPattern ) {
+		case 1:
+			glBindImageTexture( 3, textures[ "Bayer2" ], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8 );
+			break;
+		case 2:
+			glBindImageTexture( 3, textures[ "Bayer4" ], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8 );
+			break;
+		case 3:
+			glBindImageTexture( 3, textures[ "Bayer8" ], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8 );
+			break;
+		}
+	}
+
 	switch ( render.ditherMode ) {
 	case 0: // no dithering
 		break;

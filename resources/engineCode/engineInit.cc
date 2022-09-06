@@ -192,6 +192,7 @@ void engine::SetupTextures () {
 
 	// bayer patterns
 	glActiveTexture( GL_TEXTURE3 );
+	glGenTextures( 1, &bayer2 );
 	glBindTexture( GL_TEXTURE_2D, bayer2 );
 	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, &Make4Channel( BayerData( 2 ) )[ 0 ] );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
@@ -202,6 +203,7 @@ void engine::SetupTextures () {
 
 	// bayer patterns
 	glActiveTexture( GL_TEXTURE4 );
+	glGenTextures( 1, &bayer4 );
 	glBindTexture( GL_TEXTURE_2D, bayer4 );
 	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, 4, 4, 0, GL_RGBA, GL_UNSIGNED_BYTE, &Make4Channel( BayerData( 4 ) )[ 0 ] );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
@@ -211,6 +213,7 @@ void engine::SetupTextures () {
 	textures[ "Bayer4" ] = bayer4;
 
 	glActiveTexture( GL_TEXTURE5 );
+	glGenTextures( 1, &bayer8 );
 	glBindTexture( GL_TEXTURE_2D, bayer8 );
 	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, 8, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE, &Make4Channel( BayerData( 8 ) )[ 0 ] );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
