@@ -42,6 +42,12 @@ struct renderState {
 	uint32_t framesSinceStartup = 0;
 	uint32_t framesSinceLastInput = 0;
 	int numFramesHistory = 8; // how long to run after the last input - configurable via menu
+
+	// dithering configuration
+	int ditherMode = 0;
+	int ditherNumBits = 4;
+	int ditherSpaceSelect = 0;
+	int ditherPattern = 0;
 };
 
 #endif

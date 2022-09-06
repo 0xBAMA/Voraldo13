@@ -77,7 +77,13 @@ void engine::DisplaySetup () {
 
 std::vector<uint8_t> engine::BayerData ( int dimension ) {
 	ZoneScoped;
-	if ( dimension == 4 ) {
+	if ( dimension == 2 ) {
+		std::vector<uint8_t> pattern2 = {
+			0, 128,
+			192, 64
+		};
+		return pattern2;
+	} else if ( dimension == 4 ) {
 		std::vector<uint8_t> pattern4 = {
 			0,  8,  2,  10,	/* values begin scaled to the range 0..15 */
 			12, 4,  14, 6,	/* so they need to be rescaled by 16 */
@@ -108,6 +114,16 @@ std::vector<uint8_t> engine::BayerData ( int dimension ) {
 	}
 }
 
+std::vector<uint8_t> engine::Make4Channel( std::vector<uint8_t> input ) {
+	std::vector<uint8_t> data;
+	for ( unsigned int i = 0; i < input.size(); i++ ) {
+		for ( unsigned int n = 0; n < 4; n++ ) {
+			data.push_back( input[ i ] );
+		}
+	}
+	return data;
+}
+
 void engine::SetupTextures () {
 	ZoneScoped;
 	Tick();
@@ -134,7 +150,7 @@ void engine::SetupTextures () {
 	GLuint displayTexture;
 	GLuint accumulatorTexture;
 	GLuint blueNoiseTexture;
-	GLuint bayer4, bayer8;
+	GLuint bayer2, bayer4, bayer8;
 	GLuint tridentImage;
 	GLuint colorTextures[ 2 ];
 	GLuint maskTextures[ 2 ];
@@ -176,17 +192,27 @@ void engine::SetupTextures () {
 
 	// bayer patterns
 	glActiveTexture( GL_TEXTURE3 );
+	glBindTexture( GL_TEXTURE_2D, bayer2 );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, &Make4Channel( BayerData( 2 ) )[ 0 ] );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+	textures[ "Bayer2" ] = bayer2;
+
+	// bayer patterns
+	glActiveTexture( GL_TEXTURE4 );
 	glBindTexture( GL_TEXTURE_2D, bayer4 );
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_R8, 4, 4, 0, GL_RED, GL_UNSIGNED_BYTE, &BayerData( 4 )[0] );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, 4, 4, 0, GL_RGBA, GL_UNSIGNED_BYTE, &Make4Channel( BayerData( 4 ) )[ 0 ] );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 	textures[ "Bayer4" ] = bayer4;
 
-	glActiveTexture( GL_TEXTURE4 );
+	glActiveTexture( GL_TEXTURE5 );
 	glBindTexture( GL_TEXTURE_2D, bayer8 );
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_R8, 8, 8, 0, GL_RED, GL_UNSIGNED_BYTE, &BayerData( 8 )[0] );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, 8, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE, &Make4Channel( BayerData( 8 ) )[ 0 ] );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
@@ -196,7 +222,7 @@ void engine::SetupTextures () {
 	// create the image for the trident
 	Image initialT( trident.blockDimensions.x * 8, trident.blockDimensions.y * 16 );
 	glGenTextures( 1, &tridentImage );
-	glActiveTexture( GL_TEXTURE5 );
+	glActiveTexture( GL_TEXTURE6 );
 	glBindTexture( GL_TEXTURE_2D, tridentImage );
 	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, initialT.width, initialT.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &initialT.data.data()[ 0 ] );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -207,7 +233,7 @@ void engine::SetupTextures () {
 	textures[ "Trident" ] = tridentImage;
 
 	glGenTextures( 2, &colorTextures[ 0 ] );
-	glActiveTexture( GL_TEXTURE6 );
+	glActiveTexture( GL_TEXTURE7 );
 	glBindTexture( GL_TEXTURE_3D, colorTextures[ 0 ] );
 	glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &initialXOR.data()[ 0 ] );
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -217,7 +243,7 @@ void engine::SetupTextures () {
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	textures[ "Color Block Front" ] = colorTextures[ 0 ];
 
-	glActiveTexture( GL_TEXTURE7 );
+	glActiveTexture( GL_TEXTURE8 );
 	glBindTexture( GL_TEXTURE_3D, colorTextures[ 1 ] );
 	glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &zeroes.data()[ 0 ] );
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -229,7 +255,7 @@ void engine::SetupTextures () {
 
 	// mask blocks ( front and back - can this be consolidated? not sure if two are needed )
 	glGenTextures( 2, &maskTextures[ 0 ] );
-	glActiveTexture( GL_TEXTURE8 );
+	glActiveTexture( GL_TEXTURE9 );
 	glBindTexture( GL_TEXTURE_3D, maskTextures[ 0 ] );
 	glTexImage3D( GL_TEXTURE_3D, 0, GL_R8UI, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, &zeroes.data()[ 0 ] );
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -239,7 +265,7 @@ void engine::SetupTextures () {
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 	textures[ "Mask Block Front" ] = maskTextures[ 0 ];
 
-	glActiveTexture( GL_TEXTURE9 );
+	glActiveTexture( GL_TEXTURE10 );
 	glBindTexture( GL_TEXTURE_3D, maskTextures[ 1 ] );
 	glTexImage3D( GL_TEXTURE_3D, 0, GL_R8UI, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, &zeroes.data()[ 0 ] );
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -252,7 +278,7 @@ void engine::SetupTextures () {
 	// lighting data ( can probably get away with just the one buffer, tbd )
 	// also, do I need 16-bit floats or can I get away with less ( GL_R11F_G11F_B10F or GL_RGB9_E5? )
 	glGenTextures( 1, &lightTexture );
-	glActiveTexture( GL_TEXTURE10 );
+	glActiveTexture( GL_TEXTURE11 );
 	glBindTexture( GL_TEXTURE_3D, lightTexture );
 	glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA16F, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_FLOAT, &ones.data()[ 0 ] );
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -264,7 +290,7 @@ void engine::SetupTextures () {
 
 	// loadbuffer for VAT + load/save
 	glGenTextures( 1, &loadBuffer );
-	glActiveTexture( GL_TEXTURE11 );
+	glActiveTexture( GL_TEXTURE12 );
 	glBindTexture( GL_TEXTURE_3D, loadBuffer );
 	glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &zeroes.data()[ 0 ] );
 	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -275,7 +301,7 @@ void engine::SetupTextures () {
 	textures[ "LoadBuffer" ] = loadBuffer;
 
 	glGenTextures( 1, &heightmapTexture );
-	glActiveTexture( GL_TEXTURE12 );
+	glActiveTexture( GL_TEXTURE13 );
 	glBindTexture( GL_TEXTURE_2D, heightmapTexture );
 	newHeightmapDiamondSquare();
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );

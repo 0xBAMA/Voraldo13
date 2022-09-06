@@ -61,7 +61,8 @@ private:
 	void Raymarch ();
 	void SendTonemappingParameters ();
 	void Tonemap ();
-	void SendDitherParameters ();
+	void SendDitherParametersQ ();
+	void SendDitherParametersP ();
 	void Dither ();
 	void TridentAndTiming ();
 	void ImguiPass ();
@@ -123,6 +124,7 @@ private:
 	// probably refactor these into some other utilites header or something
 	glm::vec3 GetColorForTemperature( float temperature ); // 6500.0 is white
 	std::vector<uint8_t> BayerData ( int dimension );
+	std::vector<uint8_t> Make4Channel( std::vector<uint8_t> input );
 
 	void newHeightmapPerlin();
 	void newHeightmapDiamondSquare();
@@ -145,7 +147,6 @@ private:
 	void AddFloat ( json& j, string label, float value );
 	void AddIvec3 ( json& j, string label, glm::ivec3 value );
 	void AddVec3 ( json& j, string label, glm::vec3 value );
-	// void AddVec3Array ( json& j, string label, std::vector< glm::vec3 > values );
 	void AddVec4 ( json& j, string label, glm::vec4 value );
 
 	string processAddEscapeSequences( string input );
