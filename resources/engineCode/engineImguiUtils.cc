@@ -2449,13 +2449,15 @@ void engine::MenuPostProcessingSettings () {
 		" Vlachos", " Triangle Remap Vlachos", " Triangle Remap Uniform Noise",
 		" Triangle Remap Uniform Noise ( Three Channel )" };
 
+
+	ImGui::Text( " " );
 	switch ( render.ditherMode ) {
 	case 0: // No dither
 		break;
 
 	case 1: // quantize
 		ImGui::SliderInt( "Bit Depth", &render.ditherNumBits, 0, 8 );
-		ImGui::Combo( "Colorspace Select", &render.ditherSpaceSelect, colorspaceModesList, IM_ARRAYSIZE( colorspaceModesList ) );
+		ImGui::Combo( "Colorspace", &render.ditherSpaceSelect, colorspaceModesList, IM_ARRAYSIZE( colorspaceModesList ) );
 		ImGui::Combo( "Dither Pattern", &render.ditherPattern, ditherPatternList, IM_ARRAYSIZE( ditherPatternList ) );
 		break;
 
@@ -2466,9 +2468,22 @@ void engine::MenuPostProcessingSettings () {
 
 
 
+		ImGui::Combo( "Palette", &selectedPalette, paletteLabels.data(), paletteLabels.size() );
+		if ( ImGui::IsItemEdited() ) {
+			paletteResendFlag = true;
+		}
+		ImGui::SameLine();
+		if ( ImGui::Button( "Random" ) ) {
+			paletteResendFlag = true;
+			std::mt19937_64 gen;
+			std::random_device r;
+			std::seed_seq s{ r(), r(), r(), r(), r(), r(), r(), r(), r() };
+			gen = std::mt19937_64( s );
+			std::uniform_int_distribution< int > pick( 0, paletteLabels.size() - 1 );
+			selectedPalette = pick( gen );
+		}
 
-
-		ImGui::Combo( "Colorspace Select", &render.ditherSpaceSelect, colorspaceModesList, IM_ARRAYSIZE( colorspaceModesList ) );
+		ImGui::Combo( "Colorspace", &render.ditherSpaceSelect, colorspaceModesList, IM_ARRAYSIZE( colorspaceModesList ) );
 		ImGui::Combo( "Dither Pattern", &render.ditherPattern, ditherPatternList, IM_ARRAYSIZE( ditherPatternList ) );
 		break;
 

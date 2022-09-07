@@ -154,7 +154,7 @@ public:
 			for(int j = 0; j < 4; j++) {
 				col[ j ] = ( color[ j ] * 255 ) + colorDistribution( gen );
 			}
-			writeLetterToBlock( glyphs[ glyphPick( gen ) ], locationDistribution( gen ), locationDistribution( gen ), locationDistribution( gen ), directionDistribution( gen ), directionDistribution( gen ), col, data, dim );
+			writeLetterToBlock( glyphs[ glyphPick( gen ) ], locationDistribution( gen ), locationDistribution( gen ), locationDistribution( gen ), directionDistribution( gen ), scaleDistribution( gen ), col, data, dim );
 		}
 	}
 

@@ -152,7 +152,10 @@ private:
 
 	string processAddEscapeSequences( string input );
 
+	int selectedPalette = 0;
+	bool paletteResendFlag = true;
 	std::vector<palette> paletteList;
+	std::vector<const char *> paletteLabels;
 
 //==============================================================================
 	// shutdown procedures

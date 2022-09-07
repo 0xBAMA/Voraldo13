@@ -628,11 +628,13 @@ void engine::LoadPalette () {
 			glm::ivec3 val ( color[ 0 ], color[ 1 ], color[ 2 ] );
 			p.colors.push_back( val );
 		}
-		// cout << "palette is " << p.label << " and it has " << p.colors.size() << " entries\n";
-		// for ( int i = 0; i < p.colors.size(); i++ ) {
-		// 	cout << " " << p.colors[ i ].x << " " << p.colors[ i ].y << " " << p.colors[ i ].z << "\n";
-		// }
 		paletteList.push_back( p );
+
+		// copy to a cstr for use by imgui
+		char * d = new char[ p.label.length() + 1 ];
+		std::copy( p.label.begin(), p.label.end(), d );
+		d[ p.label.length() ] = '\0';
+		paletteLabels.push_back( d );
 	}
 	cout << T_GREEN << "done." << T_RED << " ( " << Tock() << " us )" << RESET << endl;
 }
