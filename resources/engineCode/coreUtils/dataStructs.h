@@ -50,4 +50,9 @@ struct renderState {
 	int ditherPattern = 0;
 };
 
+struct palette {
+	string label;
+	std::vector<glm::ivec3> colors;
+};
+
 #endif

@@ -11,6 +11,7 @@ void engine::Init () {
 	ShaderCompile();
 	SetupTextures();
 	ImguiSetup();
+	LoadPalette();
 	MenuPopulate();
 	ReportStartupStats();
 }

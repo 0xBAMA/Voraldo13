@@ -615,6 +615,28 @@ void engine::ImguiSetup () {
 	cout << T_GREEN << "done." << T_RED << " ( " << Tock() << " us )" << RESET << endl;
 }
 
+void engine::LoadPalette () {
+	ZoneScoped;
+	cout << T_BLUE << "    Loading Palette Data" << RESET << " ............................. ";
+	ifstream in( "resources/palettes/paletteData.json" );
+	json j;
+	in >> j;
+	for ( auto& entry : j ) {
+		palette p;
+		p.label = entry[ "label" ];
+		for ( auto& color : entry[ "data" ] ) {
+			glm::ivec3 val ( color[ 0 ], color[ 1 ], color[ 2 ] );
+			p.colors.push_back( val );
+		}
+		// cout << "palette is " << p.label << " and it has " << p.colors.size() << " entries\n";
+		// for ( int i = 0; i < p.colors.size(); i++ ) {
+		// 	cout << " " << p.colors[ i ].x << " " << p.colors[ i ].y << " " << p.colors[ i ].z << "\n";
+		// }
+		paletteList.push_back( p );
+	}
+	cout << T_GREEN << "done." << T_RED << " ( " << Tock() << " us )" << RESET << endl;
+}
+
 void engine::ReportStartupStats () {
 	ZoneScoped;
 	cout << endl << T_CYAN << "  " << shaders.size() << " shaders." << endl;

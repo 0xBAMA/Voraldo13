@@ -49,6 +49,7 @@ private:
 	void ImguiSetup ();
 	void MenuPopulate ();
 	void SetupTextures ();
+	void LoadPalette ();
 	void ReportStartupStats ();
 
 //==============================================================================
@@ -150,6 +151,8 @@ private:
 	void AddVec4 ( json& j, string label, glm::vec4 value );
 
 	string processAddEscapeSequences( string input );
+
+	std::vector<palette> paletteList;
 
 //==============================================================================
 	// shutdown procedures

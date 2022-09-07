@@ -189,7 +189,7 @@ void engine::ImguiPass () {
 	ZoneScoped;
 	ImguiFrameStart();			// start the imgui frame
 
-	ImGui::ShowDemoWindow();	// show the demo window
+	// ImGui::ShowDemoWindow();	// show the demo window
 
 	// menu container
 	static bool showMenu = true;
