@@ -12,7 +12,8 @@ int main ( int argc, char const *argv[] ) {
 
 	while( in >> temp ) {
 		count++;
-		j[ temp ] = 1; // placeholder
+		j[ temp ][ "index" ] = count;
+		j[ temp ][ "label" ] = temp;
 	}
 
 	std::ofstream out( "palette.json" );
