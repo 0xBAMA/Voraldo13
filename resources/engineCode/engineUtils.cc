@@ -105,7 +105,11 @@ void engine::SendDitherParametersQ () {
 }
 
 void engine::SendDitherParametersP () {
-
+	const GLuint shader = shaders[ "Dither Palette" ];
+	glUniform1i( glGetUniformLocation( shader, "colorspacePick" ), render.ditherSpaceSelect );
+	glUniform1i( glGetUniformLocation( shader, "patternSelector" ), render.ditherPattern );
+	glUniform1i( glGetUniformLocation( shader, "frameNumber" ), render.framesSinceStartup );
+	glBindImageTexture( 4, textures[ "Palette" ], 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8 );
 }
 
 void engine::Dither () {
@@ -132,6 +136,7 @@ void engine::Dither () {
 
 	case 2: // palette dither
 		glUseProgram( shaders[ "Dither Palette" ] );
+		SendSelectedPalette();
 		SendDitherParametersP();
 		glDispatchCompute( ( WIDTH + 15 ) / 16, ( HEIGHT + 15 ) / 16, 1 );
 		break;
@@ -308,6 +313,23 @@ void engine::SwapBlocks () {
 
 void engine::AddToLog ( json j ) {
 	// add the operation record to the log
+}
+
+void engine::SendSelectedPalette () {
+	std::vector<uint8_t> data;
+	const palette entry = paletteList[ selectedPalette ];
+	const int width = entry.colors.size();
+
+	for ( int i = 0; i < width; i++ ) {
+		data.push_back( entry.colors[ i ].r );
+		data.push_back( entry.colors[ i ].g );
+		data.push_back( entry.colors[ i ].b );
+		data.push_back( 255 );
+	}
+
+	glBindTexture( GL_TEXTURE_2D, textures[ "Palette" ] );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, width, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[ 0 ] );
+	paletteResendFlag = false;
 }
 
 void engine::BlockDispatch () {

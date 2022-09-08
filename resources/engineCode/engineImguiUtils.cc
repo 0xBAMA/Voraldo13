@@ -2463,10 +2463,7 @@ void engine::MenuPostProcessingSettings () {
 
 	case 2: // palette based
 	// if mode is palette, give a picker for the palette
-		// button for random palette - maybe some more effective way to index a massive
-		// quantity of palettes... imgui has some kind of text filtering thing, tbd
-
-
+		// imgui has some kind of text filtering thing, tbd - would need a text entry field
 
 		ImGui::Combo( "Palette", &selectedPalette, paletteLabels.data(), paletteLabels.size() );
 		if ( ImGui::IsItemEdited() ) {

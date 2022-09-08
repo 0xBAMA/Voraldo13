@@ -156,6 +156,7 @@ private:
 	bool paletteResendFlag = true;
 	std::vector<palette> paletteList;
 	std::vector<const char *> paletteLabels;
+	void SendSelectedPalette ();
 
 //==============================================================================
 	// shutdown procedures

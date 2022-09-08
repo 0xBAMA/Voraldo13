@@ -157,6 +157,7 @@ void engine::SetupTextures () {
 	GLuint lightTexture;
 	GLuint loadBuffer;
 	GLuint heightmapTexture;
+	GLuint paletteTexture;
 
 	// create the image textures
 	Image initial( WIDTH * std::max( SSFACTOR, 1.0 ), HEIGHT * std::max( SSFACTOR, 1.0 ) );
@@ -312,6 +313,15 @@ void engine::SetupTextures () {
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 	textures[ "Heightmap" ] = heightmapTexture;
+
+	glGenTextures( 1, &paletteTexture );
+	glActiveTexture( GL_TEXTURE14 );
+	glBindTexture( GL_TEXTURE_2D, paletteTexture );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+	textures[ "Palette" ] = paletteTexture;
 
 /*==============================================================================
 other textures, tbd
@@ -503,28 +513,6 @@ void engine::ShaderCompile () {
 	trident.PassInShaders( shaders[ "Trident Raymarch" ], shaders[ "Trident Blit" ] );
 
 	cout << T_GREEN << "done." << T_RED << " ( " << Tock() << " us )" << RESET << endl;
-
-	// Image paletteEntries( "resources/palettes/lumaSorted.png" );
-	// json j;
-	// ifstream in( "resources/palettes/palette.json" );
-	// in >> j;
-	// for ( auto& entry : j ) {
-	// 	std::vector<rgba> colors;
-	// 	for ( int col = 0; col < 256; col++ ) {
-	// 		rgba data = paletteEntries.GetAtXY( col, int( entry[ "index" ] ) - 1 );
-	// 		if ( data.a == 0 ) {
-	// 			break;
-	// 		} else {
-	// 			colors.push_back( data );
-	// 		}
-	// 	}
-	// 	for ( unsigned int i = 0; i < colors.size(); i++ ) {
-	// 		j[ entry[ "label" ] ][ "data" ][ i ] = { colors[ i ].r, colors[ i ].g, colors[ i ].b };
-	// 	}
-	// }
-	// std::ofstream out( "resources/palettes/paletteData.json" );
-	// out << j.dump( 1 );
-
 }
 
 void engine::ImguiSetup () {
