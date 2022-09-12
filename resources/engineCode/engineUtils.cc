@@ -233,14 +233,16 @@ void engine::HandleEvents () {
 			}
 			ImVec2 valueRaw = ImGui::GetMouseDragDelta( 0, 0.0f );
 			if ( ( valueRaw.x != 0 || valueRaw.y != 0 ) ) {
-				render.renderOffset.x -= valueRaw.x / 100.0f;
-				render.renderOffset.y += valueRaw.y / 100.0f;
+				render.renderOffset.x -= valueRaw.x;
+				render.renderOffset.y += valueRaw.y;
 				render.framesSinceLastInput = 0;
+				ImGui::ResetMouseDragDelta( 0 );
 			}
 			valueRaw = ImGui::GetMouseDragDelta( 1, 0.0f );
 			if ( ( valueRaw.x != 0 || valueRaw.y != 0 ) ) {
-				trident.RotateY( -valueRaw.x * 0.0001f );
-				trident.RotateX( -valueRaw.y * 0.0001f );
+				trident.RotateY( -valueRaw.x * 0.01f );
+				trident.RotateX( -valueRaw.y * 0.01f );
+				ImGui::ResetMouseDragDelta( 1 );
 			}
 		}
 		if ( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_SHIFT && SDL_GetModState() & KMOD_CTRL && SDL_GetModState() & KMOD_ALT ) {
