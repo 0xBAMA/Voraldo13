@@ -10,6 +10,12 @@ struct triangle {
 	glm::vec3 n0, n1, n2;
 };
 
+struct fragment {
+	ivec2 pos;
+	glm::vec4 color;
+	float depth;
+};
+
 // helper functions
 static const float RemapRange ( const float value, const float iMin, const float iMax, const float oMin, const float oMax ) {
 	return ( oMin + ( ( oMax - oMin ) / ( iMax - iMin ) ) * ( value - iMin ) );
@@ -148,7 +154,7 @@ public:
 
 	// draw triangle
 	// void DrawTriangle ( vec3 p0, vec3 p1, vec3 p2, vec4 color ) { // eventually extend to include texcoords + normals
-	void DrawTriangle ( triangle t, vec4 color ) { // eventually extend to include texcoords + normals
+	void DrawTriangle ( triangle t, std::vector< fragment > &fragments ) { // eventually extend to include texcoords + normals
 		vec2 bboxmin(  std::numeric_limits< float >::max(),  std::numeric_limits< float >::max() );
 		vec2 bboxmax( -std::numeric_limits< float >::max(), -std::numeric_limits< float >::max() );
 		vec2 clamp( width - 1, height - 1 );
@@ -211,11 +217,15 @@ public:
 					Color.SetAtXY( eval.x, eval.y, { uint8_t( texRef.x * 255 ), uint8_t( texRef.y * 255 ), uint8_t( texRef.z * 255 ), uint8_t( texRef.w * 255 ) } );
 					Depth.SetAtXY( eval.x, eval.y, { depth, 0.0f, 0.0f, 0.0f } );
 				}
+
+				// put the vec4 calculated color into the fragments vector
+				fragments.push_back( { eval, TexRef( vec2( texCoord.x, 1.0f - texCoord.y ) ), depth } );
+
 			}
 		}
 	}
 
-	void DrawModel ( string modelPath, string texturePath, mat3 transform, vec3 offset ) {
+	void DrawModel ( string modelPath, string texturePath, mat3 transform, vec3 offset, std::vector< fragment > & fragments ) {
 		// passing in transform means we can scale, rotate, etc, and keep the interface simple
 
 		objLoader o( modelPath );
@@ -247,7 +257,7 @@ public:
 			t.tc2 = o.texcoords[ int( o.texcoordIndices[ i ].z ) ];
 
 			// DrawTriangle ( p0x, p1x, p2x, vec4( 1.0f ) );
-			DrawTriangle ( t, vec4( 1.0f ) );
+			DrawTriangle ( t, fragments );
 		}
 
 		// wireframe
