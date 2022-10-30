@@ -220,7 +220,6 @@ public:
 
 				// put the vec4 calculated color into the fragments vector
 				fragments.push_back( { eval, TexRef( vec2( texCoord.x, 1.0f - texCoord.y ) ), depth } );
-
 			}
 		}
 	}

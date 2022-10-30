@@ -1352,11 +1352,11 @@ void engine::MenuOBJ () {
 		if ( ImGui::Button( "OBJ" ) ) {
 
 			// load the model
-			const mat3 baseTransform( 0.005f );
+			const mat3 baseTransform( 0.00618f );
 			mat3 transform = baseTransform;
 
 			// render one view, to start
-			cout << endl << "drawing model" << endl << endl;
+			// cout << endl << "drawing model" << endl << endl;
 			std::vector< fragment > fragments[ 3 ];
 
 			// +x view
@@ -1373,54 +1373,48 @@ void engine::MenuOBJ () {
 			transform = rotation( vec3( 1.0f, 0.0f, 0.0f ), pi / 2.0 ) * baseTransform;
 			s2.DrawModel( "testModel/iosen.OBJ", "testModel/iosen_6.png", transform, vec3( 0.0f ), fragments[ 2 ] );
 
-			cout << "model drawn" << endl;
+			// cout << "model drawn" << endl;
 			s0.Color.Save( "test.png" );
 
-			cout << "pulled " << fragments[ 0 ].size() + fragments[ 1 ].size() + fragments[ 2 ].size()
-				<< " fragments, ready to put in block" << newline;
+			// cout << "pulled " << fragments[ 0 ].size() + fragments[ 1 ].size() + fragments[ 2 ].size()
+				// << " fragments, ready to put in block" << newline;
 
 
 			// populate load block out of the three rendered views
-			std::vector<uint8_t> loaded;
+			std::vector< uint8_t > loaded;
 			loaded.resize( BLOCKDIM * BLOCKDIM * BLOCKDIM * 4 );
 
 			// fragments -> texture ( will need to figure out averaging, etc, eventually - for now, overwrite )
-			for ( auto& frag : fragments[ 0 ] ) {
-				int depthRemap = int( RemapRange( frag.depth, -1.0f, 1.0f, 0.0f, float( BLOCKDIM ) ) );
-				const int x = frag.pos.y;
-				const int y = BLOCKDIM - depthRemap;
-				const int z = frag.pos.x;
-				const int index = ( x + y * BLOCKDIM + z * BLOCKDIM * BLOCKDIM ) * 4;
-				loaded[ index + 0 ] = frag.color.r * 255;
-				loaded[ index + 1 ] = frag.color.g * 255;
-				loaded[ index + 2 ] = frag.color.b * 255;
-				loaded[ index + 3 ] = frag.color.a * 255;
+			for ( int i = 0; i < 3; i++ ) {
+				for ( auto& frag : fragments[ i ] ) {
+					int depthRemap = int( RemapRange( frag.depth, -1.0f, 1.0f, 0.0f, float( BLOCKDIM ) ) );
+					int x,y,z;
+					switch ( i ) {
+						case 0:
+						x = BLOCKDIM - depthRemap;
+						y = frag.pos.y;
+						z = frag.pos.x;
+						break;
+						case 1:
+						x = frag.pos.x;
+						y = frag.pos.y;
+						z = depthRemap;
+						break;
+						case 2:
+						x = BLOCKDIM - frag.pos.y;
+						y = BLOCKDIM - depthRemap;
+						z = BLOCKDIM - frag.pos.x;
+						break;
+						default:
+						break;
+					}
+					const int index = ( x + y * BLOCKDIM + z * BLOCKDIM * BLOCKDIM ) * 4;
+					loaded[ index + 0 ] = frag.color.r * 255;
+					loaded[ index + 1 ] = frag.color.g * 255;
+					loaded[ index + 2 ] = frag.color.b * 255;
+					loaded[ index + 3 ] = frag.color.a * 255;
+				}
 			}
-
-			for ( auto& frag : fragments[ 1 ] ) {
-				int depthRemap = int( RemapRange( frag.depth, -1.0f, 1.0f, 0.0f, float( BLOCKDIM ) ) );
-				const int x = frag.pos.y;
-				const int y = frag.pos.x;
-				const int z = depthRemap;
-				const int index = ( x + y * BLOCKDIM + z * BLOCKDIM * BLOCKDIM ) * 4;
-				loaded[ index + 0 ] = frag.color.r * 255;
-				loaded[ index + 1 ] = frag.color.g * 255;
-				loaded[ index + 2 ] = frag.color.b * 255;
-				loaded[ index + 3 ] = frag.color.a * 255;
-			}
-
-			for ( auto& frag : fragments[ 2 ] ) {
-				int depthRemap = int( RemapRange( frag.depth, -1.0f, 1.0f, 0.0f, float( BLOCKDIM ) ) );
-				const int x = BLOCKDIM - depthRemap;
-				const int y = BLOCKDIM - frag.pos.y;
-				const int z = BLOCKDIM - frag.pos.x;
-				const int index = ( x + y * BLOCKDIM + z * BLOCKDIM * BLOCKDIM ) * 4;
-				loaded[ index + 0 ] = frag.color.r * 255;
-				loaded[ index + 1 ] = frag.color.g * 255;
-				loaded[ index + 2 ] = frag.color.b * 255;
-				loaded[ index + 3 ] = frag.color.a * 255;
-			}
-
 
 			glBindTexture( GL_TEXTURE_3D, textures[ "LoadBuffer" ] );
 			glTexImage3D( GL_TEXTURE_3D, 0, GL_RGBA8, BLOCKDIM, BLOCKDIM, BLOCKDIM, 0, GL_RGBA, GL_UNSIGNED_BYTE, &loaded[ 0 ] );
