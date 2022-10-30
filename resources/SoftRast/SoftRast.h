@@ -217,13 +217,12 @@ public:
 
 	void DrawModel ( string modelPath, string texturePath, mat3 transform, vec3 offset ) {
 		// passing in transform means we can scale, rotate, etc, and keep the interface simple
-		objLoader o( modelPath );
 
+		objLoader o( modelPath );
 		LoadTex( texturePath );
 
-		// cout << "image loaded " << currentTex.width << " by " << currentTex.height << newline;
-
 		for ( unsigned int i = 0; i < o.triangleIndices.size() - 80 /* exclude wheel */; i++ ) {
+
 			vec4 p0 = o.vertices[ int( o.triangleIndices[ i ].x ) ];
 			vec4 p1 = o.vertices[ int( o.triangleIndices[ i ].y ) ];
 			vec4 p2 = o.vertices[ int( o.triangleIndices[ i ].z ) ];

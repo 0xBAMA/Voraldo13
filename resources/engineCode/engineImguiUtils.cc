@@ -119,6 +119,7 @@ void engine::MenuLayout( bool* p_open ) {
 			} else if ( isPicked( "Spaceship Generator" ) ) {	MenuSpaceship();
 			} else if ( isPicked( "Letters" ) ) {				MenuLetters();
 			} else if ( isPicked( "XOR" ) ) {					MenuXOR();
+			} else if ( isPicked( "OBJ" ) ) {					MenuOBJ();
 			} else if ( isPicked( "Clear" ) ) {					MenuClearBlock();
 			} else if ( isPicked( "Masking" ) ) {				MenuMasking();
 			} else if ( isPicked( "Blur" ) ) {					MenuBlur();
@@ -1338,6 +1339,60 @@ void engine::MenuLetters () {
 	ImGui::EndTabBar();
 }
 
+void engine::MenuOBJ () {
+	OrangeText( "OBJ" );
+	ImGui::BeginTabBar( "obj" );
+	if ( ImGui::BeginTabItem( " Controls " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		// maybe implement thresholding or something? tbd
+		static bool respectMask = true;
+		ImGui::Checkbox( "Respect Mask", &respectMask );
+		if ( ImGui::Button( "OBJ" ) ) {
+
+			// load the model
+			const mat3 transform( 0.005f );
+			SoftRast s( BLOCKDIM, BLOCKDIM );
+
+			// render one view, to start
+			cout << endl << "drawing model" << endl << endl;
+			s.DrawModel( "testModel/iosen.OBJ", "testModel/iosen_6.png", transform, vec3( 0.0f ) );
+			cout << "model drawn" << endl;
+			s.Color.Save( "test.png" );
+
+			// populate load block
+
+			// copy loadbuffer
+
+			// get it
+
+
+			// SwapBlocks();
+			// bindSets[ "Basic Operation" ].apply();
+			// json j;
+			// j[ "shader" ] = "XOR";
+			// j[ "bindset" ] = "Basic Operation";
+			// AddBool( j, "respectMask", respectMask );
+			// SendUniforms( j );
+			// AddToLog( j );
+			// BlockDispatch();
+			// setColorMipmapFlag();
+		}
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	if ( ImGui::BeginTabItem( " Description " ) ) {
+		ImGui::Separator();
+		ImGui::Indent( 16.0f );
+
+		ImGui::Unindent( 16.0f );
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
+}
+
 void engine::MenuXOR () {
 	OrangeText( "XOR" );
 	ImGui::BeginTabBar( "xor" );
@@ -1360,7 +1415,6 @@ void engine::MenuXOR () {
 			BlockDispatch();
 			setColorMipmapFlag();
 		}
-
 
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();

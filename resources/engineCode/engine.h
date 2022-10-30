@@ -99,6 +99,7 @@ private:
 	void MenuVAT ();				float OperationVAT ();
 	void MenuSpaceship ();			float OperationSpaceship ();
 	void MenuLetters ();			float OperationLetters ();
+	void MenuOBJ ();				float OperationOBJ ();
 	void MenuXOR ();				float OperationXOR ();
 	void MenuClearBlock ();			float OperationClearBlock ();
 	void MenuMasking ();			float OperationMasking ();

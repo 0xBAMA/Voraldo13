@@ -1,6 +1,8 @@
 // TinyOBJLoader - This has to be included in a .cc file
 #define TINYOBJLOADER_IMPLEMENTATION
 // #define TINYOBJLOADER_USE_DOUBLE
+
+#include "../engineCode/includes.h"
 #include "objLoader.h"
 
 // tinyobj callbacks
@@ -8,35 +10,38 @@
 //  vertices, normals, texcoords, index, material info
 void vertex_cb( void *user_data, float x, float y, float z, float w ) {
 	objLoader *t = reinterpret_cast< objLoader * >( user_data );
-	t->vertices.push_back( glm::vec4( x, y, z, w ) );
+	t->vertices.push_back( vec4( x, y, z, w ) );
 }
 
 void normal_cb( void *user_data, float x, float y, float z ) {
 	objLoader *t = reinterpret_cast< objLoader * >( user_data );
-	t->normals.push_back( glm::vec3( x, y, z ) );
+	t->normals.push_back( vec3( x, y, z ) );
 }
 
 void texcoord_cb( void *user_data, float x, float y, float z ) {
 	objLoader *t = reinterpret_cast< objLoader * >( user_data );
-	t->texcoords.push_back( glm::vec3( x, y, z ) );
+	t->texcoords.push_back( vec3( x, y, z ) );
 }
 
 void index_cb( void *user_data, tinyobj::index_t *indices, int num_indices ) {
 	objLoader *t = reinterpret_cast< objLoader * >( user_data );
 
 	if ( num_indices == 3 ) { // this is a triangle
-	// OBJ uses 1-indexing, convert to 0-indexing
-	t->triangleIndices.push_back( glm::ivec3( indices[ 0 ].vertex_index - 1,
-																						indices[ 1 ].vertex_index - 1,
-																						indices[ 2 ].vertex_index - 1 ) );
-	t->normalIndices.push_back( glm::ivec3( indices[ 0 ].normal_index - 1,
-																					indices[ 1 ].normal_index - 1,
-																					indices[ 2 ].normal_index - 1 ) );
-	t->texcoordIndices.push_back( glm::ivec3( indices[ 0 ].texcoord_index - 1,
-																						indices[ 1 ].texcoord_index - 1,
-																						indices[ 2 ].texcoord_index - 1 ) );
+		// OBJ uses 1-indexing, convert to 0-indexing
+		t->triangleIndices.push_back( ivec3( indices[ 0 ].vertex_index - 1, indices[ 1 ].vertex_index - 1, indices[ 2 ].vertex_index - 1 ) );
+		t->normalIndices.push_back( ivec3( indices[ 0 ].normal_index - 1, indices[ 1 ].normal_index - 1, indices[ 2 ].normal_index - 1 ) );
+		t->texcoordIndices.push_back( ivec3( indices[ 0 ].texcoord_index - 1, indices[ 1 ].texcoord_index - 1, indices[ 2 ].texcoord_index - 1 ) );
+	} else if ( num_indices == 4 ) { // this is a quad
+		t->triangleIndices.push_back( ivec3( indices[ 0 ].vertex_index - 1, indices[ 1 ].vertex_index - 1, indices[ 2 ].vertex_index - 1 ) );
+		t->normalIndices.push_back( ivec3( indices[ 0 ].normal_index - 1, indices[ 1 ].normal_index - 1, indices[ 2 ].normal_index - 1 ) );
+		t->texcoordIndices.push_back( ivec3( indices[ 0 ].texcoord_index - 1, indices[ 1 ].texcoord_index - 1, indices[ 2 ].texcoord_index - 1 ) );
+
+		t->triangleIndices.push_back( ivec3( indices[ 2 ].vertex_index - 1, indices[ 0 ].vertex_index - 1, indices[ 3 ].vertex_index - 1 ) );
+		t->normalIndices.push_back( ivec3( indices[ 2 ].normal_index - 1, indices[ 0 ].normal_index - 1, indices[ 3 ].normal_index - 1 ) );
+		t->texcoordIndices.push_back( ivec3( indices[ 2 ].texcoord_index - 1, indices[ 0 ].texcoord_index - 1, indices[ 3 ].texcoord_index - 1 ) );
 	}
-	// lines, points have a different number of indicies
+
+	// lines, points, quads have a different number of indicies
 	//  might want to handle these
 }
 
@@ -56,8 +61,10 @@ void group_cb( void *user_data, const char **names, int num_names ) {
 }
 
 void object_cb( void *user_data, const char *name ) {
+	cout << "new object???? get it in you" << endl;
 	objLoader *t = reinterpret_cast< objLoader * >( user_data );
 	( void ) t;
+
 }
 
 // this is where the callbacks are set up and used
@@ -92,11 +99,11 @@ void objLoader::LoadOBJ( std::string fileName ) {
 		std::cerr << "Failed to parse .obj at location " << fileName << std::endl;
 	}
 
-	cout << "vertex list length: " << vertices.size() << endl;
-	cout << "normal list length: " << normals.size() << endl;
-	cout << "texcoord list length: " << texcoords.size() << endl;
-
-	cout << "vertex index list length: " << triangleIndices.size() << endl;
-	cout << "normal index length: " << normalIndices.size() << endl;
-	cout << "texcoord index length: " << texcoordIndices.size() << endl;
+	// cout << "vertex list length: " << vertices.size() << endl;
+	// cout << "normal list length: " << normals.size() << endl;
+	// cout << "texcoord list length: " << texcoords.size() << endl;
+	//
+	// cout << "vertex index list length: " << triangleIndices.size() << endl;
+	// cout << "normal index length: " << normalIndices.size() << endl;
+	// cout << "texcoord index length: " << texcoordIndices.size() << endl;
 }

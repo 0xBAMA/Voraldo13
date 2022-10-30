@@ -28,6 +28,7 @@ using std::endl;
 using std::flush;
 using std::string;
 using std::unordered_map;
+constexpr char newline = '\n';
 
 // pi definition - definitely sufficient precision
 constexpr double pi = 3.14159265358979323846;
@@ -100,16 +101,16 @@ using glm::mat4;
 // #define WIDTH 640
 // #define HEIGHT 480
 
-#define WIDTH 1280
-#define HEIGHT 720
+// #define WIDTH 1280
+// #define HEIGHT 720
 
-// #define WIDTH 1920
-// #define HEIGHT 1080
+#define WIDTH 1920
+#define HEIGHT 1080
 
 #define STARTONWINDOW 1
 
 #define BLOCKDIM 256
-#define SSFACTOR 1.0
+#define SSFACTOR 0.618
 #define TILESIZE 64
 
 //==============================================================================

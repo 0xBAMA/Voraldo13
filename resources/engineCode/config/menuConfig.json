@@ -65,6 +65,11 @@
 			"Description": "Placeholder Description"
 		},
 		{
+			"Label": "OBJ",
+			"Category": "Shapes",
+			"Description": "Placeholder Description"
+		},
+		{
 			"Label": "XOR",
 			"Category": "Shapes",
 			"Description": "Placeholder Description"
