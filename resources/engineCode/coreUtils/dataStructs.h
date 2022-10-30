@@ -21,7 +21,7 @@ struct renderState {
 	bool colorMipmapFlag = true;
 
 	// render inputs
-	glm::vec2 renderOffset = glm::vec2( 0.0, 0.0 );
+	glm::vec2 renderOffset = glm::vec2( 0.0f, 0.0f );
 	float scaleFactor = 5.0f;
 	float alphaCorrectionPower = 2.0f;
 	float jitterAmount = 1.0f;

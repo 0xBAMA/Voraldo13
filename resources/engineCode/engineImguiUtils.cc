@@ -1057,6 +1057,15 @@ void engine::MenuVAT () {
 		ImGui::ColorEdit4( "State 0 Color", (float *) &color0, flags );
 		ImGui::ColorEdit4( "State 1 Color", (float *) &color1, flags );
 		ImGui::ColorEdit4( "State 2 Color", (float *) &color2, flags );
+		if ( ImGui::Button( "Randomize Colors" ) ) {
+			std::random_device r;
+			std::seed_seq s{ r(), r(), r(), r(), r(), r(), r(), r(), r() };
+			std::mt19937_64 gen = std::mt19937_64( s );
+			std::uniform_real_distribution< float > pick( 0.0f, 1.0f );
+			color0 = glm::vec4( pick( gen ), pick( gen ), pick( gen ), pick( gen ) );
+			color1 = glm::vec4( pick( gen ), pick( gen ), pick( gen ), pick( gen ) );
+			color2 = glm::vec4( pick( gen ), pick( gen ), pick( gen ), pick( gen ) );
+		}
 		ImGui::Text( " " );
 
 		OrangeText( "Rule" );

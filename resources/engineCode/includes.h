@@ -50,6 +50,16 @@ constexpr int MSAACount = 1;
 // not sure as to the utility of this
 #define GLX_GLEXT_PROTOTYPES
 
+// convenience defines for GLM
+using glm::vec2;
+using glm::vec3;
+using glm::vec4;
+using glm::ivec2;
+using glm::ivec3;
+using glm::ivec4;
+using glm::mat3;
+using glm::mat4;
+
 // OpenGL Loader
 #include "../ImGUI/gl3w.h"
 
@@ -70,7 +80,7 @@ constexpr int MSAACount = 1;
 #include "coreUtils/bindset.h"
 
 // image load/save/resize/access/manipulation wrapper
-#include "../ImageHandling/image.h"
+#include "../ImageHandling/Image.h"
 
 // letter stamping
 #include "../bitfontCore/letters.h"
@@ -85,15 +95,18 @@ constexpr int MSAACount = 1;
 	// because any change in this file triggers a full rebuild
 
 // #define WIDTH 640
+// #define HEIGHT 360
+
+// #define WIDTH 640
 // #define HEIGHT 480
 
-// #define WIDTH 1280
-// #define HEIGHT 720
+#define WIDTH 1280
+#define HEIGHT 720
 
-#define WIDTH 1920
-#define HEIGHT 1080
+// #define WIDTH 1920
+// #define HEIGHT 1080
 
-#define STARTONWINDOW 2
+#define STARTONWINDOW 1
 
 #define BLOCKDIM 256
 #define SSFACTOR 1.0
@@ -119,6 +132,9 @@ constexpr int MSAACount = 1;
 // wrapper for TinyOBJLoader
 #include "../TinyOBJLoader/objLoader.h"
 
+// software rasterizer reimplementation
+#include "../SoftRast/SoftRast.h"
+
 // new shader compilation wrapper
 #include "shaders/lib/shaderWrapper.h"
 
@@ -140,6 +156,10 @@ constexpr int MSAACount = 1;
 // Niels Lohmann - JSON for Modern C++
 #include "../JSON/json.h"
 using json = nlohmann::json;
+
+// tinyXML2 XML parser
+#include "../tinyXML2/tinyxml2.h"
+using XMLDocument = tinyxml2::XMLDocument;
 
 inline string currentTimeAndDate() {
 	auto now = std::chrono::system_clock::now();

@@ -240,8 +240,8 @@ void engine::HandleEvents () {
 			}
 			valueRaw = ImGui::GetMouseDragDelta( 1, 0.0f );
 			if ( ( valueRaw.x != 0 || valueRaw.y != 0 ) ) {
-				trident.RotateY( -valueRaw.x * 0.01f );
-				trident.RotateX( -valueRaw.y * 0.01f );
+				trident.RotateY( -valueRaw.x * 0.03f );
+				trident.RotateX( -valueRaw.y * 0.03f );
 				ImGui::ResetMouseDragDelta( 1 );
 			}
 		}
