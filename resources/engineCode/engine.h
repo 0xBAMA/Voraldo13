@@ -136,6 +136,7 @@ private:
 	void CapturePostprocessScreenshot ();
 	void SendUniforms ( json j );
 	void AddToLog ( json j );
+	void DumpLog ();
 	void BlockDispatch ();
 
 	void updateSavesList();
@@ -158,6 +159,9 @@ private:
 	std::vector<palette> paletteList;
 	std::vector<const char *> paletteLabels;
 	void SendSelectedPalette ();
+
+	// operation logging
+	std::vector< json > log;
 
 //==============================================================================
 	// shutdown procedures

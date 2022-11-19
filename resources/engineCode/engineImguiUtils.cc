@@ -36,7 +36,7 @@ static void HelpMarker ( const char *desc ) {
 
 void engine::OrangeText ( const char *string ) {
 	ImGui::Separator();
-	ImGui::PushStyleColor( ImGuiCol_Text, ImVec4( 0.75, 0.35, 0.1, 1.0 ) );
+	ImGui::PushStyleColor( ImGuiCol_Text, ImVec4( 0.75f, 0.35f, 0.1f, 1.0f ) );
 	ImGui::PushFont( titleFont );
 	ImGui::TextUnformatted( string );
 	ImGui::PopFont();
@@ -1973,7 +1973,11 @@ void engine::MenuLogging () {
 	if ( ImGui::BeginTabItem( " Controls " ) ) {
 		ImGui::Separator();
 		ImGui::Indent( 16.0f );
-		OrangeText( "Currently Unimplemented" );
+
+		if ( ImGui::Button( "Dump The Log to CLI" ) ) {
+			DumpLog();
+		}
+
 		ImGui::Unindent( 16.0f );
 		ImGui::EndTabItem();
 	}

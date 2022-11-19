@@ -326,7 +326,13 @@ void engine::SwapBlocks () {
 
 void engine::AddToLog ( json j ) {
 	// add the operation record to the log
-	cout << j.dump( 1 ) << newline << newline;
+	log.push_back( j );
+}
+
+void engine::DumpLog () {
+	for ( auto& j : log ) {
+		cout << j << newline;
+	}
 }
 
 void engine::SendSelectedPalette () {
