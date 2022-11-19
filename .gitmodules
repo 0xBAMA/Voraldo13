@@ -4,3 +4,6 @@
 [submodule "resources/fonts/hoardOfBitfonts"]
 	path = resources/fonts/hoardOfBitfonts
 	url = https://github.com/0xBAMA/hoard-of-bitfonts.git
+[submodule "resources/tracy"]
+	path = resources/tracy
+	url = https://github.com/wolfpld/tracy.git
