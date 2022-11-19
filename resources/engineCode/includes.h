@@ -109,7 +109,7 @@ using glm::mat4;
 
 #define STARTONWINDOW 1
 
-#define BLOCKDIM 512
+#define BLOCKDIM 256
 #define SSFACTOR 0.618
 #define TILESIZE 64
 
