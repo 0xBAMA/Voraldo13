@@ -1374,7 +1374,7 @@ void engine::MenuOBJ () {
 			s2.DrawModel( "testModel/iosen.OBJ", "testModel/iosen_6.png", transform, vec3( 0.0f ), fragments[ 2 ] );
 
 			// cout << "model drawn" << endl;
-			s0.Color.Save( "test.png" );
+			// s0.Color.Save( "test.png" );
 
 			// cout << "pulled " << fragments[ 0 ].size() + fragments[ 1 ].size() + fragments[ 2 ].size()
 				// << " fragments, ready to put in block" << newline;
