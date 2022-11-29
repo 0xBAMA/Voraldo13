@@ -2468,11 +2468,12 @@ void engine::MenuRenderingSettings () {
 	const char* renderModeList[] = {
 		"Image3D Raymarch",
 		"Texture Raymarch ( Nearest )",
-		"TODO: Texture Raymarch ( Mipmapped )",
+		"TODO: Texture Raymarch ( Mipmapped )", // this still needs work to figure out why they're not showing up correctly
 		"TODO: 3D DDA",
 		"TODO: Depth Visualization",
-		"TODO: Position Visualization"
-		// spherical camera here? or as an input toggle - want to try it one way or the other
+		"TODO: Position Visualization",
+		"TODO: Normal Vector Visualization", // I think I might be able to do this by looking at the gradient of the alpha channel? something to try
+		"TODO: Goofy Cameras ... " // spherical camera here? or modes as an input toggle
 	};
 
 	ImGui::Combo( "Render Mode", &render.renderMode, renderModeList, IM_ARRAYSIZE( renderModeList ) );
@@ -2521,6 +2522,10 @@ void engine::MenuRenderingSettings () {
 		case 4: // Depth Visualization
 			break;
 		case 5: // Position Visualization
+			break;
+		case 6: // Normal Vector Visualization
+			break;
+		case 7: // Goofy cameras, etc
 			break;
 		}
 	}

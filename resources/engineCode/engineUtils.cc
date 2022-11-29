@@ -566,8 +566,12 @@ void engine::SendUniforms ( json j ) {
 		// name of the operation, or name of the shader
 		string label( element.key() );
 
-		// the type of the uniform - "null" is a special value for the shader label + bindset
-		bool ignore = ( label == "shader" || label == "bindset" || label == "text" );
+		// the type of the uniform - "null" is a special value for:
+			// shader label
+			// bindset
+			// user shader text
+			// dispatch type label
+		bool ignore = ( label == "shader" || label == "bindset" || label == "text" || label == "dispatchType" );
 		string type( ignore ? "null" : element.value()[ "type" ] );
 
 		// shortens references
