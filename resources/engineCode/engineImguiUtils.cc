@@ -43,6 +43,23 @@ void engine::OrangeText ( const char *string ) {
 	ImGui::PopStyleColor();
 }
 
+void engine::CollapsingSection ( string labelString, category_t x, int &current ) {
+		if ( ImGui::CollapsingHeader( labelString.c_str() ) ) {
+			while ( current < menu.entries.size() && menu.entries[current].category == x ) {
+				std::string label = std::string("  ") + menu.entries[current].label;
+				if ( ImGui::Selectable(label.c_str(), currentlySelectedMenuItem == current ) ) {
+					currentlySelectedMenuItem = current;
+				}
+				current++;
+			}
+		}
+		else { /* if collapsed, bump current to compensate */
+			while (current < menu.entries.size() && menu.entries[current].category == x ) {
+				current++;
+			}
+		}
+}
+
 void engine::MenuLayout( bool* p_open ) {
 	const auto flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar;
 	if ( ImGui::Begin( "Menu layout", p_open, flags ) ) {
@@ -65,25 +82,10 @@ void engine::MenuLayout( bool* p_open ) {
 			ImGui::BeginChild( "TreeView", ImVec2( 185, 0 ), true );
 			int current = 0;
 
-			#define COLLAPSING_SECTION(labelString,x) \
-				if ( ImGui::CollapsingHeader( labelString ) ) { \
-					while ( menu.entries[ current ].category == x ) { \
-						std::string label = std::string( "  " ) + menu.entries[ current ].label; \
-						if ( ImGui::Selectable( label.c_str(), currentlySelectedMenuItem == current ) ) { \
-							currentlySelectedMenuItem = current; \
-						} \
-						current++; \
-					} \
-				} else { /* if collapsed, bump current to compensate */ \
-					while ( menu.entries[ current ].category == x ) { \
-						current++; \
-					} \
-				}
-
-			COLLAPSING_SECTION( "Shapes", category_t::shapes );
-			COLLAPSING_SECTION( "Utilities", category_t::utilities );
-			COLLAPSING_SECTION( "Lighting", category_t::lighting );
-			COLLAPSING_SECTION( "Settings", category_t::settings );
+			CollapsingSection( "Shapes", category_t::shapes, current );
+			CollapsingSection( "Utilities", category_t::utilities, current );
+			CollapsingSection( "Lighting", category_t::lighting, current );
+			CollapsingSection( "Settings", category_t::settings, current );
 
 			#undef COLLAPSING_SECTION // only needed in this scope
 			ImGui::EndChild();
@@ -1078,7 +1080,7 @@ void engine::MenuVAT () {
 		ImGui::SliderFloat( "Beta", &beta, 0.0f, 1.0f, "%.3f" );
 		ImGui::SliderFloat( "Mag", &mag, 0.0f, 1.0f, "%.3f" );
 
-		constexpr int blockLevelsDeep = int( log2( float( BLOCKDIM ) ) );
+		int blockLevelsDeep = int( log2( float( BLOCKDIM ) ) );
 		if ( ImGui::Button( " Compute From String " ) ) {
 			voxelAutomataTerrain vS( blockLevelsDeep, flip, string( inputString ), initMode, lambda, beta, mag, glm::bvec3( minusX, minusY, minusZ ), glm::bvec3( plusX, plusY, plusZ ) );
 			strcpy( inputString, vS.getShortRule().c_str() );
