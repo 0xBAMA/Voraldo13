@@ -168,7 +168,8 @@ public:
 		std::random_device r;
 		std::seed_seq s{ r(), r(), r(), r(), r(), r(), r(), r(), r() };
 		auto gen = std::mt19937_64( s );
-		std::uniform_int_distribution< unsigned char > cDist( 0, 255 );
+		// std::uniform_int_distribution< unsigned char > cDist( 0, 255 );
+		std::uniform_int_distribution< unsigned int > cDist( 0, 255 );
 		std::uniform_int_distribution< unsigned int > xDist( 0, width - 1 );
 		std::uniform_int_distribution< unsigned int > yDist( 0, height - 1 );
 		for ( int i = 0; i < n; i++ )
@@ -221,7 +222,8 @@ public:
 		std::random_device r;
 		std::seed_seq s{ r(), r(), r(), r(), r(), r(), r(), r(), r() };
 		auto gen = std::mt19937_64( s );
-		std::uniform_int_distribution< unsigned char > fDist( 0, 4 );
+		// std::uniform_int_distribution< unsigned char > fDist(0, 4);
+		std::uniform_int_distribution< int > fDist( 0, 4 );
 		const unsigned char fills[ 5 ] = { FILL_0, FILL_25, FILL_50, FILL_75, FILL_100 };
 
 		for( unsigned int x = min.x; x <= max.x; x++ ) {

@@ -64,7 +64,8 @@ public:
 			std::random_device r;
 			std::seed_seq s{ r(), r(), r(), r(), r(), r(), r(), r(), r() };
 			auto gen = std::mt19937_64( s );
-			std::uniform_int_distribution< uint8_t > dist( 0, 255 );
+			// std::uniform_int_distribution< uint8_t > dist( 0, 255 );
+			std::uniform_int_distribution< int > dist( 0, 255 );
 			for ( auto it = data.begin(); it != data.end(); it++ ) {
 				*it = dist( gen );
 				// *it = 255;
