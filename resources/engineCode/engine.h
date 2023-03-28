@@ -81,7 +81,7 @@ private:
 	float postprocessScreenshotScaleFactor = 1.0f;
 	void OrangeText ( const char *string );
 	void ColorPickerHelper ( bool& draw, int& mask, glm::vec4& color );
-	void CollapsingSection( string labelString, category_t x, int& current );
+	void CollapsingSection( string labelString, category_t x, unsigned int& current );
 	ImFont * defaultFont;
 	ImFont * titleFont;
 

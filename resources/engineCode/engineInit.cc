@@ -21,7 +21,7 @@ void engine::CreateWindowAndContext () {
 
 	Tick();
 	cout << T_BLUE << "    Creating window" << RESET << " .................................. ";
-	windowHandler.Init( 0 );
+	windowHandler.Init( 1 );
 	cout << T_GREEN << "done." << T_RED << " ( " << Tock() << " us )" << RESET << endl;
 
 	Tick();

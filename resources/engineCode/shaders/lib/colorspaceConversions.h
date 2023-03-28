@@ -1576,9 +1576,9 @@ vec3 rgbToLuv(vec3 tuple){
 #define HPLUV     21
 #define LUV       22
 
-vec4 convert ( uvec4 value, int spaceswitch ){
-	vec4 converted = vec4( 0.0, 0.0, 0.0, 1.0 );
-	vec4 base_rgbval = vec4( value ) / 255.0;
+vec4 convert ( uvec4 value, int spaceswitch ) {
+	vec4 converted = vec4( 0.0f, 0.0f, 0.0f, 1.0f );
+	vec4 base_rgbval = vec4( value ) / 255.0f;
 	switch ( spaceswitch ) {
 	case RGB:		converted = base_rgbval;	break;
 	case SRGB:		converted.rgb = rgb_to_srgb( base_rgbval.rgb ); break;
@@ -1609,32 +1609,32 @@ vec4 convert ( uvec4 value, int spaceswitch ){
 }
 
 // returns a uvec4 which is ready to be written as 8-bit RGBA
-uvec4 convertBack ( vec4 value, int spaceswitch ){
+uvec4 convertBack ( vec4 value, int spaceswitch ) {
 	uvec4 converted = uvec4( 0, 0, 0, 255 );
 	switch ( spaceswitch ) {
-	case RGB:		converted = uvec4( vec3( value * 255.0 ), 255 ); break;
-	case SRGB:		converted.rgb = uvec3( srgb_to_rgb( value.rgb ) * 255 ); break;
-	case XYZ:		converted.rgb = uvec3( xyz_to_rgb( value.rgb ) * 255 ); break;
-	case XYY:		converted.rgb = uvec3( xyY_to_rgb( value.rgb ) * 255 ); break;
-	case HSV:		converted.rgb = uvec3( hsv_to_rgb( value.rgb ) * 255 ); break;
-	case HSL:		converted.rgb = uvec3( hsl_to_rgb( value.rgb ) * 255 ); break;
-	case HCY:		converted.rgb = uvec3( hcy_to_rgb( value.rgb ) * 255 ); break;
-	case YPBPR:		converted.rgb = uvec3( ypbpr_rgb( value.rgb ) * 255 ); break;
-	case YPBPR601:	converted.rgb = uvec3( ypbpr_rgb_bt601( value.rgb ) * 255 ); break;
-	case YCBCR1:	converted.rgb = uvec3( ycbcr_to_rgb( value.rgb ) * 255 ); break;
-	case YCBCR2:	converted.rgb = uvec3( ycbcr_rgb( value.rgb ) * 255 ); break;
-	case YCCBCCRC:	converted.rgb = uvec3( yccbccrc_rgb( value.rgb ) * 255 ); break;
-	case YCOCG:		converted.rgb = uvec3( ycocg_rgb( value.rgb ) * 255 ); break;
-	case BCH:		converted.rgb = uvec3( bch2RGB( value.rgb ) * 255 ); break;
-	case CHROMAMAX:	converted.rgb = uvec3( cm2rgb( value.rgba ) * 255 ); break;
-	case OKLAB:		converted.rgb = uvec3( linear_srgb_from_oklab( value.rgb ) * 255 ); break;
-	case OKHSL:		converted.rgb = uvec3( okhsl_to_srgb( value.rgb ) * 255 ); break;
-	case OKHSV:		converted.rgb = uvec3( okhsv_to_srgb( value.rgb ) * 255 ); break;
-	case OKLCH:		converted.rgb = uvec3( oklch2srgb( value.rgb ) * 255 ); break;
-	case LCH:		converted.rgb = uvec3( lchToRgb( value.rgb ) * 255 ); break;
-	case HSLUV:		converted.rgb = uvec3( hsluvToRgb( value.rgb ) * 255 ); break;
-	case HPLUV:		converted.rgb = uvec3( hpluvToRgb( value.rgb ) * 255 ); break;
-	case LUV:		converted.rgb = uvec3( luvToRgb( value.rgb ) * 255 ); break;
+	case RGB:		converted.rgb = uvec3( value * 255.0f ); break;
+	case SRGB:		converted.rgb = uvec3( srgb_to_rgb( value.rgb ) * 255.0f ); break;
+	case XYZ:		converted.rgb = uvec3( xyz_to_rgb( value.rgb ) * 255.0f ); break;
+	case XYY:		converted.rgb = uvec3( xyY_to_rgb( value.rgb ) * 255.0f ); break;
+	case HSV:		converted.rgb = uvec3( hsv_to_rgb( value.rgb ) * 255.0f ); break;
+	case HSL:		converted.rgb = uvec3( hsl_to_rgb( value.rgb ) * 255.0f ); break;
+	case HCY:		converted.rgb = uvec3( hcy_to_rgb( value.rgb ) * 255.0f ); break;
+	case YPBPR:		converted.rgb = uvec3( ypbpr_rgb( value.rgb ) * 255.0f ); break;
+	case YPBPR601:	converted.rgb = uvec3( ypbpr_rgb_bt601( value.rgb ) * 255.0f ); break;
+	case YCBCR1:	converted.rgb = uvec3( ycbcr_to_rgb( value.rgb ) * 255.0f ); break;
+	case YCBCR2:	converted.rgb = uvec3( ycbcr_rgb( value.rgb ) * 255.0f ); break;
+	case YCCBCCRC:	converted.rgb = uvec3( yccbccrc_rgb( value.rgb ) * 255.0f ); break;
+	case YCOCG:		converted.rgb = uvec3( ycocg_rgb( value.rgb ) * 255.0f ); break;
+	case BCH:		converted.rgb = uvec3( bch2RGB( value.rgb ) * 255.0f ); break;
+	case CHROMAMAX:	converted.rgb = uvec3( cm2rgb( value.rgba ) * 255.0f ); break;
+	case OKLAB:		converted.rgb = uvec3( linear_srgb_from_oklab( value.rgb ) * 255.0f ); break;
+	case OKHSL:		converted.rgb = uvec3( okhsl_to_srgb( value.rgb ) * 255.0f ); break;
+	case OKHSV:		converted.rgb = uvec3( okhsv_to_srgb( value.rgb ) * 255.0f ); break;
+	case OKLCH:		converted.rgb = uvec3( oklch2srgb( value.rgb ) * 255.0f ); break;
+	case LCH:		converted.rgb = uvec3( lchToRgb( value.rgb ) * 255.0f ); break;
+	case HSLUV:		converted.rgb = uvec3( hsluvToRgb( value.rgb ) * 255.0f ); break;
+	case HPLUV:		converted.rgb = uvec3( hpluvToRgb( value.rgb ) * 255.0f ); break;
+	case LUV:		converted.rgb = uvec3( luvToRgb( value.rgb ) * 255.0f ); break;
 	default: break;
 	}
 	return converted;

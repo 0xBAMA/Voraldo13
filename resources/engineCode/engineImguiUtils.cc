@@ -43,18 +43,18 @@ void engine::OrangeText ( const char *string ) {
 	ImGui::PopStyleColor();
 }
 
-void engine::CollapsingSection ( string labelString, category_t x, int &current ) {
+void engine::CollapsingSection ( string labelString, category_t x, unsigned int &current ) {
 		if ( ImGui::CollapsingHeader( labelString.c_str() ) ) {
 			while ( current < menu.entries.size() && menu.entries[current].category == x ) {
-				std::string label = std::string("  ") + menu.entries[current].label;
-				if ( ImGui::Selectable(label.c_str(), currentlySelectedMenuItem == current ) ) {
+				std::string label = std::string( "  " ) + menu.entries[current].label;
+				if ( ImGui::Selectable( label.c_str(), currentlySelectedMenuItem == current ) ) {
 					currentlySelectedMenuItem = current;
 				}
 				current++;
 			}
 		}
 		else { /* if collapsed, bump current to compensate */
-			while (current < menu.entries.size() && menu.entries[current].category == x ) {
+			while ( current < menu.entries.size() && menu.entries[current].category == x ) {
 				current++;
 			}
 		}
@@ -80,7 +80,7 @@ void engine::MenuLayout( bool* p_open ) {
 // =============================================================================
 		{
 			ImGui::BeginChild( "TreeView", ImVec2( 185, 0 ), true );
-			int current = 0;
+			unsigned int current = 0;
 
 			CollapsingSection( "Shapes", category_t::shapes, current );
 			CollapsingSection( "Utilities", category_t::utilities, current );
@@ -2563,9 +2563,14 @@ void engine::MenuPostProcessingSettings () {
 	ImGui::Combo( "Dither Mode", &render.ditherMode, ditherModeList, IM_ARRAYSIZE( ditherModeList ) );
 
 	// color space picker ( quantize or distance metric for palette )
-	const char* colorspaceModesList[] = { " RGB", " SRGB", " XYZ", " XYY", " HSV", " HSL", " HCY",
-		" YPBPR", " YPBPR601", " YCBCR1", " YCBCR2", " YCCBCCRC", " YCOCG", " BCH", " CHROMAMAX",
-		" OKLAB" };
+	const char* colorspaceModesList[] = {
+		" RGB", " SRGB", " XYZ", " XYY",
+		" HSV", " HSL", " HCY", " YPBPR",
+		" YPBPR601", " YCBCR1", " YCBCR2",
+		" YCCBCCRC", " YCOCG", " BCH",
+		" CHROMAMAX", " OKLAB", " OKHSL",
+		" OKHSV", " OKLCH", " LCH",
+		" HSLUV", " HPLUV", " LUV" };
 
 	const char* ditherPatternList[] = {  " None", " Bayer 2x2", " Bayer 4x4", " Bayer 8x8",
 		" Blue Noise Single Channel", " Blue Noise Three Channel", " Blue Noise Single Channel ( Cycled )",
